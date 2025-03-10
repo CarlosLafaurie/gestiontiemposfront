@@ -1,0 +1,32 @@
+<h2>Gestión de Personal - Obra: {{ nombreObra }}</h2>
+
+<table border="1">
+    <thead>
+      <tr>
+        <th>Seleccionar</th>  <!-- Columna para seleccionar empleados -->
+        <th>Cédula</th>
+        <th>Nombre Completo</th>
+        <th>Cargo</th>
+        <th>Obra</th>
+        <th>Responsable</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let empleado of empleadosFiltrados">
+        <td>
+          <input type="checkbox" [(ngModel)]="empleado.seleccionado" />
+        </td>
+        <td>{{ empleado.cedula }}</td>
+        <td>{{ empleado.nombreCompleto }}</td>
+        <td>{{ empleado.cargo }}</td>
+        <td>{{ empleado.obra }}</td>
+        <td>{{ empleado.responsable }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+<button (click)="gestionarTiempos()" class="btn btn-primary">
+  Gestionar Tiempos
+</button>
+
+<app-lista-tiempos *ngIf="empleadosSeleccionados.length > 0" [empleadosSeleccionados]="empleadosSeleccionados"></app-lista-tiempos>

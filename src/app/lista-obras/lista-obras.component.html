@@ -1,0 +1,22 @@
+<div class="container">
+    <h2 class="title">Lista de Obras</h2>
+  
+    <p *ngIf="obrasFiltradas.length === 0" class="no-data">
+      No hay obras disponibles.
+    </p>
+  
+    <div class="obra-list">
+      <div *ngFor="let obra of obrasFiltradas" class="obra-card">
+        <h3>{{ obra.nombreObra }}</h3>
+        <p><strong>Responsable:</strong> {{ obra.responsable }}</p>
+        <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
+        <button (click)="verDetalles(obra.id)" class="btn-detalles">
+          Ver Detalles
+        </button>
+        <button (click)="eliminarObra(obra.id)" class="btn-eliminar">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+  

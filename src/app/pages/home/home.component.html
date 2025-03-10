@@ -1,0 +1,14 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <div class="card" [ngClass]="{
+      'admin-card': cargo === 'admin',
+      'cliente-card': cargo === 'cliente',
+      'responsable-card': cargo === 'responsable'
+    }">
+    <h2>Bienvenido</h2>
+    <p *ngIf="cargo === 'admin'">Tienes acceso total al sistema.</p>
+    <p *ngIf="cargo === 'cliente'">Puedes explorar y comprar productos.</p>
+    <p *ngIf="cargo === 'responsable'">Eres responsable de la gestión interna.</p>
+    <app-lista-obras [cargo]="cargo" [usuario]="usuario"></app-lista-obras>
+  </div>
+</div>

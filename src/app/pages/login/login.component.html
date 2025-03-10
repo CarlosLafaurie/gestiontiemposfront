@@ -1,0 +1,11 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="cedula">Cédula:</label>
+    <input id="cedula" formControlName="cedula" type="text" />
+  </div>
+  <div>
+    <label for="contrasena">Contraseña:</label>
+    <input type="password" id="contrasena" formControlName="contrasena" />
+  </div>
+  <button type="submit" [disabled]="loginForm.invalid">Iniciar sesión</button>
+</form>

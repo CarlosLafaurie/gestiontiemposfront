@@ -1,0 +1,47 @@
+<form (ngSubmit)="guardarTiempos()">
+    <label for="tipoRegistro">Tipo de registro:</label>
+    <select id="tipoRegistro" [(ngModel)]="tipoRegistro" (change)="generarListaTiempos()" name="tipoRegistro">
+      <option value="entrada">Entrada</option>
+      <option value="salida">Salida</option>
+    </select>
+  
+    <div *ngFor="let tiempo of listaTiempos">
+      <h3>{{ tiempo.empleado.nombreCompleto }}</h3>
+  
+      <label>Fecha y Hora:</label>
+      <input 
+        type="datetime-local" 
+        [(ngModel)]="tiempo.fechaHoraEntrada" 
+        *ngIf="tipoRegistro === 'entrada'" 
+        [name]="'fechaHoraEntrada' + tiempo.empleadoId" 
+        [ngModelOptions]="{ standalone: true }"
+      >
+  
+      <input 
+        type="datetime-local" 
+        [(ngModel)]="tiempo.fechaHoraSalida" 
+        *ngIf="tipoRegistro === 'salida'" 
+        [name]="'fechaHoraSalida' + tiempo.empleadoId" 
+        [ngModelOptions]="{ standalone: true }"
+      >
+  
+      <label>Comentarios:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="tiempo.comentarios" 
+        [name]="'comentarios' + tiempo.empleadoId" 
+        [ngModelOptions]="{ standalone: true }"
+      >
+  
+      <label>Permisos Especiales:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="tiempo.permisosEspeciales" 
+        [name]="'permisos' + tiempo.empleadoId" 
+        [ngModelOptions]="{ standalone: true }"
+      >
+    </div>
+  
+    <button type="submit">Guardar Tiempos</button>
+  </form>
+  

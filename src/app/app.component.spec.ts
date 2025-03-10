@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-
+console.log('Starting application2...');
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
