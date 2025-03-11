@@ -9,14 +9,6 @@ export interface Tiempo {
   fechaHoraSalida: string | null;  // Permitir null
   comentarios: string;
   permisosEspeciales: string;
-  empleado: {
-    id: number;
-    cedula: string;
-    nombreCompleto: string;
-    cargo: string;
-    obra: string;
-    responsable: string;
-  };
 }
 
 

@@ -1,47 +1,47 @@
-<form (ngSubmit)="guardarTiempos()">
-    <label for="tipoRegistro">Tipo de registro:</label>
-    <select id="tipoRegistro" [(ngModel)]="tipoRegistro" (change)="generarListaTiempos()" name="tipoRegistro">
+<form (ngSubmit)="guardarTiempos()" class="formulario-tiempos">
+  <div class="form-group">
+    <label for="tipoRegistro" class="form-label">Tipo de registro:</label>
+    <select id="tipoRegistro" [(ngModel)]="tipoRegistro" name="tipoRegistro" class="form-control" (change)="actualizarHoras()">
       <option value="entrada">Entrada</option>
       <option value="salida">Salida</option>
     </select>
-  
-    <div *ngFor="let tiempo of listaTiempos">
-      <h3>{{ tiempo.empleado.nombreCompleto }}</h3>
-  
-      <label>Fecha y Hora:</label>
-      <input 
-        type="datetime-local" 
-        [(ngModel)]="tiempo.fechaHoraEntrada" 
-        *ngIf="tipoRegistro === 'entrada'" 
-        [name]="'fechaHoraEntrada' + tiempo.empleadoId" 
-        [ngModelOptions]="{ standalone: true }"
-      >
-  
-      <input 
-        type="datetime-local" 
-        [(ngModel)]="tiempo.fechaHoraSalida" 
-        *ngIf="tipoRegistro === 'salida'" 
-        [name]="'fechaHoraSalida' + tiempo.empleadoId" 
-        [ngModelOptions]="{ standalone: true }"
-      >
-  
-      <label>Comentarios:</label>
-      <input 
-        type="text" 
-        [(ngModel)]="tiempo.comentarios" 
-        [name]="'comentarios' + tiempo.empleadoId" 
-        [ngModelOptions]="{ standalone: true }"
-      >
-  
-      <label>Permisos Especiales:</label>
-      <input 
-        type="text" 
-        [(ngModel)]="tiempo.permisosEspeciales" 
-        [name]="'permisos' + tiempo.empleadoId" 
-        [ngModelOptions]="{ standalone: true }"
-      >
+  </div>
+
+  <div class="form-group">
+    <label for="fechaHoraGlobal" class="form-label">Fecha y Hora (global):</label>
+    <input type="datetime-local" [(ngModel)]="fechaHoraGlobal" name="fechaHoraGlobal" class="form-control" (change)="actualizarHoras()">
+  </div>
+
+  <!-- Se muestra un resumen en forma de tabla de los registros generados -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <h5>Registro de Tiempos</h5>
     </div>
-  
-    <button type="submit">Guardar Tiempos</button>
-  </form>
-  
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Empleado</th>
+            <th>Comentarios</th>
+            <th>Permisos Especiales</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tiempo of listaTiempos; let i = index">
+            <td>{{ tiempo.nombreEmpleado }}</td>
+            <td>
+              <input type="text" [(ngModel)]="tiempo.comentarios" [name]="'comentarios' + i" class="form-control">
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="tiempo.permisosEspeciales" [name]="'permisos' + i" class="form-control">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="!esValidoParaGuardar()" class="btn btn-primary mt-3">
+    Guardar Tiempos
+  </button>
+</form>
