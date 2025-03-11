@@ -1,0 +1,29 @@
+<div class="usuarios-admin">
+    <h2>Administración de Usuarios</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cédula</th>
+          <th>Nombre Completo</th>
+          <th>Cargo</th>
+          <th>Obra</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios">
+          <td>{{ usuario.id }}</td>
+          <td>{{ usuario.cedula }}</td>
+          <td>{{ usuario.nombreCompleto }}</td>
+          <td>{{ usuario.cargo }}</td>
+          <td>{{ usuario.obra }}</td>
+          <td>
+            <button (click)="editarUsuario(usuario)">Editar</button>
+            <button (click)="eliminarUsuario(usuario.id)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

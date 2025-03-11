@@ -1,8 +1,9 @@
 <nav>
-    <ul>
-      <li><a routerLink="/home">Inicio</a></li>
-      <li><a routerLink="/profile">Perfil</a></li>
-      <li><button (click)="logout()">Cerrar sesión</button></li>
-    </ul>
-  </nav>
-  
+  <ul>
+    <li><a (click)="home()">Inicio</a></li>
+    <li><a routerLink="/profile">Perfil</a></li>
+    <!-- Solo se muestra el enlace al Panel de Control si el usuario es admin -->
+    <li *ngIf="isAdmin()"><a (click)="panel()">Panel de Control</a></li>
+    <li><button (click)="logout()">Cerrar sesión</button></li>
+  </ul>
+</nav>

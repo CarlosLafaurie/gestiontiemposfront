@@ -27,6 +27,7 @@ export class AuthService {
 
   saveToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
+    console.log("AuthGuard - Token encontrado:", token);
   }
 
   getToken(): string | null {

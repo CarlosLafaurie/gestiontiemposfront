@@ -53,13 +53,21 @@ export class GestionPersonalComponent implements OnInit {
   }
 
   filtrarEmpleados() {
-    // Filtra los empleados según la obra y el responsable
-    this.empleadosFiltrados = this.empleados.filter(
-      empleado =>
-        empleado.obra.trim().toLowerCase() === this.nombreObra.trim().toLowerCase() &&
-        empleado.responsable.trim().toLowerCase() === this.responsable.trim().toLowerCase()
-    );
+    const obraFiltro = this.nombreObra.trim().toLowerCase();
+    // Si el usuario es administrador, se ignora el filtro por responsable
+    if (this.responsable.trim().toLowerCase() === 'admin') {
+      this.empleadosFiltrados = this.empleados.filter(
+        empleado => empleado.obra.trim().toLowerCase() === obraFiltro
+      );
+    } else {
+      this.empleadosFiltrados = this.empleados.filter(
+        empleado =>
+          empleado.obra.trim().toLowerCase() === obraFiltro &&
+          empleado.responsable.trim().toLowerCase() === this.responsable.trim().toLowerCase()
+      );
+    }
   }
+  
 
   gestionarTiempos() {
     // Actualiza automáticamente el arreglo de empleados seleccionados cada vez que se marque un checkbox.

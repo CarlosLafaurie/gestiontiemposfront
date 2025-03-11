@@ -9,7 +9,7 @@
       <p><strong>Nombre:</strong> {{ obra.nombreObra }}</p>
       <p><strong>Responsable:</strong> {{ obra.responsable }}</p>
       <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
-      <button (click)="irAGestionPersonal()">Gestionar Personal</button>
+      <button *ngIf="cargo !== 'cliente'" (click)="irAGestionPersonal()">Gestionar Personal</button>
       <button (click)="volver()">Volver</button>
     </div>
   
