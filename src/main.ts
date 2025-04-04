@@ -9,6 +9,6 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
-    provideToastr() // <-- Agregar esta línea
+    provideToastr()
   ]
 }).catch(err => console.error(err));

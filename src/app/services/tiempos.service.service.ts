@@ -1,52 +1,64 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 
 export interface Tiempo {
-  id: number;
+  id?: number;
   empleadoId: number;
-  fechaHoraEntrada: string | null; // Permitir null
-  fechaHoraSalida: string | null;  // Permitir null
+  fechaHoraEntrada?: string | null;
+  fechaHoraSalida?: string | null;
   comentarios: string;
   permisosEspeciales: string;
+  nombreEmpleado?: string;
 }
-
 
 @Injectable({
   providedIn: 'root',
 })
 export class TiemposService {
-  private apiUrl = 'https://localhost:7280/api/tiemposg'; // URL del API
+  private apiIngresos = 'https://localhost:7280/api/IngresosPersonal';
+  private apiSalidas = 'https://localhost:7280/api/SalidasPersonal';
 
   constructor(private http: HttpClient) {}
 
-  // Obtener todos los registros de tiempos
-  getTiempos(): Observable<Tiempo[]> {
-    return this.http.get<Tiempo[]>(this.apiUrl);
+  obtenerIngresos(): Observable<Tiempo[]> {
+    return this.http.get<Tiempo[]>(this.apiIngresos);
   }
 
-  // Obtener un tiempo específico por ID de empleado
-  getTiempoByEmpleadoId(empleadoId: number): Observable<Tiempo[]> {
-    return this.http.get<Tiempo[]>(`${this.apiUrl}?empleadoId=${empleadoId}`);
+  obtenerIngresoPorEmpleado(empleadoId: number): Observable<Tiempo[]> {
+    return this.http.get<Tiempo[]>(`${this.apiIngresos}?empleadoId=${empleadoId}`);
   }
 
-  // Crear un nuevo registro de tiempo
-  createTiempo(tiempo: Tiempo): Observable<Tiempo> {
-    return this.http.post<Tiempo>(this.apiUrl, tiempo);
+  actualizarIngreso(id: number, tiempo: Tiempo): Observable<void> {
+    return this.http.put<void>(`${this.apiIngresos}/${id}`, tiempo);
   }
 
-  // Editar un registro de tiempo
-  updateTiempo(id: number, tiempo: Tiempo): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, tiempo);
+  eliminarIngreso(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiIngresos}/${id}`);
   }
 
-  // Eliminar un registro de tiempo
-  deleteTiempo(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  obtenerSalidas(): Observable<Tiempo[]> {
+    return this.http.get<Tiempo[]>(this.apiSalidas);
   }
 
-  // Crear múltiples registros de tiempos
-  guardarTiempos(tiempos: Tiempo[]): Observable<Tiempo[]> {
-    return this.http.post<Tiempo[]>(`${this.apiUrl}/bulk`, tiempos);
-  }  
+  obtenerSalidaPorEmpleado(empleadoId: number): Observable<Tiempo[]> {
+    return this.http.get<Tiempo[]>(`${this.apiSalidas}?empleadoId=${empleadoId}`);
+  }
+
+  registrarIngreso(tiempo: Tiempo): Observable<any> {
+    return this.http.post(`${this.apiIngresos}`, tiempo).pipe(
+      catchError((err) => {
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+  registrarSalida(tiempo: Tiempo): Observable<any> {
+    return this.http.post(`${this.apiSalidas}`, tiempo).pipe(
+      catchError((err) => {
+        return throwError(() => err);
+      })
+    );
+  }
 }

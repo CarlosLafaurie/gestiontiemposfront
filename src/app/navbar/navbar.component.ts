@@ -17,8 +17,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     const userData = this.authService.getUserData();
-    // Verifica que el cargo sea "admin" (ignorando mayúsculas)
-    this.isAdminFlag = userData && userData.cargo.toLowerCase() === 'admin';
+    this.isAdminFlag = userData && userData.rol.toLowerCase() === 'admin';
   }
 
   home(): void {
@@ -27,6 +26,10 @@ export class NavbarComponent implements OnInit {
 
   panel(): void {
     this.router.navigate(['/panel-control']);
+  }
+
+  profile(): void {
+    this.router.navigate(['/profile']);
   }
 
   isAdmin(): boolean {

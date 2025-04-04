@@ -9,7 +9,10 @@ export interface Empleado {
   cargo: string;
   obra: string;
   responsable: string;
-  seleccionado?: boolean; // ← Agregar esta propiedad opcional
+  responsableSecundario?: string;
+  salario: number;
+  estado?: string;
+  seleccionado?: boolean;
 }
 
 

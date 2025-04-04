@@ -1,0 +1,88 @@
+.tiempos-admin {
+
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 4% 0px 5%;
+  text-align: center;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+#title {
+  padding-top: 2%;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+  margin-top: 20px;
+  margin-bottom: 3%;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.table thead {
+  background-color: #333;
+  color: #fff;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+
+#btn {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+#btn:hover {
+  background-color: #075e04;
+}
+
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tiempos-admin {
+    padding: 10px;
+  }
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+  .btn-agregar {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}

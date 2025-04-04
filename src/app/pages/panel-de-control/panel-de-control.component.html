@@ -1,16 +1,47 @@
-<!-- panel-de-control.component.html -->
 <app-navbar></app-navbar>
+
+<div id="title">
+  <h1>Bienvenido al panel de control</h1>
+</div>
+
 <div class="container">
-    <h1>Panel de Control</h1>
-    <p>Bienvenido, Administrador. Aquí puedes gestionar la aplicación.</p>
-    <button (click)="logout()" class="btn btn-danger">Cerrar sesión</button>
-  </div>
   <div class="card">
     <div class="card-header">
       <h3>Usuarios</h3>
     </div>
     <div class="card-body">
       <p>Gestiona todos los usuarios del sistema.</p>
-      <button class="btn" (click)="irAUsuariosAdmin()">Gestionar Usuarios</button>
+      <button class="btn" (click)="irAUsuariosAdmin()"><i class='bx bx-user' style='color:#ffffff' > </i> <b> Gestionar Usuarios</b></button>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Empleados</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona todos los empleados del sistema.</p>
+      <button class="btn" (click)="irAEmpleadosAdmin()"><i class='bx bxs-hard-hat' style='color:#ffffff' > </i> <b> Gestionar Empleados</b></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Obras</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona todas las obras del sistema.</p>
+      <button class="btn" (click)="irAObrasAdmin()"><i class='bx bx-briefcase-alt-2' style='color:#ffffff' > </i> <b> Gestionar Obras</b></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Tiempos</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona todos los tiempos de los empleados del sistema.</p>
+      <button class="btn" (click)="irATiemposAdmin()"><i class='bx bx-time-five' style='color:#ffffff' > </i> <b> Gestionar Tiempos</b></button>
+    </div>
+  </div>
+</div>

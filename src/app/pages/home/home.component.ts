@@ -13,15 +13,14 @@ import { ListaObrasComponent } from '../../lista-obras/lista-obras.component';
 })
 export class HomeComponent implements OnInit {
   authService = inject(AuthService);
-  cargo: string | null = null;
+  rol: string | null = null;
   usuario: string | null = null;
 
   ngOnInit() {
-    const userData = this.authService.getUserData(); 
+    const userData = this.authService.getUserData();
     if (userData) {
-      this.cargo = userData.cargo || null;
+      this.rol = userData.rol || null;
       this.usuario = userData.nombreCompleto || null;
     }
-    console.log("Cargo:", this.cargo, "Usuario:", this.usuario);
   }
 }

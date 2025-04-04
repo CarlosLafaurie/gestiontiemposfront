@@ -11,8 +11,8 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule]
 })
 export class ListaObrasComponent implements OnInit {
-  @Input() cargo: string | null = null;
-  @Input() usuario: string | null = null; 
+  @Input() rol: string | null = null;
+  @Input() usuario: string | null = null;
 
   obras: Obra[] = [];
   obrasFiltradas: Obra[] = [];
@@ -20,50 +20,56 @@ export class ListaObrasComponent implements OnInit {
   constructor(private obraService: ObraService, private router: Router) {}
 
   ngOnInit(): void {
-    if (!this.usuario || !this.cargo) {
-      const usuarioData = localStorage.getItem('usuario'); 
+    console.log('🟢 ListaObrasComponent inicializado.');
+
+    if (!this.usuario || !this.rol) {
+      const usuarioData = localStorage.getItem('usuario');
       if (usuarioData) {
-        const usuarioObj = JSON.parse(usuarioData); 
+        const usuarioObj = JSON.parse(usuarioData);
         this.usuario = usuarioObj.nombreCompleto;
-        this.cargo = usuarioObj.cargo; 
+        this.rol = usuarioObj.rol;
+      } else {
+        console.log('❌ No se encontraron datos de usuario en localStorage.');
       }
     }
 
-    console.log("Recibido en ListaObrasComponent - Cargo:", this.cargo, "Usuario:", this.usuario);
-
-    if (this.usuario && this.cargo) {
+    if (this.usuario && this.rol) {
       this.obtenerObras();
+    } else {
+      console.log('⛔ No hay usuario o rol definido. No se cargarán obras.');
     }
   }
 
   obtenerObras() {
-    this.obraService.getObras().subscribe((data) => {
-      this.obras = data;
-      this.filtrarObras(data);
+    console.log('📡 Solicitando lista de obras al servicio...');
+    this.obraService.getObras().subscribe({
+      next: (data) => {
+        console.log('✅ Obras recibidas:', data);
+        this.obras = data;
+        this.filtrarObras(data);
+      },
+      error: (err) => {
+        console.error('❌ Error al obtener las obras:', err);
+      }
     });
   }
- 
+
+
+
   filtrarObras(obras: Obra[]) {
-    console.log("Usuario:", this.usuario, "Cargo:", this.cargo);
-    console.log("Obras sin filtrar:", obras);
-  
-    if (this.cargo === 'admin') {
-      this.obrasFiltradas = obras; 
-    } else if (this.cargo === 'responsable') {
-      this.obrasFiltradas = obras.filter(obra => {
-        console.log(`Comparando responsable: '${obra.responsable.trim().toLowerCase()}' con usuario: '${this.usuario?.trim().toLowerCase()}'`);
-        return obra.responsable.trim().toLowerCase() === this.usuario?.trim().toLowerCase();
-      });
-    } else if (this.cargo === 'cliente') {
-      this.obrasFiltradas = obras.filter(obra => {
-        console.log(`Comparando clienteObra: '${obra.clienteObra.trim().toLowerCase()}' con usuario: '${this.usuario?.trim().toLowerCase()}'`);
-        return obra.clienteObra.trim().toLowerCase() === this.usuario?.trim().toLowerCase();
-      });
+    if (this.rol === 'admin') {
+      this.obrasFiltradas = obras;
+    } else if (this.rol === 'responsable') {
+      this.obrasFiltradas = obras.filter(obra =>
+        obra.responsable.trim().toLowerCase() === this.usuario?.trim().toLowerCase() ||
+        (obra.responsableSecundario?.trim().toLowerCase() ?? '') === this.usuario?.trim().toLowerCase()
+      );
+    } else if (this.rol === 'cliente') {
+      this.obrasFiltradas = obras.filter(obra =>
+        obra.clienteObra.trim().toLowerCase() === this.usuario?.trim().toLowerCase()
+      );
     }
-  
-    console.log("Obras filtradas:", this.obrasFiltradas);
   }
-  
 
   verDetalles(id: number) {
     this.router.navigate(['/obra', id]);

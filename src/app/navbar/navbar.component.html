@@ -1,9 +1,8 @@
 <nav>
   <ul>
-    <li><a (click)="home()">Inicio</a></li>
-    <li><a routerLink="/profile">Perfil</a></li>
-    <!-- Solo se muestra el enlace al Panel de Control si el usuario es admin -->
-    <li *ngIf="isAdmin()"><a (click)="panel()">Panel de Control</a></li>
-    <li><button (click)="logout()">Cerrar sesión</button></li>
+    <li><a (click)="home()"><i class='bx bx-home-alt-2'></i></a></li>
+    <li><button (click)="profile()"><i class='bx bx-user'></i></button></li>
+    <li *ngIf="isAdmin()"><a (click)="panel()"><i class='bx bx-book-content'></i></a></li>
+    <li id="logout"><button (click)="logout()"><i class='bx bx-log-out'></i></button></li>
   </ul>
 </nav>

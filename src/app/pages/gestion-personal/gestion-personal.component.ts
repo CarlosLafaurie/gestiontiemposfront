@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { ActivatedRoute } from '@angular/router';
 import { EmpleadoService, Empleado } from '../../services/empleado-service.service';
+import { TiemposService, Tiempo } from '../../services/tiempos.service.service';
 import { CommonModule } from '@angular/common';
 import { ListaTiemposComponent } from '../../lista-tiempos/lista-tiempos.component';
 import { FormsModule } from '@angular/forms';
-import { NavbarComponent } from "../../navbar/navbar.component";
+import { NavbarComponent } from '../../navbar/navbar.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-gestion-personal',
@@ -17,72 +18,104 @@ import { NavbarComponent } from "../../navbar/navbar.component";
 export class GestionPersonalComponent implements OnInit {
   nombreObra: string = '';
   responsable: string = '';
+  rol: string = '';
   empleados: Empleado[] = [];
   empleadosFiltrados: Empleado[] = [];
-  empleadosSeleccionados: any[] = []; // Se almacenarán { id, nombre }
+  empleadosSeleccionados: any[] = [];
+  guardandoTiempos = false;
+  searchQuery: string = ''; 
 
-  constructor(
-    private route: ActivatedRoute,
-    private empleadoService: EmpleadoService,
-    private authService: AuthService,
-     private router: Router
-  ) {}
+  private route = inject(ActivatedRoute);
+  private empleadoService = inject(EmpleadoService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private tiemposService = inject(TiemposService);
 
   ngOnInit(): void {
-    // Recupera el nombre de la obra de la URL
     this.route.paramMap.subscribe(params => {
       this.nombreObra = params.get('nombreObra')?.replace(/-/g, ' ') || '';
+      this.obtenerEmpleados();
     });
 
-    // Recupera el nombre del responsable desde localStorage
     const usuario = localStorage.getItem('usuario');
     if (usuario) {
       const usuarioParseado = JSON.parse(usuario);
       this.responsable = usuarioParseado.nombreCompleto;
+      this.rol = usuarioParseado.rol;
     }
-
-    this.obtenerEmpleados();
   }
 
-  obtenerEmpleados() {
+  obtenerEmpleados(): void {
     this.empleadoService.obtenerEmpleados().subscribe((data) => {
-      // Agrega la propiedad "seleccionado" a cada empleado para el checkbox
       this.empleados = data.map(emp => ({ ...emp, seleccionado: false }));
       this.filtrarEmpleados();
     });
   }
 
-  filtrarEmpleados() {
+  filtrarEmpleados(): void {
     const obraFiltro = this.nombreObra.trim().toLowerCase();
-    // Si el usuario es administrador, se ignora el filtro por responsable
-    if (this.responsable.trim().toLowerCase() === 'admin') {
-      this.empleadosFiltrados = this.empleados.filter(
-        empleado => empleado.obra.trim().toLowerCase() === obraFiltro
-      );
-    } else {
-      this.empleadosFiltrados = this.empleados.filter(
-        empleado =>
-          empleado.obra.trim().toLowerCase() === obraFiltro &&
-          empleado.responsable.trim().toLowerCase() === this.responsable.trim().toLowerCase()
+
+    // Filtrar por obra primero
+    this.empleadosFiltrados = this.empleados.filter(empleado =>
+      empleado.obra.trim().toLowerCase() === obraFiltro
+    );
+
+    // Aplicar la búsqueda dentro de los empleados ya filtrados
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      this.empleadosFiltrados = this.empleadosFiltrados.filter(u =>
+        (u.nombreCompleto && u.nombreCompleto.toLowerCase().includes(q)) ||
+        (u.responsable && u.responsable.toLowerCase().includes(q)) ||
+        (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
+        (u.cedula && u.cedula.toLowerCase().includes(q)) ||
+        (u.cargo && u.cargo.toLowerCase().includes(q)) ||
+        (u.obra && u.obra.toLowerCase().includes(q))
       );
     }
   }
-  
 
-  gestionarTiempos() {
-    // Actualiza automáticamente el arreglo de empleados seleccionados cada vez que se marque un checkbox.
-    this.empleadosSeleccionados = this.empleadosFiltrados
-      .filter(e => e.seleccionado)
-      .map(e => ({
-        id: e.id,
-        nombre: e.nombreCompleto
-      }));
-
-    console.log("✅ Empleados seleccionados para lista de tiempos:", this.empleadosSeleccionados);
+  gestionarTiempos(): void {
+    this.empleadosSeleccionados = this.empleadosFiltrados.filter(e => e.seleccionado).map(e => ({ id: e.id, nombre: e.nombreCompleto }));
   }
 
-  logout() {
+  registrarIngreso(): void {
+    this.registrarTiempos('ingreso');
+  }
+
+  registrarSalida(): void {
+    this.registrarTiempos('salida');
+  }
+
+  private registrarTiempos(accion: 'ingreso' | 'salida'): void {
+    this.guardandoTiempos = true;
+    const observables = this.empleadosSeleccionados.map(empleado => {
+      const tiempo: Tiempo = {
+        empleadoId: empleado.id,
+        fechaHoraEntrada: accion === 'ingreso' ? new Date().toISOString() : null,
+        fechaHoraSalida: accion === 'salida' ? new Date().toISOString() : null,
+        comentarios: '',
+        permisosEspeciales: '',
+      };
+      return accion === 'ingreso' ? this.tiemposService.registrarIngreso(tiempo) : this.tiemposService.registrarSalida(tiempo);
+    });
+
+    forkJoin(observables).subscribe({
+      next: () => {
+        alert(`✅ ${accion === 'ingreso' ? 'Ingresos' : 'Salidas'} registradas correctamente.`);
+        window.location.reload();
+      },
+      error: (err) => {
+        console.error(`❌ Error al registrar ${accion}`, err);
+        alert(`❌ Error al registrar ${accion}.`);
+      },
+      complete: () => {
+        this.guardandoTiempos = false;
+      }
+    });
+  }
+
+  logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']); 
+    this.router.navigate(['/login']);
   }
 }

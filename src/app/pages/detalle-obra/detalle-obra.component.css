@@ -1,4 +1,11 @@
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+ padding-top: 7%;
+}
+
 .detalle-obra {
+  padding-top: 10%;
     max-width: 500px;
     margin: 20px auto;
     padding: 20px;
@@ -6,17 +13,17 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background: #fff;
   }
-  
+
   h2 {
     text-align: center;
     color: #333;
   }
-  
+
   p {
     font-size: 16px;
     margin: 10px 0;
   }
-  
+
   button {
     display: block;
     width: 100%;
@@ -24,13 +31,58 @@
     margin-top: 20px;
     border: none;
     border-radius: 5px;
-    background: #007bff;
+    background: rgba(186,207,18,255);
     color: white;
     font-size: 16px;
     cursor: pointer;
   }
-  
+
   button:hover {
-    background: #0056b3;
+    background-color: #075e04;
   }
-  
+
+@media (max-width: 768px) {
+  .container {
+    padding-top: 8%;
+    padding-bottom: 5%;
+    max-width: 90%;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .obra-card {
+    padding: 15px;
+  }
+
+  .btn-detalles,
+  .btn-eliminar {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .container {
+    padding-top: 15%;
+    padding-bottom: 10%;
+    max-width: 90%;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .obra-card {
+    padding: 10px;
+  }
+
+  .btn-detalles,
+  .btn-eliminar {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+}
+

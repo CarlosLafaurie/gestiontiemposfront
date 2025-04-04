@@ -1,0 +1,19 @@
+<app-navbar></app-navbar>
+
+
+<div class="container">
+  <div class="image-container">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBYjo1_UfbblCBlBfSt0Rz5y1DPXxD5pVDag&s" id="image">
+  </div>
+  <div *ngIf="user; else loading">
+    <h2>Perfil de Usuario</h2>
+    <p><strong>Nombre:</strong> {{ user.nombreCompleto || user.name }}</p>
+    <p><strong>cedula:</strong> {{ user.cedula }}</p>
+    <p><strong>Rol:</strong> {{ user.rol }}</p>
+    <p><strong>cargo:</strong> {{ user.cargo }}</p>
+    <p><strong>obra:</strong> {{ user.obra }}</p>
+  </div>
+</div>
+<ng-template #loading>
+  <p>Cargando perfil...</p>
+</ng-template>

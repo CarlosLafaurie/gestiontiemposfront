@@ -7,7 +7,12 @@ import { DetalleObraComponent } from './pages/detalle-obra/detalle-obra.componen
 import { GestionPersonalComponent } from './pages/gestion-personal/gestion-personal.component';
 import { PanelDeControlComponent } from './pages/panel-de-control/panel-de-control.component';
 import { UsuariosAdminComponent } from './pages/usuarios-admin/usuarios-admin.component';
+import { EmpleadosAdminComponent } from './pages/empleados-admin/empleados-admin.component'
+import { ObrasAdminComponent } from './pages/obras-admin/obras-admin.component';
+import { TiemposAdminComponent } from './pages/tiempos-admin/tiempos-admin.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -16,11 +21,12 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
   { path: 'obras', component: ListaObrasComponent, canActivate: [authGuard] },
   { path: 'gestionIngresos/:nombreObra', component: GestionPersonalComponent, canActivate: [authGuard] },
-  { path: 'panel-control', component: PanelDeControlComponent, canActivate: [authGuard] },
-  { path: 'usuario-admin', component: PanelDeControlComponent, canActivate: [authGuard] },
-  
-
-  
+  { path: 'panel-control', component: PanelDeControlComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'usuario-admin', component: UsuariosAdminComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'empleado-admin', component: EmpleadosAdminComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'obras-admin', component: ObrasAdminComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'tiempos-admin', component: TiemposAdminComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'obra/:id', component: DetalleObraComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' }
 ];

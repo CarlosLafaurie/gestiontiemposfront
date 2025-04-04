@@ -18,14 +18,10 @@ export class PanelDeControlComponent implements OnInit {
 
   ngOnInit(): void {
     const userData = this.authService.getUserData();
-    // Verifica que el usuario tenga el cargo "admin" (ignorando mayúsculas)
-    if (!userData || userData.cargo.toLowerCase() !== 'admin') {
-      // Si no es administrador, redirige a la página principal
+    if (!userData || userData.rol.toLowerCase() !== 'admin') {
       this.router.navigate(['/home']);
     }
   }
-
-  
 
   logout(): void {
     this.authService.logout();
@@ -33,6 +29,23 @@ export class PanelDeControlComponent implements OnInit {
   }
 
   irAUsuariosAdmin(): void {
-    this.router.navigate(['/usuario-admin']);
+    this.router.navigate(['/usuario-admin']).then(success => {
+    });
   }
+
+  irAEmpleadosAdmin(): void {
+    this.router.navigate(['/empleado-admin']).then(success => {
+    });
+  }
+
+  irAObrasAdmin(): void {
+    this.router.navigate(['/obras-admin']).then(success => {
+    });
+  }
+
+  irATiemposAdmin(): void {
+    this.router.navigate(['/tiempos-admin']).then(success => {
+    });
+  }
+
 }

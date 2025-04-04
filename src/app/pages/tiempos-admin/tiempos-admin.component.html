@@ -1,0 +1,22 @@
+<app-navbar></app-navbar>
+
+<div class="tiempos-admin">
+  <h2>Total de Horas por Empleado</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre Completo</th>
+        <th>Total de Horas</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let resumen of resumenEmpleados">
+        <td>{{ resumen.id }}</td>
+        <td>{{ resumen.nombreCompleto }}</td>
+        <td>{{ resumen.totalHoras }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <button id="btn" (click)="exportarExcel()"><i class='bx bx-export' style='color:#ffffff' ></i> Exportar a Excel</button>
+</div>

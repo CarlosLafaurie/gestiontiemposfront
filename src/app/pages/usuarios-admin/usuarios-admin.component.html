@@ -1,29 +1,75 @@
+<app-navbar></app-navbar>
+
 <div class="usuarios-admin">
-    <h2>Administración de Usuarios</h2>
+  <h2 id="title">Administración de Usuarios</h2>
+
+  <div class="search-container">
+    <input type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" (ngModelChange)="filtrarUsuarios()" class="search-input">
+  </div>
+
+  <div class="table-responsive">
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Cédula</th>
+          <th>#</th>
           <th>Nombre Completo</th>
+          <th>Rol</th>
+          <th>Cédula</th>
           <th>Cargo</th>
           <th>Obra</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let usuario of usuarios">
-          <td>{{ usuario.id }}</td>
-          <td>{{ usuario.cedula }}</td>
+        <tr *ngFor="let usuario of usuariosFiltrados; let i = index">
+          <td>{{ i + 1 }}</td>
           <td>{{ usuario.nombreCompleto }}</td>
+          <td>{{ usuario.rol }}</td>
+          <td>{{ usuario.cedula }}</td>
           <td>{{ usuario.cargo }}</td>
           <td>{{ usuario.obra }}</td>
-          <td>
-            <button (click)="editarUsuario(usuario)">Editar</button>
-            <button (click)="eliminarUsuario(usuario.id)">Eliminar</button>
+          <td class="container-row">
+            <button (click)="copiarContrasena(usuario)" class="btn-copiar"><i class='bx bx-copy'></i></button>
+            <button (click)="mostrarFormularioUsuario(usuario)" class="btn-editar"><i class='bx bxs-edit'></i></button>
+            <button (click)="eliminarUsuario(usuario.id)" class="btn-eliminar"><i class='bx bx-trash' style='color:#ffffff'></i></button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-  
+
+  <button (click)="mostrarFormularioUsuario()" class="btn-agregar"><i class='bx bx-user-plus'></i> Agregar Usuario</button>
+
+  <div *ngIf="mostrarFormulario" class="modal">
+    <div class="modal-content">
+      <h3>{{ esEdicion ? 'Editar Usuario' : 'Agregar Usuario' }}</h3>
+
+      <label>Cédula:</label>
+      <input [(ngModel)]="usuarioActual.cedula" type="text" required>
+
+      <label>Nombre Completo:</label>
+      <input [(ngModel)]="usuarioActual.nombreCompleto" type="text" required>
+
+      <label>Cargo:</label>
+      <input [(ngModel)]="usuarioActual.cargo" type="text" required>
+
+      <label>Rol:</label>
+      <select [(ngModel)]="usuarioActual.rol" required>
+        <option value="admin">Admin</option>
+        <option value="responsable">Responsable</option>
+        <option value="cliente">Cliente</option>
+      </select>
+
+      <label>Obra:</label>
+      <select [(ngModel)]="usuarioActual.obraId" required>
+        <option *ngFor="let obra of obras" [value]="obra.id">{{ obra.nombreObra }}</option>
+      </select>
+
+      <label for="contrasena">Contraseña:</label>
+      <input id="contrasena" type="password" [(ngModel)]="usuarioActual.contrasena" required>
+
+      <button (click)="guardarUsuario()" class="btn-guardar"><i class='bx bx-save' style='color:#ffffff'></i></button>
+      <button (click)="cerrarFormulario()" class="btn-cancelar"><i class='bx bx-x-circle' style='color:#ffffff'></i></button>
+    </div>
+  </div>
+</div>

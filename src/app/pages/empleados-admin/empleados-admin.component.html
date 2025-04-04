@@ -1,0 +1,82 @@
+<app-navbar></app-navbar>
+
+<div class="empleados-admin">
+  <h2 id="title">Administración de Empleados</h2>
+
+  <div class="search-container">
+    <input type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" (ngModelChange)="filtrarEmpleados()" class="search-input">
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Cédula</th>
+          <th>Nombre Completo</th>
+          <th>Cargo</th>
+          <th>Obra</th>
+          <th>Responsable</th>
+          <th>Responsable Secundario</th>
+          <th>Salario</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let empleado of empleadosFiltrados; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ empleado.cedula }}</td>
+          <td>{{ empleado.nombreCompleto }}</td>
+          <td>{{ empleado.cargo }}</td>
+          <td>{{ empleado.obra }}</td>
+          <td>{{ empleado.responsable }}</td>
+          <td>{{ empleado.responsableSecundario || 'Sin responsable Secundario' }}</td>
+          <td>{{ empleado.salario | number:'1.2-2' }}</td>
+          <td class="container-row">
+            <button (click)="mostrarFormularioEmpleado(empleado)" class="btn-editar"><i class='bx bxs-edit'></i></button>
+            <button (click)="eliminarEmpleado(empleado.id)" class="btn-eliminar"><i class='bx bx-trash' style='color:#ffffff'></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button (click)="mostrarFormularioEmpleado()" class="btn-agregar"><i class='bx bx-user-plus'></i> Agregar Empleado</button>
+
+  <div *ngIf="mostrarFormulario" class="modal">
+    <div class="modal-content">
+      <h3>{{ esEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}</h3>
+
+      <label>Cédula:</label>
+      <input [(ngModel)]="empleadoActual.cedula" type="text" required>
+
+      <label>Nombre Completo:</label>
+      <input [(ngModel)]="empleadoActual.nombreCompleto" type="text" required>
+
+      <label>Cargo:</label>
+      <input [(ngModel)]="empleadoActual.cargo" type="text" required>
+
+      <label>Obra:</label>
+      <select [(ngModel)]="empleadoActual.obra" required>
+        <option *ngFor="let obra of obras" [value]="obra.nombreObra">{{ obra.nombreObra }}</option>
+      </select>
+
+      <label>Responsable:</label>
+      <select [(ngModel)]="empleadoActual.responsable" required>
+        <option *ngFor="let r of responsables" [value]="r.nombreCompleto">{{ r.nombreCompleto }}</option>
+      </select>
+
+      <label>Responsable Secundario:</label>
+      <select [(ngModel)]="empleadoActual.responsableSecundario">
+        <option value="">Sin responsable Secundario</option>
+        <option *ngFor="let r of responsables" [value]="r.nombreCompleto">{{ r.nombreCompleto }}</option>
+      </select>
+
+      <label>Salario:</label>
+      <input [(ngModel)]="empleadoActual.salario" type="number" step="0.01" required>
+
+      <button (click)="guardarEmpleado()" class="btn-guardar"><i class='bx bx-save' style='color:#ffffff'></i></button>
+      <button (click)="cerrarFormulario()" class="btn-cancelar"><i class='bx bx-x-circle' style='color:#ffffff'></i></button>
+    </div>
+  </div>
+</div>

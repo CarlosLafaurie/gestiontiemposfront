@@ -1,0 +1,89 @@
+<app-navbar></app-navbar>
+
+<div class="obras-admin">
+  <h2 id="title">Administración de Obras</h2>
+
+  <div class="search-container">
+    <input
+      type="text"
+      placeholder="Buscar..."
+      [(ngModel)]="searchQuery"
+      (ngModelChange)="filtrarObras()"
+      class="search-input">
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre de la Obra</th>
+        <th>Responsable</th>
+        <th>Responsable Secundario</th>
+        <th>Cliente</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Cambiamos "obras" por "obrasFiltrados" para usar la lista filtrada -->
+      <tr *ngFor="let obra of obrasFiltrados; let i = index">
+        <td>{{ obra.id }}</td>
+        <td>{{ obra.nombreObra }}</td>
+        <td>{{ obra.responsable ? obra.responsable : 'Sin responsable' }}</td>
+        <td>{{ obra.responsableSecundario ? obra.responsableSecundario : 'Sin responsable Secundario' }}</td>
+        <td>{{ obra.clienteObra ? obra.clienteObra : 'Sin cliente' }}</td>
+        <td>
+          <button (click)="mostrarFormularioObra(obra)" class="btn-editar">
+            <i class='bx bxs-edit'></i>
+          </button>
+          <button (click)="eliminarObra(obra.id)" class="btn-eliminar">
+            <i class='bx bx-trash' style='color:#ffffff'></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button (click)="mostrarFormularioObra()" class="btn-agregar">
+    <i class='bx bx-user-plus'></i> Agregar Obra
+  </button>
+
+  <div *ngIf="mostrarFormulario" class="modal">
+    <div class="modal-content">
+      <h3>{{ esEdicion ? 'Editar Obra' : 'Nueva Obra' }}</h3>
+
+      <label>Nombre de la Obra:</label>
+      <input [(ngModel)]="obraActual.nombreObra" type="text" required>
+
+      <label>Responsable:</label>
+      <select [(ngModel)]="obraActual.responsable" required>
+        <option *ngFor="let resp of responsables" [value]="resp.nombre">
+          {{ resp.nombre }}
+        </option>
+      </select>
+
+      <label>Responsable Secundario:</label>
+      <select [(ngModel)]="obraActual.responsableSecundario">
+        <option *ngFor="let resp of responsables" [value]="resp.nombre">
+          {{ resp.nombre }}
+        </option>
+      </select>
+
+      <label>Costo de la Obra:</label>
+      <input type="number" [(ngModel)]="obraActual.costoObra" min="0" step="0.01" required>
+
+      <label>Cliente:</label>
+      <select [(ngModel)]="obraActual.clienteObra" required>
+        <option *ngFor="let cli of clientes" [value]="cli.nombre">
+          {{ cli.nombre }}
+        </option>
+      </select>
+
+      <button (click)="guardarObra()" class="btn-guardar">
+        <i class='bx bx-save' style='color:#ffffff'></i>
+      </button>
+      <button (click)="cerrarFormulario()" class="btn-cancelar">
+        <i class='bx bx-x-circle' style='color:#ffffff'></i>
+      </button>
+    </div>
+  </div>
+</div>

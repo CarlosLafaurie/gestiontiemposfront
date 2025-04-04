@@ -1,33 +1,35 @@
 .container {
     max-width: 800px;
     margin: auto;
-    padding: 20px;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    text-align: center;
   }
-  
+
   .title {
     text-align: center;
     font-size: 24px;
     margin-bottom: 20px;
   }
-  
+
   .no-data {
     text-align: center;
     color: gray;
   }
-  
+
   .obra-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .obra-card {
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     background: #f9f9f9;
   }
-  
+
   .btn-detalles {
     background-color: #007bff;
     color: white;
@@ -35,7 +37,7 @@
     border: none;
     cursor: pointer;
   }
-  
+
   .btn-eliminar {
     background-color: #dc3545;
     color: white;
@@ -44,4 +46,48 @@
     cursor: pointer;
     margin-left: 10px;
   }
-  
+
+@media (max-width: 768px) {
+  .container {
+    padding-top: 8%;
+    padding-bottom: 5%;
+    max-width: 90%;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .obra-card {
+    padding: 15px;
+  }
+
+  .btn-detalles,
+  .btn-eliminar {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .container {
+    padding-top: 15%;
+    padding-bottom: 10%;
+    max-width: 90%;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .obra-card {
+    padding: 10px;
+  }
+
+  .btn-detalles,
+  .btn-eliminar {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+}

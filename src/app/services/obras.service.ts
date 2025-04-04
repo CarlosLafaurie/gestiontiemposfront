@@ -7,21 +7,23 @@ export interface Obra {
   id: number;
   nombreObra: string;
   responsable: string;
+  responsableSecundario?: string;
   clienteObra: string;
+  estado?: string;
+  costoObra: number;
 }
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class ObraService {
-  private apiUrl = `${environment.apiUrl}/Obras`; 
+  private apiUrl = `${environment.apiUrl}/Obras`;
 
   private http = inject(HttpClient);
 
   getObras(): Observable<Obra[]> {
-    return this.http.get<Obra[]>(this.apiUrl).pipe(
-      tap((data: Obra[]) => console.log("Datos obtenidos de API:", data))
-    );
+    return this.http.get<Obra[]>(this.apiUrl).pipe( );
   }
   getObra(id: number): Observable<Obra> {
     return this.http.get<Obra>(`${this.apiUrl}/${id}`);

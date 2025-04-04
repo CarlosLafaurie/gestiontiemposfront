@@ -30,8 +30,15 @@ export class LoginComponent {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
-        this.authService.saveToken(response.token);
-        this.router.navigate(['/home']);
+
+        if (response?.token) {
+          this.authService.saveToken(response.token);
+          console.log("Token guardado correctamente.");
+          this.router.navigate(['/home']);
+        } else {
+          console.error("Error: No se recibió token en la respuesta.");
+          alert('Error en la autenticación. Intenta nuevamente.');
+        }
       },
       error: (err) => {
         console.error('Error en login:', err);

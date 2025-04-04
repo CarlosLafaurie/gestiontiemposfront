@@ -3,16 +3,16 @@
   <div class="card">
 <div class="detalle-obra">
     <h2>Detalles de la Obra</h2>
-  
+
     <div *ngIf="obra; else loading">
-      <p><strong>ID:</strong> {{ obra.id }}</p>
       <p><strong>Nombre:</strong> {{ obra.nombreObra }}</p>
-      <p><strong>Responsable:</strong> {{ obra.responsable }}</p>
+      <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>
+      <p><strong>Responsable Secundario:</strong> {{ obra.responsableSecundario }}</p>
       <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
       <button *ngIf="cargo !== 'cliente'" (click)="irAGestionPersonal()">Gestionar Personal</button>
       <button (click)="volver()">Volver</button>
     </div>
-  
+
     <ng-template #loading>
       <p>Cargando detalles...</p>
     </ng-template>

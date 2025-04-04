@@ -1,47 +1,101 @@
-<form (ngSubmit)="guardarTiempos()" class="formulario-tiempos">
-  <div class="form-group">
-    <label for="tipoRegistro" class="form-label">Tipo de registro:</label>
-    <select id="tipoRegistro" [(ngModel)]="tipoRegistro" name="tipoRegistro" class="form-control" (change)="actualizarHoras()">
-      <option value="entrada">Entrada</option>
-      <option value="salida">Salida</option>
-    </select>
-  </div>
+<mat-accordion>
+  <!-- Panel para Cargar Tiempos (sin permisos especiales) -->
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Cargar Tiempos
+      </mat-panel-title>
+    </mat-expansion-panel-header>
 
-  <div class="form-group">
-    <label for="fechaHoraGlobal" class="form-label">Fecha y Hora (global):</label>
-    <input type="datetime-local" [(ngModel)]="fechaHoraGlobal" name="fechaHoraGlobal" class="form-control" (change)="actualizarHoras()">
-  </div>
+    <form (ngSubmit)="guardarTiempos()" class="formulario-tiempos">
+      <div class="form-group">
+        <label for="tipoRegistro" class="form-label">Tipo de registro:</label>
+        <select id="tipoRegistro" [(ngModel)]="tipoRegistro" name="tipoRegistro" class="form-control" (change)="actualizarHoras()">
+          <option value="entrada">Entrada</option>
+          <option value="salida">Salida</option>
+        </select>
+      </div>
 
-  <!-- Se muestra un resumen en forma de tabla de los registros generados -->
-  <div class="card mt-3">
-    <div class="card-header">
-      <h5>Registro de Tiempos</h5>
-    </div>
-    <div class="card-body">
-      <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-          <tr>
-            <th>Empleado</th>
-            <th>Comentarios</th>
-            <th>Permisos Especiales</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let tiempo of listaTiempos; let i = index">
-            <td>{{ tiempo.nombreEmpleado }}</td>
-            <td>
-              <input type="text" [(ngModel)]="tiempo.comentarios" [name]="'comentarios' + i" class="form-control">
-            </td>
-            <td>
-              <input type="text" [(ngModel)]="tiempo.permisosEspeciales" [name]="'permisos' + i" class="form-control">
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+      <div class="form-group">
+        <label for="fechaHoraGlobal" class="form-label">Fecha y Hora (global):</label>
+        <input type="datetime-local" [(ngModel)]="fechaHoraGlobal" name="fechaHoraGlobal" class="form-control" (change)="actualizarHoras()">
+      </div>
 
-  <button type="submit" [disabled]="!esValidoParaGuardar()" class="btn btn-primary mt-3">
-    Guardar Tiempos
-  </button>
-</form>
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5>Registro de Tiempos</h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>Empleado</th>
+                <th>Comentarios</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tiempo of listaTiempos; let i = index">
+                <td>{{ tiempo.nombreEmpleado }}</td>
+                <td>
+                  <input type="text" [(ngModel)]="tiempo.comentarios" [name]="'comentarios' + i" class="form-control">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="!esValidoParaGuardar()" class="btn btn-primary mt-3">
+        Guardar Tiempos
+      </button>
+    </form>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Cargar Ausentismo
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <form (ngSubmit)="guardarTiempos()" class="formulario-ausentismo">
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5>Registro de Ausentismo</h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>Empleado</th>
+                <th>Comentarios</th>
+                <th>Permisos Especiales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tiempo of listaTiempos; let i = index">
+                <td>{{ tiempo.nombreEmpleado }}</td>
+                <td>
+                  <input type="text" [(ngModel)]="tiempo.comentarios" [name]="'comentarios' + i" class="form-control">
+                </td>
+                <td>
+                  <select [(ngModel)]="tiempo.permisosEspeciales" [name]="'permisos' + i" class="form-control">
+                    <option value="">(Ninguno)</option>
+                    <option value="incapacidad">Incapacidad</option>
+                    <option value="enfermedad_general">Enfermedad General</option>
+                    <option value="calamidad_familiar">Calamidad Familiar</option>
+                    <option value="sin_justificacion">Sin Justificación</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="!esValidoParaGuardar()" class="btn btn-primary mt-3">
+        Guardar Ausentismo
+      </button>
+    </form>
+  </mat-expansion-panel>
+</mat-accordion>

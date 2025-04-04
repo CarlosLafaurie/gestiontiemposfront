@@ -1,4 +1,7 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <div class="image-container">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBYjo1_UfbblCBlBfSt0Rz5y1DPXxD5pVDag&s" id="image">
+  </div>
   <div>
     <label for="cedula">Cédula:</label>
     <input id="cedula" formControlName="cedula" type="text" />
