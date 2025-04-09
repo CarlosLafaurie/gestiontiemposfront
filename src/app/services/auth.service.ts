@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environments';
 import { jwtDecode } from 'jwt-decode';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -12,6 +13,12 @@ export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/Usuarios/login`;
 
   private http = inject(HttpClient);
+
+  constructor() {
+  //  window.addEventListener('beforeunload', () => {
+    //  this.logout();
+      //});
+  }
 
   login(credentials: { correo: string; contraseña: string }): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(this.apiUrl, credentials).pipe(
@@ -24,7 +31,6 @@ export class AuthService {
       })
     );
   }
-
 
   saveToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);

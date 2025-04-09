@@ -129,8 +129,7 @@ export class EmpleadosAdminComponent implements OnInit {
     }
 
     if (this.esEdicion) {
-      console.log("✏️ Modo edición - Actualizando empleado con ID:", this.empleadoActual.id);
-
+      console.log("📝 Modo edición - Actualizando empleado...");
       this.empleadoService.actualizarEmpleado(this.empleadoActual.id, this.empleadoActual).subscribe({
         next: () => {
           console.log("✅ Empleado actualizado correctamente:", this.empleadoActual);

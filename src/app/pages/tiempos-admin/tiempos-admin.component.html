@@ -5,14 +5,14 @@
   <table class="table">
     <thead>
       <tr>
-        <th>ID</th>
+        <th>#</th>
         <th>Nombre Completo</th>
         <th>Total de Horas</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let resumen of resumenEmpleados">
-        <td>{{ resumen.id }}</td>
+      <tr *ngFor="let resumen of resumenEmpleados; let i = index">
+        <td>{{ i + 1 }}</td>
         <td>{{ resumen.nombreCompleto }}</td>
         <td>{{ resumen.totalHoras }}</td>
       </tr>

@@ -1,10 +1,8 @@
 <mat-accordion>
-  <!-- Panel para Cargar Tiempos (sin permisos especiales) -->
-  <mat-expansion-panel>
+  <!-- Panel para Cargar Tiempos -->
+  <mat-expansion-panel (opened)="cambiarModo('tiempos')">
     <mat-expansion-panel-header>
-      <mat-panel-title>
-        Cargar Tiempos
-      </mat-panel-title>
+      <mat-panel-title>Cargar Tiempos</mat-panel-title>
     </mat-expansion-panel-header>
 
     <form (ngSubmit)="guardarTiempos()" class="formulario-tiempos">
@@ -22,9 +20,7 @@
       </div>
 
       <div class="card mt-3">
-        <div class="card-header">
-          <h5>Registro de Tiempos</h5>
-        </div>
+        <div class="card-header"><h5>Registro de Tiempos</h5></div>
         <div class="card-body">
           <table class="table table-bordered table-hover">
             <thead class="table-dark">
@@ -51,51 +47,55 @@
     </form>
   </mat-expansion-panel>
 
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Cargar Ausentismo
-      </mat-panel-title>
-    </mat-expansion-panel-header>
+<mat-expansion-panel (opened)="cambiarModo('ausentismo')">
+  <mat-expansion-panel-header>
+    <mat-panel-title>Cargar Ausentismo</mat-panel-title>
+  </mat-expansion-panel-header>
 
-    <form (ngSubmit)="guardarTiempos()" class="formulario-ausentismo">
-      <div class="card mt-3">
-        <div class="card-header">
-          <h5>Registro de Ausentismo</h5>
-        </div>
-        <div class="card-body">
-          <table class="table table-bordered table-hover">
-            <thead class="table-dark">
-              <tr>
-                <th>Empleado</th>
-                <th>Comentarios</th>
-                <th>Permisos Especiales</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let tiempo of listaTiempos; let i = index">
-                <td>{{ tiempo.nombreEmpleado }}</td>
-                <td>
-                  <input type="text" [(ngModel)]="tiempo.comentarios" [name]="'comentarios' + i" class="form-control">
-                </td>
-                <td>
-                  <select [(ngModel)]="tiempo.permisosEspeciales" [name]="'permisos' + i" class="form-control">
-                    <option value="">(Ninguno)</option>
-                    <option value="incapacidad">Incapacidad</option>
-                    <option value="enfermedad_general">Enfermedad General</option>
-                    <option value="calamidad_familiar">Calamidad Familiar</option>
-                    <option value="sin_justificacion">Sin Justificación</option>
-                  </select>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  <form (ngSubmit)="guardarAusentismo()" class="formulario-ausentismo">
+    <div class="form-group">
+      <label for="fechaHoraGlobalAusentismo" class="form-label">Fecha y Hora:</label>
+      <input type="datetime-local" [(ngModel)]="fechaHoraGlobalAusentismo" name="fechaHoraGlobalAusentismo" class="form-control">
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><h5>Registro de Ausentismo</h5></div>
+      <div class="card-body">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Empleado</th>
+              <th>Comentarios</th>
+              <th>Permisos Especiales</th>
+              <th>Documento Soporte</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tiempo of listaTiempos; let i = index">
+              <td>{{ tiempo.nombreEmpleado }}</td>
+              <td>
+                <input type="text" [(ngModel)]="tiempo.comentarios" [name]="'comentariosAus' + i" class="form-control">
+              </td>
+              <td>
+                <select [(ngModel)]="tiempo.permisosEspeciales" [name]="'permisos' + i" class="form-control">
+                  <option value="">(Ninguno)</option>
+                  <option value="incapacidad">Incapacidad</option>
+                  <option value="enfermedad_general">Enfermedad General</option>
+                  <option value="calamidad_familiar">Calamidad Familiar</option>
+                  <option value="sin_justificacion">Sin Justificación</option>
+                </select>
+              </td>
+              <td>
+                <input type="file" (change)="manejarArchivo($event, i)" class="form-control">
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+    </div>
 
-      <button type="submit" [disabled]="!esValidoParaGuardar()" class="btn btn-primary mt-3">
-        Guardar Ausentismo
-      </button>
-    </form>
-  </mat-expansion-panel>
-</mat-accordion>
+    <button type="submit" [disabled]="!esValidoParaGuardarAusentismo()" class="btn btn-primary mt-3">
+      Guardar Ausentismo
+    </button>
+  </form>
+</mat-expansion-panel>

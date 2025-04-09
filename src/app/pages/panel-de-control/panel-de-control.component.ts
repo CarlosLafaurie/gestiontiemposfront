@@ -48,4 +48,8 @@ export class PanelDeControlComponent implements OnInit {
     });
   }
 
+  irAPermisosAdmin(): void {
+    this.router.navigate(['/permisos-admin']).then(success => {
+    });
+  }
 }

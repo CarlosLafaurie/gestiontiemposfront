@@ -10,6 +10,7 @@ import { UsuariosAdminComponent } from './pages/usuarios-admin/usuarios-admin.co
 import { EmpleadosAdminComponent } from './pages/empleados-admin/empleados-admin.component'
 import { ObrasAdminComponent } from './pages/obras-admin/obras-admin.component';
 import { TiemposAdminComponent } from './pages/tiempos-admin/tiempos-admin.component';
+import { PermisosAdminComponent } from './pages/permisos-admin/permisos-admin.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
@@ -26,6 +27,7 @@ export const routes: Routes = [
   { path: 'empleado-admin', component: EmpleadosAdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'obras-admin', component: ObrasAdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'tiempos-admin', component: TiemposAdminComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'permisos-admin', component: PermisosAdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'obra/:id', component: DetalleObraComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' }

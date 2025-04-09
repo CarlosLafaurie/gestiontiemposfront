@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
+import { environment } from '../../environments/environments';
 
 export interface Tiempo {
   id?: number;
@@ -16,8 +17,8 @@ export interface Tiempo {
   providedIn: 'root',
 })
 export class TiemposService {
-  private apiIngresos = 'https://localhost:7280/api/IngresosPersonal';
-  private apiSalidas = 'https://localhost:7280/api/SalidasPersonal';
+  private apiIngresos = `${environment.apiUrl}/IngresosPersonal`;
+  private apiSalidas = `${environment.apiUrl}/SalidasPersonal`;
 
   constructor(private http: HttpClient) {}
 

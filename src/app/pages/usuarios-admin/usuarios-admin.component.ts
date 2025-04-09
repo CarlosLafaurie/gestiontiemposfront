@@ -116,13 +116,11 @@ export class UsuariosAdminComponent implements OnInit {
       cedula: this.usuarioActual.cedula,
       nombreCompleto: this.usuarioActual.nombreCompleto,
       cargo: this.usuarioActual.cargo,
-      obra: obraSeleccionada.nombreObra, // ✅ Usa "obra" en vez de "obraId"
+      obra: obraSeleccionada.nombreObra,
       rol: this.usuarioActual.rol,
-      contrasenaHash: this.usuarioActual.contrasena, // ✅ Cambia "contrasena" a "contrasenaHash"
+      contrasenaHash: this.usuarioActual.contrasena,
       estado: this.usuarioActual.estado || 'activo'
     };
-
-    console.log('📤 Enviando usuario:', usuarioParaEnviar);
 
     if (this.esEdicion) {
       this.userService.updateUser(usuarioParaEnviar.id, usuarioParaEnviar).subscribe({

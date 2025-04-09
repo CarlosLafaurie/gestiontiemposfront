@@ -1,8 +1,22 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TiemposService, Tiempo } from '../services/tiempos.service.service';
+import { TiemposService } from '../services/tiempos.service.service';
+import { AusentismoService } from '../services/documento-permiso.service';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+
+export interface TiempoExtendido {
+  id: number;
+  empleadoId: number;
+  fechaHoraEntrada: string | null;
+  fechaHoraSalida: string | null;
+  comentarios: string;
+  permisosEspeciales: string;
+  nombreEmpleado: string;
+  archivo?: File | null;
+}
 
 @Component({
   selector: 'app-lista-tiempos',
@@ -10,16 +24,21 @@ import { MatExpansionModule } from '@angular/material/expansion';
   templateUrl: './lista-tiempos.component.html',
   styleUrls: ['./lista-tiempos.component.css'],
   imports: [NgFor, FormsModule, MatExpansionModule],
-  providers: [TiemposService]
+  providers: [TiemposService, AusentismoService]
 })
 export class ListaTiemposComponent implements OnInit, OnChanges {
   @Input() empleadosSeleccionados: any[] = [];
-  listaTiempos: Tiempo[] = [];
+  listaTiempos: TiempoExtendido[] = [];
   tipoRegistro: string = 'entrada';
   fechaHoraGlobal: string = '';
-  modo: string = 'tiempos';  // 'tiempos' o 'ausentismo'
+  fechaHoraGlobalAusentismo: string = '';
+  modo: string = 'tiempos';
 
-  constructor(private tiemposService: TiemposService) {}
+  constructor(
+    private tiemposService: TiemposService,
+    private ausentismoService: AusentismoService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
     if (this.empleadosSeleccionados.length === 0) {
@@ -43,8 +62,9 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
       fechaHoraSalida: null,
       comentarios: "",
       permisosEspeciales: "",
-      nombreEmpleado: emp.nombre
-    })) as Tiempo[];
+      nombreEmpleado: emp.nombre,
+      archivo: null
+    })) as TiempoExtendido[];
   }
 
   actualizarHoras() {
@@ -76,20 +96,48 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
       if (tiempo.fechaHoraEntrada) {
         this.tiemposService.registrarIngreso(tiempo).subscribe({
           next: res => {
-            this.verificarFinalizacion(++registrosCompletados, totalRegistros);
+            registrosCompletados++;
+            this.verificarFinalizacion(registrosCompletados, totalRegistros);
           },
+          error: err => {
+            if (err.status === 409) {
+              const fecha = tiempo.fechaHoraEntrada ? new Date(tiempo.fechaHoraEntrada).toLocaleDateString() : 'desconocida';
+              this.snackBar.open(
+                `⚠️ Ya existe un ingreso registrado para la fecha ${fecha}`,
+                'Cerrar',
+                { duration: 5000, panelClass: ['snackbar-error'] }
+              );
+            } else {
+              console.error("❌ Error al registrar ingreso:", err);
+            }
+          }
         });
       }
+
       if (tiempo.fechaHoraSalida) {
         this.tiemposService.registrarSalida(tiempo).subscribe({
           next: res => {
-            console.log(`✅ Salida registrada`, res);
-            this.verificarFinalizacion(++registrosCompletados, totalRegistros);
+            registrosCompletados++;
+            this.verificarFinalizacion(registrosCompletados, totalRegistros);
           },
+          error: err => {
+            if (err.status === 409) {
+              const fecha = tiempo.fechaHoraSalida ? new Date(tiempo.fechaHoraSalida).toLocaleDateString() : 'desconocida';
+              this.snackBar.open(
+                `⚠️ Ya existe una salida registrada para la fecha ${fecha}`,
+                'Cerrar',
+                { duration: 5000, panelClass: ['snackbar-error'] }
+              );
+            } else {
+              console.error("❌ Error al registrar salida:", err);
+            }
+          }
         });
       }
     });
   }
+
+
 
   verificarFinalizacion(completados: number, total: number) {
     if (completados === total) {
@@ -100,5 +148,56 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
 
   cambiarModo(modo: string) {
     this.modo = modo;
+  }
+
+  esValidoParaGuardarAusentismo(): boolean {
+    return this.fechaHoraGlobalAusentismo !== '' && this.listaTiempos.some(t => t.permisosEspeciales);
+  }
+
+  guardarAusentismo() {
+    const registros = this.listaTiempos.filter(t => t.permisosEspeciales);
+    if (registros.length === 0) return;
+
+    let completados = 0;
+
+    for (let tiempo of registros) {
+      const formData = new FormData();
+      formData.append('NombreEmpleado', tiempo.nombreEmpleado);
+      formData.append('Comentarios', tiempo.comentarios || '');
+      formData.append('PermisosEspeciales', tiempo.permisosEspeciales || '');
+      formData.append('FechaHoraEntrada', this.fechaHoraGlobalAusentismo || '');
+
+      if (tiempo.archivo) {
+        formData.append('Archivo', tiempo.archivo);
+      }
+
+      this.ausentismoService.subirDocumentoAusentismo(formData).subscribe({
+        next: res => {
+          completados++;
+          if (completados === registros.length) {
+            this.snackBar.open('✅ Documento de ausentismo enviado correctamente.', 'Cerrar', {
+              duration: 5000,
+              panelClass: ['snackbar-success']
+            });
+            setTimeout(() => location.reload(), 1000);
+          }
+        },
+        error: err => {
+          console.error('❌ Error al subir el documento:', err);
+          this.snackBar.open('❌ Error al subir el documento de ausentismo.', 'Cerrar', {
+            duration: 5000,
+            panelClass: ['snackbar-error']
+          });
+        }
+      });
+    }
+  }
+
+
+  manejarArchivo(event: any, index: number) {
+    const archivo = event.target.files[0];
+    if (archivo) {
+      this.listaTiempos[index].archivo = archivo;
+    }
   }
 }

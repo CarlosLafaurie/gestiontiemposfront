@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { EmpleadoService } from '../../services/empleado-service.service';
 import { TiemposService, Tiempo } from '../../services/tiempos.service.service';
-import { ExcelService } from '../../services/excel.service.ts.service'; 
+import { ExcelService } from '../../services/excel.service.ts.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -59,24 +59,30 @@ export class TiemposAdminComponent implements OnInit {
         .sort((a, b) => new Date(a.fechaHoraSalida as string).getTime() - new Date(b.fechaHoraSalida as string).getTime());
 
       let totalHoras = 0;
+      let diasUnicos = new Set<string>();
       let i = 0, j = 0;
 
       while (i < ingresosEmp.length && j < salidasEmp.length) {
-        const entradaTime = ingresosEmp[i].fechaHoraEntrada
-          ? new Date(ingresosEmp[i].fechaHoraEntrada as string).getTime()
-          : null;
-        const salidaTime = salidasEmp[j].fechaHoraSalida
-          ? new Date(salidasEmp[j].fechaHoraSalida as string).getTime()
-          : null;
+        const entrada = ingresosEmp[i].fechaHoraEntrada ? new Date(ingresosEmp[i].fechaHoraEntrada as string) : null;
+        const salida = salidasEmp[j].fechaHoraSalida ? new Date(salidasEmp[j].fechaHoraSalida as string) : null;
 
-        if (entradaTime !== null && salidaTime !== null && salidaTime >= entradaTime) {
-          totalHoras += (salidaTime - entradaTime) / 3600000;
+        if (entrada && salida && salida >= entrada) {
+          totalHoras += (salida.getTime() - entrada.getTime()) / 3600000;
+
+          // Guardar el día (YYYY-MM-DD) como string
+          const dia = entrada.toISOString().split('T')[0];
+          diasUnicos.add(dia);
+
           i++;
           j++;
         } else {
           j++;
         }
       }
+
+      // Restar 1.5 horas por cada día trabajado
+      const horasARestar = diasUnicos.size * 1.5;
+      totalHoras = Math.max(0, totalHoras - horasARestar); // evitar negativos
 
       return { ...emp, totalHoras: totalHoras.toFixed(2) };
     });
