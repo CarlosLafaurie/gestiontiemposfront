@@ -1,0 +1,134 @@
+<app-navbar></app-navbar>
+
+<div class="solicitudes-admin container mt-4">
+  <h2 id="title">Gestión de Solicitudes</h2>
+
+  <!-- Formulario (solo responsable) -->
+  <div *ngIf="esResponsable && !esAdmin" class="formulario-solicitud">
+    <h4>Nueva Solicitud</h4>
+    <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="herramienta" class="form-label">Herramienta</label>
+          <select id="herramienta"
+                  class="form-select"
+                  required
+                  name="inventarioId"
+                  [(ngModel)]="nueva.inventarioId">
+            <option [value]="0" disabled>Seleccione...</option>
+            <option *ngFor="let it of inventario" [value]="it.id">
+              {{ it.herramienta }} ({{ it.ubicacion }})
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="cantidad" class="form-label">Cantidad</label>
+          <input id="cantidad"
+                 type="number"
+                 class="form-control"
+                 required
+                 min="1"
+                 name="cantidad"
+                 [(ngModel)]="nueva.cantidad">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="obra" class="form-label">Obra</label>
+          <select id="obra"
+                  class="form-select"
+                  required
+                  name="obra"
+                  [(ngModel)]="nueva.obra">
+            <option value="" disabled>Seleccione obra...</option>
+            <option *ngFor="let o of obras" [value]="o.nombreObra">
+              {{ o.nombreObra }} (Cliente: {{ o.clienteObra }})
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="observaciones" class="form-label">Comentario</label>
+          <textarea id="observaciones"
+                    class="form-control"
+                    rows="3"
+                    name="observaciones"
+                    [(ngModel)]="nueva.observaciones">
+          </textarea>
+        </div>
+      </div>
+
+      <button type="submit"
+              class="btn btn-primary"
+              [disabled]="formSolicitud.invalid">
+        Solicitar
+      </button>
+    </form>
+  </div>
+
+  <!-- Filtro (solo admin) -->
+  <div *ngIf="esAdmin" class="mt-4">
+    <label for="filtroEstado" class="form-label">Ver:</label>
+    <select id="filtroEstado"
+            class="form-select w-auto d-inline-block ms-2"
+            name="filtroEstado"
+            [(ngModel)]="filtroEstado"
+            (ngModelChange)="aplicarFiltro()">
+      <option [ngValue]="''">Todas</option>
+      <option [ngValue]="EstadoSolicitud.Pendiente">Pendientes</option>
+      <option [ngValue]="EstadoSolicitud.Aprobada">Aprobadas</option>
+      <option [ngValue]="EstadoSolicitud.Rechazada">Rechazadas</option>
+    </select>
+  </div>
+
+  <!-- Tabla de solicitudes -->
+  <div *ngIf="filtradas.length > 0; else sinDatos" class="table-responsive mt-3">
+    <table class="table align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Herramienta</th>
+          <th>Cant.</th>
+          <th>Obra</th>
+          <th>Solicitante</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th *ngIf="esAdmin">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of filtradas; let i = index"
+            [ngClass]="{
+              'row-aprobada': s.estado === EstadoSolicitud.Aprobada,
+              'row-rechazada': s.estado === EstadoSolicitud.Rechazada
+            }">
+          <td>{{ i + 1 }}</td>
+          <td>{{ getHerramienta(s.inventarioId) }}</td>
+          <td>{{ s.cantidad }}</td>
+          <td>{{ s.obra }}</td>
+          <td>{{ s.solicitante }}</td>
+          <td>{{ s.fechaSolicitud | date:'short' }}</td>
+          <td>{{ s.estado }}</td>
+          <td *ngIf="esAdmin" class="acciones-cell">
+            <button class="btn-aprobar"
+                    [disabled]="s.estado !== EstadoSolicitud.Pendiente"
+                    (click)="cambiarEstado(s, EstadoSolicitud.Aprobada)">
+              Aprobar
+            </button>
+            <button class="btn-rechazar"
+                    [disabled]="s.estado !== EstadoSolicitud.Pendiente"
+                    (click)="cambiarEstado(s, EstadoSolicitud.Rechazada)">
+              Rechazar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #sinDatos>
+    <div class="alert alert-info text-center mt-3">
+      No hay solicitudes para mostrar.
+    </div>
+  </ng-template>
+</div>

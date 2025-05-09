@@ -8,7 +8,8 @@ export interface TiempoAusentismo {
   nombreEmpleado: string;
   comentarios: string;
   permisosEspeciales?: string;
-  fechaHoraEntrada: string;
+  fechaInicio: string;
+  fechaFin: string;
   rutaDocumento?: string;
   archivo?: File | null;
 }
@@ -21,8 +22,8 @@ export class AusentismoService {
 
   constructor(private http: HttpClient) {}
 
-  subirDocumentoAusentismo(formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/SubirDocumento`, formData);
+  subirDocumentoAusentismo(formData: FormData): Observable<TiempoAusentismo> {
+    return this.http.post<TiempoAusentismo>(`${this.apiUrl}/SubirDocumento`, formData);
   }
 
   getDocumentos(): Observable<TiempoAusentismo[]> {
@@ -33,21 +34,19 @@ export class AusentismoService {
     return this.http.get<TiempoAusentismo>(`${this.apiUrl}/${id}`);
   }
 
-  actualizarDocumento(id: number, data: TiempoAusentismo): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, data);
+  actualizarDocumento(id: number, data: FormData): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, data);
   }
 
-  eliminarDocumento(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  eliminarDocumento(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   verPDF(fileName: string): Observable<Blob> {
-    const url = `${environment.apiUrl}/Pdf/ver/${fileName}`;
-    return this.http.get(url, { responseType: 'blob' });
+    return this.http.get(`${environment.apiUrl}/Pdf/ver/${fileName}`, { responseType: 'blob' });
   }
 
   descargarPDF(fileName: string): Observable<Blob> {
-    const url = `${environment.apiUrl}/Pdf/descargar/${fileName}`;
-    return this.http.get(url, { responseType: 'blob' });
+    return this.http.get(`${environment.apiUrl}/Pdf/descargar/${fileName}`, { responseType: 'blob' });
   }
 }

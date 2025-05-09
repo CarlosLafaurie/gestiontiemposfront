@@ -1,10 +1,19 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../navbar/navbar.component';
-import { EmpleadoService } from '../../services/empleado-service.service';
-import { TiemposService, Tiempo } from '../../services/tiempos.service.service';
+import { RegistroJornadaService, ResumenEmpleado } from '../../services/registrojornada.service';
 import { ExcelService } from '../../services/excel.service.ts.service';
-import { forkJoin } from 'rxjs';
+
+interface EmpleadoAgrupado {
+  nombreCompleto: string;
+  totalHoras: number;
+  horasDiurnas: number;
+  horasNocturnas: number;
+  horasExtrasDiurnas: number;
+  horasExtrasNocturnas: number;
+  dominicales: boolean;
+  festivos: boolean;
+}
 
 @Component({
   selector: 'tiempos-admin',
@@ -14,96 +23,81 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./tiempos-admin.component.css']
 })
 export class TiemposAdminComponent implements OnInit {
-  empleados: any[] = [];
-  ingresos: Tiempo[] = [];
-  salidas: Tiempo[] = [];
-  resumenEmpleados: any[] = [];
+  resumenEmpleados: Array<{
+    nombreCompleto: string;
+    totalHoras: string;
+    horasDiurnas: string;
+    horasNocturnas: string;
+    horasExtrasDiurnas: string;
+    horasExtrasNocturnas: string;
+    dominicales: string;
+    festivos: string;
+  }> = [];
 
-  private empleadoService = inject(EmpleadoService);
-  private tiemposService = inject(TiemposService);
+  private datosOriginales: ResumenEmpleado[] = []; // ✅ datos sin transformar
+
+  private jornadaService = inject(RegistroJornadaService);
   private excelService = inject(ExcelService);
 
   ngOnInit(): void {
-    this.cargarDatos();
+    console.log('⏳ Iniciando TiemposAdminComponent...');
+    this.cargarResumen();
   }
 
-  cargarDatos(): void {
-    forkJoin({
-      empleados: this.empleadoService.obtenerEmpleados(),
-      ingresos: this.tiemposService.obtenerIngresos(),
-      salidas: this.tiemposService.obtenerSalidas()
-    }).subscribe({
-      next: ({ empleados, ingresos, salidas }) => {
-        this.empleados = empleados;
-        this.ingresos = ingresos;
-        this.salidas = salidas;
-        this.procesarResumen();
+  private cargarResumen(): void {
+    console.log('📡 Llamando a obtenerResumenHoras()...');
+    this.jornadaService.obtenerResumenHoras(true).subscribe({
+      next: (data: ResumenEmpleado[]) => {
+        console.log('✅ Datos crudos recibidos del backend:', data);
+
+        this.datosOriginales = data; // ✅ Guardamos los datos sin transformar
+
+        const agrupado = data.reduce((acc: EmpleadoAgrupado[], r: ResumenEmpleado) => {
+          let e = acc.find(x => x.nombreCompleto === r.nombreCompleto);
+          if (!e) {
+            e = {
+              nombreCompleto: r.nombreCompleto,
+              totalHoras: 0,
+              horasDiurnas: 0,
+              horasNocturnas: 0,
+              horasExtrasDiurnas: 0,
+              horasExtrasNocturnas: 0,
+              dominicales: false,
+              festivos: false
+            };
+            acc.push(e);
+          }
+          e.totalHoras += r.horasTrabajadas;
+          e.horasDiurnas += r.horasDiurnas;
+          e.horasNocturnas += r.horasNocturnas;
+          e.horasExtrasDiurnas += r.horasExtrasDiurnas;
+          e.horasExtrasNocturnas += r.horasExtrasNocturnas;
+          if (r.trabajoDomingo) e.dominicales = true;
+          if (r.trabajoFestivo) e.festivos = true;
+          return acc;
+        }, []);
+
+        this.resumenEmpleados = agrupado.map((e) => ({
+          nombreCompleto: e.nombreCompleto,
+          totalHoras: e.totalHoras.toFixed(2),
+          horasDiurnas: e.horasDiurnas.toFixed(2),
+          horasNocturnas: e.horasNocturnas.toFixed(2),
+          horasExtrasDiurnas: e.horasExtrasDiurnas.toFixed(2),
+          horasExtrasNocturnas: e.horasExtrasNocturnas.toFixed(2),
+          dominicales: e.dominicales ? 'Sí' : 'No',
+          festivos: e.festivos ? 'Sí' : 'No'
+        }));
+
+        console.log('🔧 resumenEmpleados agrupado y mapeado:', this.resumenEmpleados);
       },
-      error: (err) => console.error('❌ Error al cargar datos:', err)
-    });
-  }
-
-  procesarResumen(): void {
-    if (!this.empleados.length || !this.ingresos.length || !this.salidas.length) {
-      console.warn("⚠️ No hay suficientes datos para calcular las horas trabajadas.");
-      return;
-    }
-
-    this.resumenEmpleados = this.empleados.map(emp => {
-      const ingresosEmp = this.ingresos
-        .filter(ing => ing.empleadoId === emp.id && ing.fechaHoraEntrada)
-        .sort((a, b) => new Date(a.fechaHoraEntrada as string).getTime() - new Date(b.fechaHoraEntrada as string).getTime());
-
-      const salidasEmp = this.salidas
-        .filter(sal => sal.empleadoId === emp.id && sal.fechaHoraSalida)
-        .sort((a, b) => new Date(a.fechaHoraSalida as string).getTime() - new Date(b.fechaHoraSalida as string).getTime());
-
-      let totalHoras = 0;
-      let diasUnicos = new Set<string>();
-      let i = 0, j = 0;
-
-      while (i < ingresosEmp.length && j < salidasEmp.length) {
-        const entrada = ingresosEmp[i].fechaHoraEntrada ? new Date(ingresosEmp[i].fechaHoraEntrada as string) : null;
-        const salida = salidasEmp[j].fechaHoraSalida ? new Date(salidasEmp[j].fechaHoraSalida as string) : null;
-
-        if (entrada && salida && salida >= entrada) {
-          totalHoras += (salida.getTime() - entrada.getTime()) / 3600000;
-
-          // Guardar el día (YYYY-MM-DD) como string
-          const dia = entrada.toISOString().split('T')[0];
-          diasUnicos.add(dia);
-
-          i++;
-          j++;
-        } else {
-          j++;
-        }
+      error: err => {
+        console.error('❌ Error al cargar resumen de horas:', err);
       }
-
-      // Restar 1.5 horas por cada día trabajado
-      const horasARestar = diasUnicos.size * 1.5;
-      totalHoras = Math.max(0, totalHoras - horasARestar); // evitar negativos
-
-      return { ...emp, totalHoras: totalHoras.toFixed(2) };
     });
   }
 
   exportarExcel(): void {
-    const empleadosConTiempos = this.empleados.map(emp => ({
-      ...emp,
-      tiempos: this.ingresos
-        .filter(i => i.empleadoId === emp.id)
-        .map(i => ({
-          fechaHoraEntrada: i.fechaHoraEntrada,
-          fechaHoraSalida: this.salidas.find(
-            s => s.empleadoId === emp.id &&
-                 s.fechaHoraSalida &&
-                 i.fechaHoraEntrada &&
-                 new Date(s.fechaHoraSalida as string) >= new Date(i.fechaHoraEntrada as string)
-          )?.fechaHoraSalida || null
-        }))
-    }));
-
-    this.excelService.exportarExcel(this.resumenEmpleados, empleadosConTiempos);
+    console.log('📤 Exportando a Excel, resumenEmpleados:', this.resumenEmpleados)
+    this.excelService.exportarExcel(this.datosOriginales);
   }
 }

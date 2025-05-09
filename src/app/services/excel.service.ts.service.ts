@@ -1,76 +1,95 @@
-import * as XLSX from 'xlsx';
 import { Injectable } from '@angular/core';
-import { saveAs } from 'file-saver';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-interface Tiempo {
-  fechaHoraEntrada: string | null | undefined;
-  fechaHoraSalida?: string | null | undefined;
-}
+import { environment } from '../../environments/environments';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { RegistroJornadaService, ResumenEmpleado } from './registrojornada.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExcelService {
-  private apiUrl = 'https://tu-api.com';
+  private apiUrl = `${environment.apiUrl}`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private registroJornadaService: RegistroJornadaService
+  ) {}
 
-  getResumenEmpleados(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/resumen-empleados`);
+  generarYExportarExcel(usarFestivos: boolean = false) {
+    this.registroJornadaService.obtenerResumenHoras(usarFestivos)
+      .subscribe(resumen => this.exportarExcel(resumen));
   }
 
-  getEmpleadosConTiempos(): Observable<{ nombre: string; tiempos: Tiempo[] }[]> {
-    return this.http.get<{ nombre: string; tiempos: Tiempo[] }[]>(`${this.apiUrl}/empleados-tiempos`);
-  }
-
-  exportarExcel(resumenEmpleados: any[], empleadosConTiempos: { nombreCompleto: string; tiempos: Tiempo[] }[]) {
+  exportarExcel(resumenEmpleados: ResumenEmpleado[]) {
     const workbook = XLSX.utils.book_new();
 
-    const resumenData = [['Nombre', 'Cédula', 'Sueldo', 'Cargo', 'Obra', 'Horas Trabajadas']];
-    resumenEmpleados.forEach(emp => {
-      resumenData.push([
-        emp.nombreCompleto || '-',
-        emp.cedula ? emp.cedula.toString() : '-',
-        emp.salario ? emp.salario.toString() : '-',
-        emp.cargo || '-',
-        emp.obra || '-',
-        emp.totalHoras ? emp.totalHoras.toString() : '0'
-      ]);
-    });
-    const resumenSheet = XLSX.utils.aoa_to_sheet(resumenData);
-    XLSX.utils.book_append_sheet(workbook, resumenSheet, 'Resumen');
+    // 1) Agrupar registros por nombreCompleto
+    const grupos = resumenEmpleados.reduce((acc, emp) => {
+      (acc[emp.nombreCompleto] ||= []).push(emp);
+      return acc;
+    }, {} as Record<string, ResumenEmpleado[]>);
 
-    empleadosConTiempos.forEach((emp, index) => {
-      const sheetData = [['Fecha', 'Hora de Entrada', 'Hora de Salida']];
-      emp.tiempos.forEach((t: Tiempo) => {
-        const fechaEntrada = t.fechaHoraEntrada && typeof t.fechaHoraEntrada === 'string'
-          ? new Date(t.fechaHoraEntrada).toLocaleDateString()
-          : '-';
-        const horaEntrada = t.fechaHoraEntrada && typeof t.fechaHoraEntrada === 'string'
-          ? new Date(t.fechaHoraEntrada).toLocaleTimeString()
-          : '-';
-        const horaSalida = t.fechaHoraSalida && typeof t.fechaHoraSalida === 'string'
-          ? new Date(t.fechaHoraSalida).toLocaleTimeString()
-          : '-';
-        sheetData.push([fechaEntrada, horaEntrada, horaSalida]);
+    // 2) Para cada grupo (un empleado), crear su propia hoja
+    Object.entries(grupos).forEach(([nombre, registros]) => {
+      const data: any[][] = [
+        ['N°', 'FECHA', 'DÍA', 'JORNADA',
+         'HORA DE ENTRADA', 'HORA DE SALIDA',
+         'TOTAL HORAS TRABAJADAS (96 h. quincena)',
+         'HORAS EXTRA (+25%)',
+         'RECARGOS NOCTURNOS (+35%)',
+         'RECARGOS NOCTURNOS DOMINICALES O FESTIVOS',
+         'RECARGOS DOMINICALES (+75%)',
+         'HORA EXTRA DOMINICAL'
+        ]
+      ];
+
+      registros.forEach((emp, i) => {
+        const fecha = this.formatearFecha(emp.fecha);
+        const diaSemana = this.obtenerDiaSemana(fecha);
+        const diurnasExtra = emp.horasExtrasDiurnas;
+        const nocturnasExtra = emp.horasExtrasNocturnas;
+        const recDom = emp.trabajoDomingo ? nocturnasExtra : 0;
+        const recFes = emp.trabajoFestivo ? diurnasExtra * 0.75 : 0;
+
+        data.push([
+          String(i + 1),
+          fecha,
+          diaSemana,
+          'X',
+          emp.horaEntrada,
+          emp.horaSalida,
+          String(emp.horasTrabajadas),
+          String(diurnasExtra),
+          String(emp.horasNocturnas),
+          String(recDom),
+          String(recFes),
+          String(recFes + nocturnasExtra * 0.75)
+        ]);
       });
-      const sheet = XLSX.utils.aoa_to_sheet(sheetData);
 
-      const baseName = emp.nombreCompleto && emp.nombreCompleto.trim().length > 0 ? emp.nombreCompleto : 'Sin nombre';
-      let sheetName = baseName;
-      let count = 1;
-      while (workbook.SheetNames.includes(sheetName)) {
-        sheetName = `${baseName} ${count}`;
-        count++;
-      }
-
+      const sheet = XLSX.utils.aoa_to_sheet(data);
+      // Limitar nombre de hoja a 31 caracteres (límite de Excel)
+      const sheetName = nombre.length > 31 ? nombre.slice(0, 28) + '...' : nombre;
       XLSX.utils.book_append_sheet(workbook, sheet, sheetName);
     });
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const fileData = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(fileData, 'Reporte_Tiempos.xlsx');
+    // 3) Exportar el libro completo
+    const buf = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([buf], { type: 'application/octet-stream' }), 'Resumen_Jornada_Empleados.xlsx');
+  }
+
+  private formatearFecha(fecha: string): string {
+    const d = new Date(fecha);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
+  private obtenerDiaSemana(fecha: string): string {
+    const d = new Date(fecha);
+    const dias = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+    return dias[d.getDay()];
   }
 }

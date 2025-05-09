@@ -46,7 +46,8 @@ export class PermisosAdminComponent implements OnInit {
         (doc.nombreEmpleado && doc.nombreEmpleado.toLowerCase().includes(q)) ||
         (doc.comentarios && doc.comentarios.toLowerCase().includes(q)) ||
         (doc.permisosEspeciales && doc.permisosEspeciales.toLowerCase().includes(q)) ||
-        (doc.fechaHoraEntrada && doc.fechaHoraEntrada.toLowerCase().includes(q))
+        (doc.fechaInicio && doc.fechaInicio.toLowerCase().includes(q)) ||
+        (doc.fechaFin && doc.fechaFin.toLowerCase().includes(q))
       );
     }
   }
@@ -57,7 +58,27 @@ export class PermisosAdminComponent implements OnInit {
 
   guardarCambios(): void {
     if (this.documentoEditando?.id) {
-      this.ausentismoService.actualizarDocumento(this.documentoEditando.id, this.documentoEditando).subscribe({
+      // Crear un nuevo objeto FormData
+      const formData = new FormData();
+
+      // Añadir los datos de TiempoAusentismo al FormData
+      formData.append('nombreEmpleado', this.documentoEditando.nombreEmpleado);
+      formData.append('comentarios', this.documentoEditando.comentarios);
+      if (this.documentoEditando.permisosEspeciales) {
+        formData.append('permisosEspeciales', this.documentoEditando.permisosEspeciales);
+      }
+      formData.append('fechaInicio', this.documentoEditando.fechaInicio);
+      formData.append('fechaFin', this.documentoEditando.fechaFin);
+      if (this.documentoEditando.rutaDocumento) {
+        formData.append('rutaDocumento', this.documentoEditando.rutaDocumento);
+      }
+      // Si tienes un archivo que enviar, puedes agregarlo de la siguiente forma:
+      if (this.documentoEditando.archivo) {
+        formData.append('archivo', this.documentoEditando.archivo, this.documentoEditando.archivo.name);
+      }
+
+      // Ahora, pasamos el FormData al servicio
+      this.ausentismoService.actualizarDocumento(this.documentoEditando.id, formData).subscribe({
         next: () => {
           this.documentoEditando = null;
           this.cargarDocumentos();
@@ -68,6 +89,7 @@ export class PermisosAdminComponent implements OnInit {
       });
     }
   }
+
 
   cancelarEdicion(): void {
     this.documentoEditando = null;

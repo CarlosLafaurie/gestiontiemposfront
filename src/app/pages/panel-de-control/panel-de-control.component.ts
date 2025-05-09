@@ -52,4 +52,10 @@ export class PanelDeControlComponent implements OnInit {
     this.router.navigate(['/permisos-admin']).then(success => {
     });
   }
+
+  irAMovimientos(): void {
+    this.router.navigate(['/movimientos']).then(success => {
+    });
+  }
+
 }

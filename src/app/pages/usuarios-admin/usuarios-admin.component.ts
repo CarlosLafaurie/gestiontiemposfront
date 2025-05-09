@@ -40,9 +40,8 @@ export class UsuariosAdminComponent implements OnInit {
 
   cargarUsuarios(): void {
     this.userService.getAllUsers().subscribe({
-      next: (data) => {
-        this.usuarios = data;
-        this.filtrarUsuarios();
+      next: (data) => { this.usuarios = data;
+         this.filtrarUsuarios();
       },
       error: (err) => console.error('❌ Error al obtener usuarios:', err)
     });

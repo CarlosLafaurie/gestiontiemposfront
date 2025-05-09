@@ -1,0 +1,119 @@
+<app-navbar></app-navbar>
+
+<div class="inventario-admin">
+  <h2 id="title">Administración de Inventario</h2>
+
+  <div class="search-and-add-container">
+    <div class="search-container">
+      <input
+        type="text"
+        placeholder="Buscar material..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="filtrarMateriales()"
+        class="search-input"
+      />
+    </div>
+    <button (click)="mostrarFormularioMaterial()" class="btn-agregar">
+      <i class="bx bx-plus-circle"></i>
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Código</th>
+          <th>Herramienta</th>
+          <th>Cantidad</th>
+          <th>Último Mto.</th>
+          <th>Próximo Mto.</th>
+          <th>Ubicación</th>
+          <th>Responsable</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let material of materialesFiltrados; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ material.codigo }}</td>
+          <td>{{ material.herramienta }}</td>
+          <td>{{ material.cantidad }}</td>
+          <td>{{ material.fechaUltimoMantenimiento }}</td>
+          <td>{{ material.fechaProximoMantenimiento }}</td>
+          <td>{{ material.ubicacion }}</td>
+          <td>{{ material.responsable }}</td>
+          <td class="container-row">
+            <button (click)="mostrarFormularioMaterial(material)" class="btn-editar">
+              <i class="bx bxs-edit"></i>
+            </button>
+            <button (click)="eliminarMaterial(material.id)" class="btn-eliminar">
+              <i class="bx bx-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="mostrarFormulario" class="modal">
+    <div class="modal-content">
+      <h3>{{ esEdicion ? 'Editar Material' : 'Nuevo Material' }}</h3>
+
+      <label>Código:</label>
+      <input [(ngModel)]="materialActual.codigo" type="text" required />
+
+      <label>Herramienta:</label>
+      <input [(ngModel)]="materialActual.herramienta" type="text" required />
+
+      <label>Cantidad:</label>
+      <input [(ngModel)]="materialActual.cantidad" type="number" min="1" required />
+
+      <label>Número de Serie:</label>
+      <input [(ngModel)]="materialActual.numeroSerie" type="text" />
+
+      <label>Empresa Mto.:</label>
+      <input [(ngModel)]="materialActual.empresaMantenimiento" type="text" />
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha Último Mto.:</label>
+          <input [(ngModel)]="materialActual.fechaUltimoMantenimiento" type="date" />
+        </div>
+        <div class="form-group">
+          <label>Fecha Próximo Mto.:</label>
+          <input [(ngModel)]="materialActual.fechaProximoMantenimiento" type="date" />
+        </div>
+      </div>
+
+      <label>Observaciones:</label>
+      <textarea [(ngModel)]="materialActual.observaciones"></textarea>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ubicación:</label>
+          <select [(ngModel)]="materialActual.ubicacion" class="form-select">
+            <option *ngFor="let obra of obras" [value]="obra.nombreObra">
+              {{ obra.nombreObra }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Responsable:</label>
+          <select [(ngModel)]="materialActual.responsable" class="form-select">
+            <option *ngFor="let u of responsables" [value]="u.nombreCompleto">
+              {{ u.nombreCompleto }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <button (click)="guardarMaterial()" class="btn-guardar">
+        <i class="bx bx-save"></i>
+      </button>
+      <button (click)="cerrarFormulario()" class="btn-cancelar">
+        <i class="bx bx-x-circle"></i>
+      </button>
+    </div>
+  </div>
+</div>

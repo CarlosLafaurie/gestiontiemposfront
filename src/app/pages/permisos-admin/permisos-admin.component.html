@@ -3,11 +3,18 @@
 <div class="permisos-admin">
   <h2 id="title">Permisos Especiales Registrados</h2>
 
+  <!-- Contenedor de búsqueda -->
   <div class="search-container">
     <input
-      type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" (ngModelChange)="filtrarPermisos()" class="search-input">
+      type="text"
+      placeholder="Buscar..."
+      [(ngModel)]="searchQuery"
+      (ngModelChange)="filtrarPermisos()"
+      class="search-input"
+    />
   </div>
 
+  <!-- Tabla de permisos -->
   <div class="table-responsive">
     <table class="table">
       <thead>
@@ -15,14 +22,17 @@
           <th>#</th>
           <th>Nombre Empleado</th>
           <th>Comentarios</th>
-          <th>Fecha y Hora</th>
+          <th>Fecha de inicio</th>
+          <th>Fecha de fin</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let i = index; let doc of documentosFiltrados">
+        <tr *ngFor="let doc of documentosFiltrados; let i = index">
+          <!-- Índice de la fila -->
           <td>{{ i + 1 }}</td>
 
+          <!-- Editar nombre del empleado -->
           <ng-container *ngIf="documentoEditando && documentoEditando.id === doc.id; else mostrarNombre">
             <td>
               <input [(ngModel)]="documentoEditando.nombreEmpleado" class="form-control" />
@@ -32,6 +42,7 @@
             <td>{{ doc.nombreEmpleado }}</td>
           </ng-template>
 
+          <!-- Editar comentarios -->
           <ng-container *ngIf="documentoEditando && documentoEditando.id === doc.id; else mostrarComentarios">
             <td>
               <input [(ngModel)]="documentoEditando.comentarios" class="form-control" />
@@ -41,8 +52,11 @@
             <td>{{ doc.comentarios }}</td>
           </ng-template>
 
-          <td>{{ doc.fechaHoraEntrada | date: 'short' }}</td>
+          <!-- Fecha y hora -->
+          <td>{{ doc.fechaInicio | date: 'short' }}</td>
+          <td>{{ doc.fechaFin | date: 'short' }}</td>
 
+          <!-- Acciones -->
           <td class="container-row">
             <ng-container *ngIf="documentoEditando?.id === doc.id; else accionesNormales">
               <button class="btn-guardar" (click)="guardarCambios()">

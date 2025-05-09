@@ -12,6 +12,9 @@ import { ObrasAdminComponent } from './pages/obras-admin/obras-admin.component';
 import { TiemposAdminComponent } from './pages/tiempos-admin/tiempos-admin.component';
 import { PermisosAdminComponent } from './pages/permisos-admin/permisos-admin.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { InventarioComponent } from './pages/inventario/inventario.component';
+import { MovimientoComponent } from './pages/movimiento/movimiento-component';
+import { SolicitudesComponent } from './pages/solicitudes/solicitudes.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 
@@ -30,5 +33,8 @@ export const routes: Routes = [
   { path: 'permisos-admin', component: PermisosAdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'obra/:id', component: DetalleObraComponent, canActivate: [authGuard] },
+  { path: 'inventario', component: InventarioComponent, canActivate: [authGuard] },
+  { path: 'movimientos', component: MovimientoComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'solicitudes', component: SolicitudesComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' }
 ];
