@@ -11,6 +11,7 @@ export interface Obra {
   clienteObra: string;
   estado?: string;
   costoObra: number;
+  ubicacion: string; 
 }
 
 

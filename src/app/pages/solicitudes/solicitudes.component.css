@@ -1,4 +1,3 @@
-/* Contenedor principal */
 .solicitudes-admin {
   max-width: 1000px;
   margin: 0 auto;
@@ -7,14 +6,12 @@
   text-align: center;
 }
 
-/* Título */
 #title {
   font-size: 2rem;
   margin-bottom: 20px;
   color: #333;
 }
 
-/* Formulario de nueva solicitud */
 .formulario-solicitud {
   max-width: 800px;
   margin: 20px auto 40px;
@@ -26,7 +23,6 @@
   text-align: left;
 }
 
-/* Filas según estado */
 .row-aprobada {
   background-color: #e6f4ea !important;
 }
@@ -34,7 +30,6 @@
   background-color: #fdecea !important;
 }
 
-/* Filtro por estado */
 .filtro-estado {
   max-width: 400px;
   margin: 0 auto 20px;
@@ -45,7 +40,6 @@
   font-weight: 600;
 }
 
-/* Tabla de solicitudes */
 .table-responsive {
   overflow-x: auto;
   margin-bottom: 40px;
@@ -73,7 +67,6 @@
   background: #f1f1f1;
 }
 
-/* Columna de acciones */
 .table th:last-child,
 .table td:last-child {
   min-width: 160px;
@@ -89,7 +82,6 @@
   border-radius: 4px;
 }
 
-/* Botones de acción */
 .btn-aprobar,
 .btn-rechazar {
   height: 32px;
@@ -126,7 +118,6 @@
   cursor: not-allowed;
 }
 
-/* Controles de formulario */
 .form-row {
   display: flex;
   gap: 16px;
@@ -154,7 +145,6 @@ textarea {
   padding: 8px 16px;
 }
 
-/* Responsividad */
 @media (max-width: 768px) {
   .form-row {
     flex-direction: column;

@@ -20,6 +20,7 @@
         <th>Responsable</th>
         <th>Responsable Secundario</th>
         <th>Cliente</th>
+        <th>Ubicación</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -30,6 +31,7 @@
         <td>{{ obra.responsable ? obra.responsable : 'Sin responsable' }}</td>
         <td>{{ obra.responsableSecundario ? obra.responsableSecundario : 'Sin responsable Secundario' }}</td>
         <td>{{ obra.clienteObra ? obra.clienteObra : 'Sin cliente' }}</td>
+        <td>{{ obra.ubicacion ? obra.ubicacion : 'Sin ubicación' }}</td>
         <td>
           <button (click)="mostrarFormularioObra(obra)" class="btn-editar">
             <i class='bx bxs-edit'></i>
@@ -76,6 +78,9 @@
           {{ cli.nombre }}
         </option>
       </select>
+
+      <label>Ubicación:</label>
+      <input [(ngModel)]="obraActual.ubicacion" type="text" placeholder="Ingrese la ubicación">
 
       <button (click)="guardarObra()" class="btn-guardar">
         <i class='bx bx-save' style='color:#ffffff'></i>

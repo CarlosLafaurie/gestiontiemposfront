@@ -5,7 +5,7 @@
   <div class="image-container">
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBYjo1_UfbblCBlBfSt0Rz5y1DPXxD5pVDag&s" id="image">
   </div>
-  <div *ngIf="user; else loading">
+  <div id="content" *ngIf="user; else loading">
     <h2>Perfil de Usuario</h2>
     <p><strong>Nombre:</strong> {{ user.nombreCompleto || user.name }}</p>
     <p><strong>cedula:</strong> {{ user.cedula }}</p>

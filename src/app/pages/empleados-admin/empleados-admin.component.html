@@ -3,6 +3,10 @@
 <div class="empleados-admin">
   <h2 id="title">Administración de Empleados</h2>
 
+  <button (click)="mostrarFormularioEmpleado()" class="btn-agregar">
+    <i class='bx bx-user-plus'></i> Agregar Empleado
+  </button>
+
   <div class="search-container">
     <input type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" (ngModelChange)="filtrarEmpleados()" class="search-input">
   </div>
@@ -17,66 +21,78 @@
           <th>Cargo</th>
           <th>Obra</th>
           <th>Responsable</th>
-          <th>Responsable Secundario</th>
+          <th>Resp. Secundario</th>
           <th>Salario</th>
+          <th>Teléfono</th>
+          <th>N° Cuenta</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let empleado of empleadosFiltrados; let i = index">
-          <td>{{ i + 1 }}</td>
+        <tr *ngFor="let empleado of empleadosPaginados; let i = index">
+          <td>{{ (paginaActual - 1) * itemsPorPagina + i + 1 }}</td>
           <td>{{ empleado.cedula }}</td>
           <td>{{ empleado.nombreCompleto }}</td>
           <td>{{ empleado.cargo }}</td>
           <td>{{ empleado.obra }}</td>
           <td>{{ empleado.responsable }}</td>
-          <td>{{ empleado.responsableSecundario || 'Sin responsable Secundario' }}</td>
+          <td>{{ empleado.responsableSecundario || 'Sin responsable' }}</td>
           <td>{{ empleado.salario | number:'1.2-2' }}</td>
-          <td class="container-row">
-            <button (click)="mostrarFormularioEmpleado(empleado)" class="btn-editar"><i class='bx bxs-edit'></i></button>
-            <button (click)="eliminarEmpleado(empleado.id)" class="btn-eliminar"><i class='bx bx-trash' style='color:#ffffff'></i></button>
+          <td>{{ empleado.telefono || 'N/A' }}</td>
+          <td>{{ empleado.numeroCuenta || 'N/A' }}</td>
+          <td>
+            <button (click)="mostrarFormularioEmpleado(empleado)" class="btn-editar">
+              <i class='bx bxs-edit'></i>
+            </button>
+            <button (click)="eliminarEmpleado(empleado.id)" class="btn-eliminar">
+              <i class='bx bx-trash'></i>
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <button (click)="mostrarFormularioEmpleado()" class="btn-agregar"><i class='bx bx-user-plus'></i> Agregar Empleado</button>
+  <div class="paginacion">
+    <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1">Anterior</button>
+    <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+    <button (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas">Siguiente</button>
+  </div>
 
   <div *ngIf="mostrarFormulario" class="modal">
     <div class="modal-content">
       <h3>{{ esEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}</h3>
+      <div class="form-grid">
+        <label>Cédula:</label>
+        <input [(ngModel)]="empleadoActual.cedula" type="text" required>
+        <label>Nombre Completo:</label>
+        <input [(ngModel)]="empleadoActual.nombreCompleto" type="text" required>
+        <label>Cargo:</label>
+        <input [(ngModel)]="empleadoActual.cargo" type="text" required>
+        <label>Obra:</label>
+        <select [(ngModel)]="empleadoActual.obra">
+          <option *ngFor="let obra of obras" [value]="obra.nombreObra">{{ obra.nombreObra }}</option>
+        </select>
+        <label>Responsable:</label>
+        <select [(ngModel)]="empleadoActual.responsable">
+          <option *ngFor="let resp of responsables" [value]="resp.nombre">{{ resp.nombre }}</option>
+        </select>
+        <label>Responsable Secundario:</label>
+        <select [(ngModel)]="empleadoActual.responsableSecundario">
+          <option *ngFor="let resp of responsables" [value]="resp.nombre">{{ resp.nombre }}</option>
+        </select>
+        <label>Salario:</label>
+        <input [(ngModel)]="empleadoActual.salario" type="number" required>
+        <label>Teléfono:</label>
+        <input [(ngModel)]="empleadoActual.telefono" type="text">
+        <label>N° Cuenta:</label>
+        <input [(ngModel)]="empleadoActual.numeroCuenta" type="text">
+      </div>
 
-      <label>Cédula:</label>
-      <input [(ngModel)]="empleadoActual.cedula" type="text" required>
-
-      <label>Nombre Completo:</label>
-      <input [(ngModel)]="empleadoActual.nombreCompleto" type="text" required>
-
-      <label>Cargo:</label>
-      <input [(ngModel)]="empleadoActual.cargo" type="text" required>
-
-      <label>Obra:</label>
-      <select [(ngModel)]="empleadoActual.obra" required>
-        <option *ngFor="let obra of obras" [value]="obra.nombreObra">{{ obra.nombreObra }}</option>
-      </select>
-
-      <label>Responsable:</label>
-      <select [(ngModel)]="empleadoActual.responsable" required>
-        <option *ngFor="let r of responsables" [value]="r.nombreCompleto">{{ r.nombreCompleto }}</option>
-      </select>
-
-      <label>Responsable Secundario:</label>
-      <select [(ngModel)]="empleadoActual.responsableSecundario">
-        <option value="">Sin responsable Secundario</option>
-        <option *ngFor="let r of responsables" [value]="r.nombreCompleto">{{ r.nombreCompleto }}</option>
-      </select>
-
-      <label>Salario:</label>
-      <input [(ngModel)]="empleadoActual.salario" type="number" step="0.01" required>
-
-      <button (click)="guardarEmpleado()" class="btn-guardar"><i class='bx bx-save' style='color:#ffffff'></i></button>
-      <button (click)="cerrarFormulario()" class="btn-cancelar"><i class='bx bx-x-circle' style='color:#ffffff'></i></button>
+      <div class="form-actions">
+        <button (click)="guardarEmpleado()">{{ esEdicion ? 'Actualizar' : 'Guardar' }}</button>
+        <button (click)="cerrarFormulario()">Cancelar</button>
+      </div>
     </div>
   </div>
 </div>

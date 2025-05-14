@@ -13,6 +13,8 @@ export interface Empleado {
   responsableSecundario?: string;
   salario: number;
   estado?: string;
+  telefono?: string;
+  numeroCuenta?: string;
   seleccionado?: boolean;
 }
 
@@ -25,8 +27,8 @@ export class EmpleadoService {
 
   constructor(private http: HttpClient) {}
 
-  obtenerEmpleados(): Observable<Empleado[]> {
-    return this.http.get<Empleado[]>(this.apiUrl);
+  obtenerEmpleados(page: number = 1, pageSize: number = 100): Observable<Empleado[]> {
+  return this.http.get<Empleado[]>(`${this.apiUrl}?page=${page}&pageSize=${pageSize}`);
   }
 
   obtenerEmpleadosPorObraYResponsable(obra: string, responsable: string): Observable<Empleado[]> {

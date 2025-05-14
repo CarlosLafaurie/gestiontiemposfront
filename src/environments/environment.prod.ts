@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://localhost:7280/api'
+    apiUrl: 'https://backpicso-ebbaf6hshfhpbpe0.centralus-01.azurewebsites.net/api'
   };

@@ -29,7 +29,8 @@ export class ObrasAdminComponent implements OnInit {
     responsableSecundario: 'Sin responsable Secundario',
     clienteObra: 'Sin cliente',
     estado: 'Activo',
-    costoObra: 0
+    costoObra: 0,
+    ubicacion: 'sin definir'
   };
 
   private obraService = inject(ObraService);
@@ -128,7 +129,8 @@ export class ObrasAdminComponent implements OnInit {
         responsable: 'Sin responsable',
         responsableSecundario: 'Sin responsable Secundario',
         clienteObra: 'Sin cliente',
-        costoObra: 0
+        costoObra: 0,
+        ubicacion: 'sin definir'
       };
     }
   }
@@ -141,7 +143,8 @@ export class ObrasAdminComponent implements OnInit {
       responsable: 'Sin responsable',
       responsableSecundario: 'Sin responsable Secundario',
       clienteObra: 'Sin cliente',
-      costoObra: 0
+      costoObra: 0,
+      ubicacion: 'sin definir'
     };
   }
 
@@ -165,7 +168,8 @@ export class ObrasAdminComponent implements OnInit {
         responsable: this.obraActual.responsable,
         clienteObra: this.obraActual.clienteObra,
         estado: this.obraActual.estado,
-        costoObra: this.obraActual.costoObra
+        costoObra: this.obraActual.costoObra,
+        ubicacion: this.obraActual.ubicacion
       };
       (obraAEnviar as any).responsableSecundario = this.obraActual.responsableSecundario;
       this.obraService.editObra(obraAEnviar.id, obraAEnviar).subscribe({
@@ -186,7 +190,8 @@ export class ObrasAdminComponent implements OnInit {
         responsable: this.obraActual.responsable,
         clienteObra: this.obraActual.clienteObra,
         estado: "activo",
-        costoObra: this.obraActual.costoObra
+        costoObra: this.obraActual.costoObra,
+        ubicacion: this.obraActual.ubicacion
       };
       (obraNueva as any).responsableSecundario = this.obraActual.responsableSecundario;
       this.obraService.createObra(obraNueva).subscribe({

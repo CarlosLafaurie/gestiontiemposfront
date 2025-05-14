@@ -15,9 +15,9 @@ import { NavbarComponent } from '../../navbar/navbar.component';
 })
 export class EmpleadosAdminComponent implements OnInit {
   empleados: Empleado[] = [];
+  empleadosFiltrados: Empleado[] = [];
   obras: Obra[] = [];
   responsables: any[] = [];
-  empleadosFiltrados: Empleado[] = [];
   searchQuery: string = '';
 
   mostrarFormulario = false;
@@ -31,8 +31,15 @@ export class EmpleadosAdminComponent implements OnInit {
     responsable: '',
     responsableSecundario: '',
     estado: 'Activo',
-    salario: 0
+    salario: 0,
+    telefono: '',
+    numeroCuenta: '',
   };
+
+  // Paginación
+  paginaActual = 1;
+  itemsPorPagina = 10;
+  totalPaginas = 1;
 
   private empleadoService = inject(EmpleadoService);
   private obraService = inject(ObraService);
@@ -47,7 +54,7 @@ export class EmpleadosAdminComponent implements OnInit {
   }
 
   cargarEmpleados(): void {
-    this.empleadoService.obtenerEmpleados().subscribe({
+    this.empleadoService.obtenerEmpleados(1, 1000).subscribe({
       next: (data) => {
         this.empleados = data;
         this.filtrarEmpleados();
@@ -68,122 +75,94 @@ export class EmpleadosAdminComponent implements OnInit {
   cargarResponsables(): void {
     this.userService.getAllUsers().subscribe({
       next: (data) => {
-        this.responsables = data.filter(user => user.rol && user.rol.toLowerCase() === 'responsable');
+        this.responsables = data.filter(user => user.rol?.toLowerCase() === 'responsable');
       },
       error: (err) => console.error('❌ Error al obtener responsables:', err)
     });
   }
 
   filtrarEmpleados(): void {
-    if (!this.searchQuery) {
-      this.empleadosFiltrados = this.empleados;
-    } else {
-      const q = this.searchQuery.toLowerCase();
-      this.empleadosFiltrados = this.empleados.filter(u =>
-        (u.nombreCompleto && u.nombreCompleto.toLowerCase().includes(q)) ||
-        (u.responsable && u.responsable.toLowerCase().includes(q)) ||
-        (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
-        (u.cedula && u.cedula.toLowerCase().includes(q)) ||
-        (u.cargo && u.cargo.toLowerCase().includes(q)) ||
-        (u.obra && u.obra.toLowerCase().includes(q))
-      );
-    }
+    const q = this.searchQuery.toLowerCase();
+    this.empleadosFiltrados = this.empleados.filter(u =>
+      u.nombreCompleto?.toLowerCase().includes(q) ||
+      u.responsable?.toLowerCase().includes(q) ||
+      u.responsableSecundario?.toLowerCase().includes(q) ||
+      u.cedula?.toLowerCase().includes(q) ||
+      u.cargo?.toLowerCase().includes(q) ||
+      u.telefono?.toLowerCase().includes(q) ||
+      u.numeroCuenta?.toLowerCase().includes(q) ||
+      u.obra?.toLowerCase().includes(q)
+    );
+
+    this.totalPaginas = Math.ceil(this.empleadosFiltrados.length / this.itemsPorPagina);
+    this.paginaActual = 1;
+  }
+
+  get empleadosPaginados(): Empleado[] {
+    const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
+    const fin = inicio + this.itemsPorPagina;
+    return this.empleadosFiltrados.slice(inicio, fin);
+  }
+
+
+  cambiarPagina(delta: number): void {
+    this.paginaActual += delta;
+    if (this.paginaActual < 1) this.paginaActual = 1;
+    if (this.paginaActual > this.totalPaginas) this.paginaActual = this.totalPaginas;
   }
 
   mostrarFormularioEmpleado(empleado: Empleado | null = null): void {
     this.mostrarFormulario = true;
-    this.esEdicion = empleado !== null;
-    if (empleado) {
-      this.empleadoActual = { ...empleado };
-    } else {
-      this.empleadoActual = { id: 0, cedula: '', nombreCompleto: '', cargo: '', obra: '', responsable: '', responsableSecundario: '', salario: 0 };
-    }
+    this.esEdicion = !!empleado;
+    this.empleadoActual = empleado ? { ...empleado } : {
+      id: 0, cedula: '', nombreCompleto: '', cargo: '', obra: '', responsable: '',
+      responsableSecundario: '', salario: 0, telefono: '', numeroCuenta: '', estado: 'Activo'
+    };
   }
 
   cerrarFormulario(): void {
     this.mostrarFormulario = false;
-    this.empleadoActual = { id: 0, cedula: '', nombreCompleto: '', cargo: '', obra: '', responsable: '', responsableSecundario: '', salario: 0 };
+    this.empleadoActual = {
+      id: 0, cedula: '', nombreCompleto: '', cargo: '', obra: '', responsable: '',
+      responsableSecundario: '', salario: 0, telefono: '', numeroCuenta: '', estado: 'Activo'
+    };
   }
 
- guardarEmpleado(): void {
-    console.log("📌 Intentando guardar empleado...", this.empleadoActual);
-
-    if (
-      !this.empleadoActual.cedula ||
-      !this.empleadoActual.nombreCompleto ||
-      !this.empleadoActual.cargo ||
-      !this.empleadoActual.obra ||
-      !this.empleadoActual.responsable ||
-      this.empleadoActual.salario === undefined || this.empleadoActual.salario === null || this.empleadoActual.salario <= 0
-    ) {
-      console.error("❌ Todos los campos obligatorios deben estar completos", this.empleadoActual);
+  guardarEmpleado(): void {
+    if (!this.empleadoActual.cedula || !this.empleadoActual.nombreCompleto || !this.empleadoActual.cargo ||
+        !this.empleadoActual.obra || !this.empleadoActual.responsable || !this.empleadoActual.responsableSecundario ||
+        !this.empleadoActual.telefono || !this.empleadoActual.numeroCuenta || this.empleadoActual.salario <= 0) {
+      alert('Completa todos los campos requeridos.');
       return;
     }
 
-    if (!this.empleadoActual.estado) {
-      this.empleadoActual.estado = "Activo";
-    }
-
-    if (typeof this.empleadoActual.salario !== "number") {
-      this.empleadoActual.salario = Number(this.empleadoActual.salario);
-    }
-
     if (this.esEdicion) {
-      console.log("📝 Modo edición - Actualizando empleado...");
       this.empleadoService.actualizarEmpleado(this.empleadoActual.id, this.empleadoActual).subscribe({
         next: () => {
-          console.log("✅ Empleado actualizado correctamente:", this.empleadoActual);
           this.cargarEmpleados();
           this.cerrarFormulario();
         },
-        error: (error) => {
-          console.error("❌ Error al actualizar empleado:", error);
-          console.error("📌 Detalles del error:", error.error);
-        }
+        error: err => console.error('Error al actualizar:', err)
       });
     } else {
-      console.log("🆕 Modo creación - Creando nuevo empleado...");
-
       this.empleadoActual.id = 0;
-      console.log("📤 Enviando al backend:", this.empleadoActual);
-
       this.empleadoService.crearEmpleado(this.empleadoActual).subscribe({
-        next: (response) => {
-          console.log("✅ Empleado agregado correctamente:", response);
+        next: () => {
           this.cargarEmpleados();
           this.cerrarFormulario();
         },
-        error: (error) => {
-          console.error("❌ Error al agregar empleado:", error);
-          console.error("📌 Detalles del error:", error.error);
-        }
+        error: err => console.error('Error al crear:', err)
       });
-    }
-}
-
-
-  copiarContrasena(usuario: any): void {
-    if (usuario.contrasena) {
-      navigator.clipboard.writeText(usuario.contrasena)
-        .then(() => alert('Contraseña copiada al portapapeles'))
-        .catch(err => console.error('❌ Error al copiar la contraseña:', err));
-    } else {
-      alert('No hay contraseña para copiar');
     }
   }
 
   eliminarEmpleado(id: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar este empleado?')) {
+    if (confirm('¿Deseas eliminar este empleado?')) {
       this.empleadoService.eliminarEmpleado(id).subscribe({
         next: () => {
-          console.log('✅ Empleado eliminado correctamente.');
-          this.empleados = this.empleados.filter(emp => emp.id !== id);
-          this.filtrarEmpleados();
+          this.cargarEmpleados();
         },
-        error: (err) => {
-          console.error('❌ Error al eliminar empleado:', err);
-          alert('Error al eliminar empleado. Por favor, inténtalo nuevamente.');
-        }
+        error: err => console.error('Error al eliminar:', err)
       });
     }
   }
