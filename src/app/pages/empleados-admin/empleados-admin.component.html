@@ -73,14 +73,21 @@
         <select [(ngModel)]="empleadoActual.obra">
           <option *ngFor="let obra of obras" [value]="obra.nombreObra">{{ obra.nombreObra }}</option>
         </select>
+
         <label>Responsable:</label>
-        <select [(ngModel)]="empleadoActual.responsable">
-          <option *ngFor="let resp of responsables" [value]="resp.nombre">{{ resp.nombre }}</option>
+        <select [(ngModel)]="empleadoActual.responsable" required>
+          <option *ngFor="let resp of responsables" [value]="resp.nombre">
+            {{ resp.nombre }}
+          </option>
         </select>
+
         <label>Responsable Secundario:</label>
         <select [(ngModel)]="empleadoActual.responsableSecundario">
-          <option *ngFor="let resp of responsables" [value]="resp.nombre">{{ resp.nombre }}</option>
+          <option *ngFor="let resp of responsables" [value]="resp.nombre">
+            {{ resp.nombre }}
+          </option>
         </select>
+
         <label>Salario:</label>
         <input [(ngModel)]="empleadoActual.salario" type="number" required>
         <label>Teléfono:</label>

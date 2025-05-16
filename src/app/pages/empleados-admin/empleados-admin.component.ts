@@ -36,7 +36,6 @@ export class EmpleadosAdminComponent implements OnInit {
     numeroCuenta: '',
   };
 
-  // Paginación
   paginaActual = 1;
   itemsPorPagina = 10;
   totalPaginas = 1;
@@ -75,7 +74,14 @@ export class EmpleadosAdminComponent implements OnInit {
   cargarResponsables(): void {
     this.userService.getAllUsers().subscribe({
       next: (data) => {
-        this.responsables = data.filter(user => user.rol?.toLowerCase() === 'responsable');
+        const listaResponsables = data
+          .filter(user => user.rol && user.rol.toLowerCase() === 'responsable')
+          .map(user => ({
+            id: user.id,
+            nombre: user.nombreCompleto || 'Nombre no disponible'
+          }));
+
+        this.responsables = [{ id: null, nombre: 'Sin responsable' }, ...listaResponsables];
       },
       error: (err) => console.error('❌ Error al obtener responsables:', err)
     });
