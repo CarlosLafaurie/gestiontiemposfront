@@ -110,7 +110,6 @@ export class EmpleadosAdminComponent implements OnInit {
     return this.empleadosFiltrados.slice(inicio, fin);
   }
 
-
   cambiarPagina(delta: number): void {
     this.paginaActual += delta;
     if (this.paginaActual < 1) this.paginaActual = 1;
@@ -135,9 +134,15 @@ export class EmpleadosAdminComponent implements OnInit {
   }
 
   guardarEmpleado(): void {
-    if (!this.empleadoActual.cedula || !this.empleadoActual.nombreCompleto || !this.empleadoActual.cargo ||
-        !this.empleadoActual.obra || !this.empleadoActual.responsable || !this.empleadoActual.responsableSecundario ||
-        !this.empleadoActual.telefono || !this.empleadoActual.numeroCuenta || this.empleadoActual.salario <= 0) {
+    if (!this.empleadoActual.cedula ||
+        !this.empleadoActual.nombreCompleto ||
+        !this.empleadoActual.cargo ||
+        !this.empleadoActual.obra ||
+        !this.empleadoActual.responsable ||
+        !this.empleadoActual.responsableSecundario ||
+        !this.empleadoActual.telefono ||
+        !this.empleadoActual.numeroCuenta ||
+        this.empleadoActual.salario <= 0) {
       alert('Completa todos los campos requeridos.');
       return;
     }
@@ -148,7 +153,9 @@ export class EmpleadosAdminComponent implements OnInit {
           this.cargarEmpleados();
           this.cerrarFormulario();
         },
-        error: err => console.error('Error al actualizar:', err)
+        error: (err) => {
+          console.error('❌ Error al actualizar el empleado:', err);
+        }
       });
     } else {
       this.empleadoActual.id = 0;
@@ -157,7 +164,9 @@ export class EmpleadosAdminComponent implements OnInit {
           this.cargarEmpleados();
           this.cerrarFormulario();
         },
-        error: err => console.error('Error al crear:', err)
+        error: (err) => {
+          console.error('❌ Error al crear el empleado:', err);
+        }
       });
     }
   }

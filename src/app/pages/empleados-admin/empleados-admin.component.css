@@ -168,10 +168,35 @@ button {
   justify-content: flex-end;
 }
 
-.btn-guardar,
-.btn-cancelar {
-  flex: 1 1 140px;
+.btn-guardar {
+  background-color: #28a745;
+  color: #fff;
   padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 48%;
+  margin-right: 4%;
+  transition: background-color 0.3s ease;
+}
+
+.btn-guardar:hover {
+  background-color: #218838;
+}
+
+.btn-cancelar {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 48%;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cancelar:hover {
+  background-color: #c82333;
 }
 
 .container-row {
