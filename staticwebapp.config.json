@@ -1,0 +1,11 @@
+{
+  "routes": [
+    {
+      "route": "login",
+      "methods": [
+        "post"
+      ],
+      "redirect": "/login"
+    }
+  ]
+}
