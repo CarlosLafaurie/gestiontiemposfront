@@ -14,12 +14,6 @@ export class AuthService {
 
   private http = inject(HttpClient);
 
-  constructor() {
-  window.addEventListener('beforeunload', () => {
-   this.logout();
-    });
-  }
-
   login(credentials: { correo: string; contraseña: string }): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(this.apiUrl, credentials).pipe(
       tap(response => {
