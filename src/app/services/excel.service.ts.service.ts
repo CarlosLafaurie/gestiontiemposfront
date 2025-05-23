@@ -57,8 +57,8 @@ export class ExcelService {
           fecha,
           diaSemana,
           'X',
-          emp.horaEntrada,
-          emp.horaSalida,
+          this.extraerHora(emp.horaEntrada),
+          this.extraerHora(emp.horaSalida),
           String(emp.horasTrabajadas),
           String(diurnasExtra),
           String(emp.horasNocturnas),
@@ -69,12 +69,10 @@ export class ExcelService {
       });
 
       const sheet = XLSX.utils.aoa_to_sheet(data);
-      // Limitar nombre de hoja a 31 caracteres (límite de Excel)
       const sheetName = nombre.length > 31 ? nombre.slice(0, 28) + '...' : nombre;
       XLSX.utils.book_append_sheet(workbook, sheet, sheetName);
     });
 
-    // 3) Exportar el libro completo
     const buf = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     saveAs(new Blob([buf], { type: 'application/octet-stream' }), 'Resumen_Jornada_Empleados.xlsx');
   }
@@ -91,5 +89,13 @@ export class ExcelService {
     const d = new Date(fecha);
     const dias = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
     return dias[d.getDay()];
+  }
+
+  // ✅ NUEVO MÉTODO PARA OBTENER SOLO LA HORA
+  private extraerHora(fechaHora: string): string {
+    const date = new Date(fechaHora);
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `${hh}:${mm}`;
   }
 }
