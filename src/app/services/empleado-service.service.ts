@@ -12,9 +12,11 @@ export interface Empleado {
   responsable: string;
   responsableSecundario?: string;
   salario: number;
-  estado?: string;
+  estado: string;
   telefono?: string;
   numeroCuenta?: string;
+  fechaInicioContrato: string;
+  fechaFinContrato: string;
   seleccionado?: boolean;
 }
 

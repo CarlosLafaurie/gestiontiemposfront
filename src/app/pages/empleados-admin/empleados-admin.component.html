@@ -23,6 +23,8 @@
           <th>Responsable</th>
           <th>Resp. Secundario</th>
           <th>Salario</th>
+          <th>Inicio Contrato</th>
+          <th>Fin Contrato</th>
           <th>Teléfono</th>
           <th>N° Cuenta</th>
           <th>Acciones</th>
@@ -38,6 +40,8 @@
           <td>{{ empleado.responsable }}</td>
           <td>{{ empleado.responsableSecundario || 'Sin responsable' }}</td>
           <td>{{ empleado.salario | number:'1.2-2' }}</td>
+          <td>{{ empleado.fechaInicioContrato | date: 'yyyy-MM-dd' }}</td>
+          <td>{{ empleado.fechaFinContrato | date: 'yyyy-MM-dd' }}</td>
           <td>{{ empleado.telefono || 'N/A' }}</td>
           <td>{{ empleado.numeroCuenta || 'N/A' }}</td>
           <td>
@@ -63,12 +67,16 @@
     <div class="modal-content">
       <h3>{{ esEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}</h3>
       <div class="form-grid">
+        
         <label>Cédula:</label>
         <input [(ngModel)]="empleadoActual.cedula" type="text" required>
+
         <label>Nombre Completo:</label>
         <input [(ngModel)]="empleadoActual.nombreCompleto" type="text" required>
+
         <label>Cargo:</label>
         <input [(ngModel)]="empleadoActual.cargo" type="text" required>
+
         <label>Obra:</label>
         <select [(ngModel)]="empleadoActual.obra">
           <option *ngFor="let obra of obras" [value]="obra.nombreObra">{{ obra.nombreObra }}</option>
@@ -90,8 +98,16 @@
 
         <label>Salario:</label>
         <input [(ngModel)]="empleadoActual.salario" type="number" required>
+
+        <label>Fecha Inicio Contrato:</label>
+        <input [(ngModel)]="empleadoActual.fechaInicioContrato" type="date" required>
+
+        <label>Fecha Fin Contrato:</label>
+        <input [(ngModel)]="empleadoActual.fechaFinContrato" type="date" required>
+
         <label>Teléfono:</label>
         <input [(ngModel)]="empleadoActual.telefono" type="text">
+
         <label>N° Cuenta:</label>
         <input [(ngModel)]="empleadoActual.numeroCuenta" type="text">
       </div>

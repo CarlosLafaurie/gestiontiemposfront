@@ -34,6 +34,8 @@ export class EmpleadosAdminComponent implements OnInit {
     salario: 0,
     telefono: '',
     numeroCuenta: '',
+    fechaInicioContrato: '',
+    fechaFinContrato: ''
   };
 
   paginaActual = 1;
@@ -80,7 +82,6 @@ export class EmpleadosAdminComponent implements OnInit {
             id: user.id,
             nombre: user.nombreCompleto || 'Nombre no disponible'
           }));
-
         this.responsables = [{ id: null, nombre: 'Sin responsable' }, ...listaResponsables];
       },
       error: (err) => console.error('❌ Error al obtener responsables:', err)
@@ -99,7 +100,6 @@ export class EmpleadosAdminComponent implements OnInit {
       u.numeroCuenta?.toLowerCase().includes(q) ||
       u.obra?.toLowerCase().includes(q)
     );
-
     this.totalPaginas = Math.ceil(this.empleadosFiltrados.length / this.itemsPorPagina);
     this.paginaActual = 1;
   }
@@ -120,53 +120,66 @@ export class EmpleadosAdminComponent implements OnInit {
     this.mostrarFormulario = true;
     this.esEdicion = !!empleado;
     this.empleadoActual = empleado ? { ...empleado } : {
-      id: 0, cedula: '', nombreCompleto: '', cargo: '', obra: '', responsable: '',
-      responsableSecundario: '', salario: 0, telefono: '', numeroCuenta: '', estado: 'Activo'
+      id: 0,
+      cedula: '',
+      nombreCompleto: '',
+      cargo: '',
+      obra: '',
+      responsable: '',
+      responsableSecundario: '',
+      estado: 'Activo',
+      salario: 0,
+      telefono: '',
+      numeroCuenta: '',
+      fechaInicioContrato: '',
+      fechaFinContrato: ''
     };
   }
 
   cerrarFormulario(): void {
     this.mostrarFormulario = false;
     this.empleadoActual = {
-      id: 0, cedula: '', nombreCompleto: '', cargo: '', obra: '', responsable: '',
-      responsableSecundario: '', salario: 0, telefono: '', numeroCuenta: '', estado: 'Activo'
+      id: 0,
+      cedula: '',
+      nombreCompleto: '',
+      cargo: '',
+      obra: '',
+      responsable: '',
+      responsableSecundario: '',
+      estado: 'Activo',
+      salario: 0,
+      telefono: '',
+      numeroCuenta: '',
+      fechaInicioContrato: '',
+      fechaFinContrato: ''
     };
   }
 
   guardarEmpleado(): void {
-    if (!this.empleadoActual.cedula ||
-        !this.empleadoActual.nombreCompleto ||
-        !this.empleadoActual.cargo ||
-        !this.empleadoActual.obra ||
-        !this.empleadoActual.responsable ||
-        !this.empleadoActual.responsableSecundario ||
-        !this.empleadoActual.telefono ||
-        !this.empleadoActual.numeroCuenta ||
-        this.empleadoActual.salario <= 0) {
+    const e = this.empleadoActual;
+    if (!e.cedula || !e.nombreCompleto || !e.cargo || !e.obra || !e.responsable ||
+        !e.responsableSecundario || !e.fechaInicioContrato || !e.fechaFinContrato ||
+        !e.telefono || !e.numeroCuenta || e.salario <= 0) {
       alert('Completa todos los campos requeridos.');
       return;
     }
 
     if (this.esEdicion) {
-      this.empleadoService.actualizarEmpleado(this.empleadoActual.id, this.empleadoActual).subscribe({
+      this.empleadoService.actualizarEmpleado(e.id, e).subscribe({
         next: () => {
           this.cargarEmpleados();
           this.cerrarFormulario();
         },
-        error: (err) => {
-          console.error('❌ Error al actualizar el empleado:', err);
-        }
+        error: (err) => console.error('❌ Error al actualizar el empleado:', err)
       });
     } else {
-      this.empleadoActual.id = 0;
-      this.empleadoService.crearEmpleado(this.empleadoActual).subscribe({
+      e.id = 0;
+      this.empleadoService.crearEmpleado(e).subscribe({
         next: () => {
           this.cargarEmpleados();
           this.cerrarFormulario();
         },
-        error: (err) => {
-          console.error('❌ Error al crear el empleado:', err);
-        }
+        error: (err) => console.error('❌ Error al crear el empleado:', err)
       });
     }
   }
@@ -174,10 +187,8 @@ export class EmpleadosAdminComponent implements OnInit {
   eliminarEmpleado(id: number): void {
     if (confirm('¿Deseas eliminar este empleado?')) {
       this.empleadoService.eliminarEmpleado(id).subscribe({
-        next: () => {
-          this.cargarEmpleados();
-        },
-        error: err => console.error('Error al eliminar:', err)
+        next: () => this.cargarEmpleados(),
+        error: (err) => console.error('Error al eliminar:', err)
       });
     }
   }

@@ -131,4 +131,58 @@
       </button>
     </form>
   </mat-expansion-panel>
-</mat-accordion>
+
+    <!-- Separación entre paneles -->
+  <div style="margin-top: 20px;"></div>
+
+  <mat-expansion-panel (opened)="cambiarModo('editar')">
+  <mat-expansion-panel-header>
+    <mat-panel-title>Editar Tiempos</mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <form (ngSubmit)="guardarEdicion()" class="formulario-actualizar">
+    <!-- Campo de solo lectura con el nombre del empleado -->
+    <div class="form-group">
+      <label>Empleado:</label>
+      <input
+        type="text"
+        class="form-control"
+        [value]="empleadoSeleccionado?.nombreEmpleado"
+        readonly />
+    </div>
+
+    <div *ngIf="empleadoSeleccionado">
+      <div class="form-group mt-3">
+        <label>Última Entrada:</label>
+        <input
+          type="datetime-local"
+          [(ngModel)]="empleadoSeleccionado.fechaHoraEntrada"
+          name="fechaEntradaEdit"
+          class="form-control" />
+      </div>
+
+      <div class="form-group mt-2">
+        <label>Última Salida:</label>
+        <input
+          type="datetime-local"
+          [(ngModel)]="empleadoSeleccionado.fechaHoraSalida"
+          name="fechaSalidaEdit"
+          class="form-control" />
+      </div>
+
+      <div class="form-group mt-2">
+        <label>Comentarios:</label>
+        <input
+          type="text"
+          [(ngModel)]="empleadoSeleccionado.comentarios"
+          name="comentariosEdit"
+          class="form-control" />
+      </div>
+
+      <div class="mt-3">
+        <button type="submit" class="btn btn-warning mr-2">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+      </div>
+    </div>
+  </form>
+</mat-expansion-panel>

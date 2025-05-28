@@ -5,15 +5,17 @@ import { TiemposService } from '../services/tiempos.service.service';
 import { AusentismoService } from '../services/documento-permiso.service';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { forkJoin, Observable } from 'rxjs';
 
 export interface TiempoExtendido {
-  id: number;
+  ingresoId: number | null;
+  salidaId: number | null;
   empleadoId: number;
+  nombreEmpleado: string;
   fechaHoraEntrada: string | null;
   fechaHoraSalida: string | null;
   comentarios: string;
   permisosEspeciales: string;
-  nombreEmpleado: string;
   archivo?: File | null;
 }
 
@@ -28,9 +30,11 @@ export interface TiempoExtendido {
 export class ListaTiemposComponent implements OnInit, OnChanges {
   @Input() empleadosSeleccionados: any[] = [];
   listaTiempos: TiempoExtendido[] = [];
+
+  empleadoSeleccionado: TiempoExtendido | null = null;
+
   tipoRegistro = 'entrada';
   fechaHoraGlobal = '';
-  // Campos nuevos para ausentismo
   fechaInicioPermiso = '';
   fechaFinPermiso = '';
   modo = 'tiempos';
@@ -42,11 +46,9 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
-    if (this.empleadosSeleccionados.length === 0) {
-      console.warn('⚠️ No se recibieron empleados seleccionados.');
-      return;
+    if (this.empleadosSeleccionados.length) {
+      this.generarListaTiempos();
     }
-    this.generarListaTiempos();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -57,26 +59,25 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
 
   private generarListaTiempos() {
     this.listaTiempos = this.empleadosSeleccionados.map(emp => ({
-      id: 0,
+      ingresoId: null,
+      salidaId: null,
       empleadoId: emp.id,
+      nombreEmpleado: emp.nombre,
       fechaHoraEntrada: null,
       fechaHoraSalida: null,
       comentarios: '',
       permisosEspeciales: '',
-      nombreEmpleado: emp.nombre,
       archivo: null
     }));
   }
 
   actualizarHoras() {
-    // No modificado: mantiene la lógica original para tiempos
     this.listaTiempos.forEach(t => {
-      if (this.fechaHoraGlobal) {
-        if (this.tipoRegistro === 'entrada') {
-          t.fechaHoraEntrada = this.fechaHoraGlobal;
-        } else if (this.tipoRegistro === 'salida') {
-          t.fechaHoraSalida = this.fechaHoraGlobal;
-        }
+      if (!this.fechaHoraGlobal) return;
+      if (this.tipoRegistro === 'entrada') {
+        t.fechaHoraEntrada = this.fechaHoraGlobal;
+      } else {
+        t.fechaHoraSalida = this.fechaHoraGlobal;
       }
     });
   }
@@ -86,112 +87,141 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
   }
 
   guardarTiempos() {
-    // Lógica original sin cambios
-    if (!this.esValidoParaGuardar()) {
-      console.warn('⚠️ No hay tiempos válidos para guardar.');
-      return;
-    }
-    let completados = 0;
-    const total = this.listaTiempos.filter(t => t.fechaHoraEntrada || t.fechaHoraSalida).length;
-    this.listaTiempos.forEach(({ nombreEmpleado, ...tiempo }) => {
-      if (tiempo.fechaHoraEntrada) {
-        this.tiemposService.registrarIngreso(tiempo).subscribe({
-          next: () => {
-            completados++;
-            if (completados === total) {
-              alert('✅ Ingreso cargado correctamente.');
-              location.reload();
-            }
-          },
-          error: err => {
-            console.error('❌ Error al registrar ingreso:', err);
-          }
-        });
+    const observables: Observable<any>[] = [];
+    this.listaTiempos.forEach(t => {
+      if (t.fechaHoraEntrada) {
+        observables.push(this.tiemposService.registrarIngreso({
+          empleadoId: t.empleadoId,
+          fechaHoraEntrada: t.fechaHoraEntrada,
+          comentarios: t.comentarios,
+          permisosEspeciales: ''
+        }));
       }
-      if (tiempo.fechaHoraSalida) {
-        this.tiemposService.registrarSalida(tiempo).subscribe({
-          next: () => {
-            completados++;
-            if (completados === total) {
-              alert('✅ Salida cargada correctamente.');
-              location.reload();
-            }
-          },
-          error: err => {
-            console.error('❌ Error al registrar salida:', err);
-          }
-        });
+      if (t.fechaHoraSalida) {
+        observables.push(this.tiemposService.registrarSalida({
+          empleadoId: t.empleadoId,
+          fechaHoraSalida: t.fechaHoraSalida,
+          comentarios: t.comentarios,
+          permisosEspeciales: ''
+        }));
+      }
+    });
+    forkJoin(observables).subscribe({
+      next: () => {
+        this.snackBar.open('✅ Tiempos cargados correctamente.', 'Cerrar', { duration: 3000 });
+        location.reload();
+      },
+      error: () => {
+        this.snackBar.open('❌ Error al guardar tiempos.', 'Cerrar', { duration: 3000 });
       }
     });
   }
 
   cambiarModo(modo: string) {
     this.modo = modo;
+    if (modo === 'editar' && this.listaTiempos.length) {
+      this.empleadoSeleccionado = this.listaTiempos[0];
+      this.cargarUltimosTiempos();
+    }
   }
 
-  // --- Solo de aquí para abajo: AUSENTISMO ---
-
   esValidoParaGuardarAusentismo(): boolean {
-    return (
-      this.fechaInicioPermiso !== '' &&
-      this.fechaFinPermiso !== '' &&
-      this.fechaInicioPermiso <= this.fechaFinPermiso &&
-      this.listaTiempos.some(t => !!t.permisosEspeciales)
-    );
+    return !!this.fechaInicioPermiso &&
+           !!this.fechaFinPermiso &&
+           this.fechaInicioPermiso <= this.fechaFinPermiso &&
+           this.listaTiempos.some(t => t.permisosEspeciales.trim() !== '');
   }
 
   guardarAusentismo() {
-    if (!this.esValidoParaGuardarAusentismo()) {
-      this.snackBar.open(
-        '⚠️ Complete fechas y seleccione al menos un permiso.',
-        'Cerrar',
-        { duration: 3000 }
-      );
-      return;
-    }
-
-    const registros = this.listaTiempos.filter(t => !!t.permisosEspeciales);
-    let completados = 0;
-
-    registros.forEach(tiempo => {
-      const formData = new FormData();
-      formData.append('NombreEmpleado', tiempo.nombreEmpleado);
-      formData.append('Comentarios', tiempo.comentarios);
-      formData.append('PermisosEspeciales', tiempo.permisosEspeciales);
-      formData.append('FechaInicio', this.fechaInicioPermiso);
-      formData.append('FechaFin', this.fechaFinPermiso);
-      if (tiempo.archivo) {
-        formData.append('Archivo', tiempo.archivo);
+    const regs = this.listaTiempos.filter(t => t.permisosEspeciales.trim());
+    const observables = regs.map(t => {
+      const fd = new FormData();
+      fd.append('NombreEmpleado', t.nombreEmpleado);
+      fd.append('Comentarios', t.comentarios);
+      fd.append('PermisosEspeciales', t.permisosEspeciales);
+      fd.append('FechaInicio', this.fechaInicioPermiso);
+      fd.append('FechaFin', this.fechaFinPermiso);
+      if (t.archivo) fd.append('Archivo', t.archivo);
+      return this.ausentismoService.subirDocumentoAusentismo(fd);
+    });
+    forkJoin(observables).subscribe({
+      next: () => {
+        this.snackBar.open('✅ Ausentismo enviado correctamente.', 'Cerrar', { duration: 3000 });
+        setTimeout(() => location.reload(), 1000);
+      },
+      error: () => {
+        this.snackBar.open('❌ Error al guardar ausentismo.', 'Cerrar', { duration: 3000 });
       }
-
-      this.ausentismoService.subirDocumentoAusentismo(formData).subscribe({
-        next: () => {
-          completados++;
-          if (completados === registros.length) {
-            this.snackBar.open(
-              '✅ Documento de ausentismo enviado correctamente.',
-              'Cerrar',
-              { duration: 3000 }
-            );
-            setTimeout(() => location.reload(), 1000);
-          }
-        },
-        error: err => {
-          console.error('❌ Error al subir el documento de ausentismo:', err);
-          this.snackBar.open(
-            '❌ Error al guardar ausentismo.',
-            'Cerrar',
-            { duration: 3000 }
-          );
-        }
-      });
     });
   }
 
-  manejarArchivo(event: Event, index: number) {
+  manejarArchivo(event: Event, i: number) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length) {
-      this.listaTiempos[index].archivo = input.files[0];
+    if (input.files?.length) {
+      this.listaTiempos[i].archivo = input.files[0];
     }
+  }
+
+  cargarUltimosTiempos() {
+    if (!this.empleadoSeleccionado) return;
+    const emp = this.empleadoSeleccionado;
+    forkJoin([
+      this.tiemposService.obtenerUltimoIngresoPorEmpleado(emp.empleadoId),
+      this.tiemposService.obtenerUltimaSalidaPorEmpleado(emp.empleadoId)
+    ]).subscribe({
+      next: ([ingreso, salida]) => {
+        emp.ingresoId        = ingreso.id ?? null;
+        emp.fechaHoraEntrada = ingreso.fechaHoraEntrada ?? null;
+        emp.comentarios      = ingreso.comentarios ?? '';
+        emp.salidaId         = salida.id ?? null;
+        emp.fechaHoraSalida  = salida.fechaHoraSalida ?? null;
+      },
+      error: () => {
+        this.snackBar.open('❌ No se pudieron cargar últimos tiempos.', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  guardarEdicion() {
+    if (!this.empleadoSeleccionado) {
+      this.snackBar.open('⚠️ Seleccione un empleado.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    const t = this.empleadoSeleccionado;
+    const tareas: Observable<void>[] = [];
+
+    if (t.fechaHoraEntrada && t.ingresoId != null) {
+      tareas.push(this.tiemposService.actualizarIngreso(t.ingresoId, {
+        id: t.ingresoId,
+        empleadoId: t.empleadoId,
+        fechaHoraEntrada: t.fechaHoraEntrada,
+        comentarios: t.comentarios,
+        permisosEspeciales: ''
+      }));
+    }
+    if (t.fechaHoraSalida && t.salidaId != null) {
+      tareas.push(this.tiemposService.actualizarSalida(t.salidaId, {
+        id: t.salidaId,
+        empleadoId: t.empleadoId,
+        fechaHoraSalida: t.fechaHoraSalida,
+        comentarios: t.comentarios,
+        permisosEspeciales: ''
+      }));
+    }
+
+    forkJoin(tareas).subscribe({
+      next: () => {
+        this.snackBar.open('✅ Tiempo actualizado correctamente.', 'Cerrar', { duration: 3000 });
+        this.empleadoSeleccionado = null;
+        setTimeout(() => location.reload(), 500);
+      },
+      error: () => {
+        this.snackBar.open('❌ Error al actualizar tiempo.', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  cancelarEdicion() {
+    this.empleadoSeleccionado = null;
   }
 }
