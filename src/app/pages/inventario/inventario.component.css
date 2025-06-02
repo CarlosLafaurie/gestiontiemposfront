@@ -1,6 +1,7 @@
 .inventario-admin {
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: 1300px;
+  margin: 20px auto;
+
   padding: 1px;
   padding-bottom: 7%;
   text-align: center;
@@ -264,6 +265,53 @@
 
 .form-group {
   flex: 1;
+}
+
+/* Contenedor de paginación */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+/* Lista de páginas */
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Elementos de página */
+.pagination li {
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Página activa */
+.pagination li.active {
+  background-color: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+/* Hover sobre páginas no activas */
+.pagination li:not(.active):hover {
+  background-color: #e9ecef;
+}
+
+/* Elementos deshabilitados */
+.pagination li.disabled {
+  pointer-events: none;
+  color: #aaa;
+  border-color: #eee;
+  background-color: #f8f9fa;
+  cursor: default;
 }
 
 @media (max-width: 768px) {

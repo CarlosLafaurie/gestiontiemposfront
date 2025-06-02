@@ -1,3 +1,4 @@
+// src/app/components/inventario/inventario.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -29,6 +30,10 @@ export class InventarioComponent implements OnInit {
   obras: Obra[] = [];
   responsables: User[] = [];
 
+  // *** PAGINACIÓN ***
+  pageSize = 10;
+  currentPage = 1;
+
   private inventarioService = inject(InventarioService);
   private authService       = inject(AuthService);
   private obraService       = inject(ObraService);
@@ -45,53 +50,62 @@ export class InventarioComponent implements OnInit {
 
   obtenerInventario(): void {
     console.log('[InventarioComponent] obtenerInventario: solicitando lista...');
-    this.inventarioService.obtenerInventario().subscribe((data) => {
-      console.log('[InventarioComponent] obtenerInventario: recibí', data);
-      this.materiales = data;
-      this.filtrarMateriales();
-    }, err => {
-      console.error('[InventarioComponent] obtenerInventario ERROR:', err);
+    this.inventarioService.obtenerInventario().subscribe({
+      next: data => {
+        console.log('[InventarioComponent] recibí', data);
+        this.materiales = data;
+        this.filtrarMateriales();
+      },
+      error: err => console.error(err)
     });
   }
 
   cargarObras(): void {
-    console.log('[InventarioComponent] cargarObras: solicitando obras...');
-    this.obraService.getObras().subscribe((data) => {
-      console.log('[InventarioComponent] cargarObras: recibí', data);
-      this.obras = data;
-    }, err => {
-      console.error('[InventarioComponent] cargarObras ERROR:', err);
+    this.obraService.getObras().subscribe({
+      next: data => this.obras = data,
+      error: err => console.error(err)
     });
   }
 
   cargarUsuarios(): void {
-    console.log('[InventarioComponent] cargarUsuarios: solicitando usuarios...');
     this.userService.getAllUsers().subscribe({
-      next: (data) => {
-        console.log('[InventarioComponent] cargarUsuarios: recibí', data);
-        this.usuarios = data;
-        this.responsables = data.filter(u => u.rol === 'responsable');
-        console.log('[InventarioComponent] cargarUsuarios: responsables filtrados', this.responsables);
-      },
-      error: (err) => console.error('[InventarioComponent] cargarUsuarios ERROR:', err)
+      next: data => this.responsables = data.filter(u => u.rol === 'responsable'),
+      error: err => console.error(err)
     });
   }
 
   filtrarMateriales(): void {
-    console.log('[InventarioComponent] filtrarMateriales: query=', this.searchQuery);
     const q = this.searchQuery.trim().toLowerCase();
     this.materialesFiltrados = this.materiales.filter(item =>
       item.codigo.toLowerCase().includes(q) ||
       item.herramienta.toLowerCase().includes(q) ||
-      item.numeroSerie.toLowerCase().includes(q) ||
+      (item.numeroSerie || '').toLowerCase().includes(q) ||
       item.responsable.toLowerCase().includes(q) ||
-      item.ubicacion.toLowerCase().includes(q)
+      item.ubicacion.toLowerCase().includes(q) ||
+      item.estado.toLowerCase().includes(q)
     );
-    console.log('[InventarioComponent] filtrarMateriales: filtrados=', this.materialesFiltrados);
+    // al filtrar, volvemos a la página 1
+    this.currentPage = 1;
+  }
+
+  // getter para el array de páginas
+  get pages(): number[] {
+    const total = Math.ceil(this.materialesFiltrados.length / this.pageSize);
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  // cambia de página, con límites
+  setPage(page: number): void {
+    if (page < 1 || page > this.pages.length) return;
+    this.currentPage = page;
+  }
+
+  // trackBy para optimizar renderizado
+  trackById(_: number, item: Inventario): number {
+    return item.id;
   }
 
   mostrarFormularioMaterial(material?: Inventario): void {
-    console.log('[InventarioComponent] mostrarFormularioMaterial:', material);
     if (material) {
       this.materialActual = { ...material };
       this.esEdicion = true;
@@ -99,7 +113,6 @@ export class InventarioComponent implements OnInit {
       this.materialActual = this.crearNuevoItem();
       this.esEdicion = false;
     }
-    console.log('[InventarioComponent] mostrarFormularioMaterial: materialActual=', this.materialActual, 'esEdicion=', this.esEdicion);
     this.mostrarFormulario = true;
   }
 
@@ -109,53 +122,50 @@ export class InventarioComponent implements OnInit {
   }
 
   guardarMaterial(): void {
-    console.log('[InventarioComponent] guardarMaterial: esEdicion=', this.esEdicion, 'materialActual=', this.materialActual);
-    if (this.esEdicion) {
-      this.inventarioService.actualizarItem(this.materialActual).subscribe(() => {
-        console.log('[InventarioComponent] guardarMaterial: actualización exitosa');
+    console.log('[InventarioComponent] guardarMaterial:', this.materialActual);
+    const obs = this.esEdicion
+      ? this.inventarioService.actualizarItem(this.materialActual)
+      : this.inventarioService.agregarItem(this.materialActual);
+
+    obs.subscribe({
+      next: () => {
         this.obtenerInventario();
         this.cerrarFormulario();
-      }, err => console.error('[InventarioComponent] guardarMaterial ERROR al actualizar:', err));
-    } else {
-      this.inventarioService.agregarItem(this.materialActual).subscribe(() => {
-        console.log('[InventarioComponent] guardarMaterial: creación exitosa');
-        this.obtenerInventario();
-        this.cerrarFormulario();
-      }, err => console.error('[InventarioComponent] guardarMaterial ERROR al crear:', err));
-    }
+      },
+      error: err => console.error(err)
+    });
   }
 
   eliminarMaterial(id: number): void {
-    console.log('[InventarioComponent] eliminarMaterial id=', id);
-    if (confirm('¿Estás seguro de que deseas eliminar este material del inventario?')) {
-      this.inventarioService.eliminarItem(id).subscribe(() => {
-        console.log('[InventarioComponent] eliminarMaterial: eliminación exitosa');
-        this.obtenerInventario();
-      }, err => console.error('[InventarioComponent] eliminarMaterial ERROR:', err));
-    }
+    if (!confirm('¿Eliminar material?')) return;
+    this.inventarioService.eliminarItem(id).subscribe({
+      next: () => this.obtenerInventario(),
+      error: err => console.error(err)
+    });
   }
 
   logout(): void {
-    console.log('[InventarioComponent] logout');
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
   private crearNuevoItem(): Inventario {
-    const nuevo: Inventario = {
+    return {
       id: 0,
       codigo: '',
       herramienta: '',
       numeroSerie: '',
-      fechaUltimoMantenimiento: '',
+      fechaUltimoMantenimiento: null,
+      fechaProximoMantenimiento: null,
       empresaMantenimiento: '',
-      fechaProximoMantenimiento: '',
+      fechaCompra: null,
+      proveedor: '',
+      garantia: 0,
       observaciones: '',
       ubicacion: '',
       responsable: '',
+      estado: 'Activo',
       cantidad: 1
     };
-    console.log('[InventarioComponent] crearNuevoItem:', nuevo);
-    return nuevo;
   }
 }

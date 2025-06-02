@@ -9,6 +9,12 @@ nav {
   z-index: 1000;
 }
 
+#logout {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}
+
 ul {
   list-style: none;
   display: flex;
@@ -19,6 +25,10 @@ ul {
 
 li {
   display: inline;
+}
+
+li i {
+  font-size: 23px;
 }
 
 a, button {

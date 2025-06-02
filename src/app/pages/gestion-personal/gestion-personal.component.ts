@@ -23,7 +23,9 @@ export class GestionPersonalComponent implements OnInit {
   empleadosFiltrados: Empleado[] = [];
   empleadosSeleccionados: any[] = [];
   guardandoTiempos = false;
-  searchQuery: string = ''; 
+  searchQuery: string = '';
+  todosSeleccionados: boolean = false;
+
 
   private route = inject(ActivatedRoute);
   private empleadoService = inject(EmpleadoService);
@@ -73,6 +75,18 @@ export class GestionPersonalComponent implements OnInit {
       );
     }
   }
+
+toggleSeleccionarTodos(): void {
+  this.empleadosFiltrados.forEach(emp => emp.seleccionado = this.todosSeleccionados);
+  this.gestionarTiempos();
+}
+
+verificarSeleccionIndividual(): void {
+  const total = this.empleadosFiltrados.length;
+  const seleccionados = this.empleadosFiltrados.filter(emp => emp.seleccionado).length;
+  this.todosSeleccionados = total > 0 && seleccionados === total;
+  this.gestionarTiempos();
+}
 
   gestionarTiempos(): void {
     this.empleadosSeleccionados = this.empleadosFiltrados.filter(e => e.seleccionado).map(e => ({ id: e.id, nombre: e.nombreCompleto }));

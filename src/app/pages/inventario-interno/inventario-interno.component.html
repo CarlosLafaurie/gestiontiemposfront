@@ -1,0 +1,68 @@
+<app-navbar></app-navbar>
+
+<div class="inventario-admin">
+  <h2 id="title">Asignaciones de Inventario</h2>
+
+  <div class="search-and-add-container">
+    <div class="search-container">
+      <input
+        type="text"
+        placeholder="Buscar asignación..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="filtrarAsignaciones()"
+        class="search-input"
+      />
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Equipo</th>
+          <th>Número de Serie</th>
+          <th>Marca</th>
+          <th>Cantidad</th>
+          <th>Unidades</th>
+          <th>Obra</th>
+          <th>Responsable de Obra</th>
+          <th>Usando</th>
+          <th>Cantidad Asignada</th>
+          <th>Observaciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let asignacion of registrosFiltrados | slice:(currentPage - 1) * pageSize : currentPage * pageSize; let i = index; trackBy: trackById"
+        >
+          <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <td>{{ asignacion.equipo.nombre }}</td>
+          <td>{{ asignacion.equipo.numeroSerie || '-' }}</td>
+          <td>{{ asignacion.equipo.marca || '-' }}</td>
+          <td>{{ asignacion.equipo.cantidad }}</td>
+          <td>{{ asignacion.equipo.unidades || '-' }}</td>
+          <td>{{ asignacion.obra }}</td>
+          <td>{{ asignacion.responsableObra }}</td>
+          <td>{{ asignacion.usando || '-' }}</td>
+          <td>{{ asignacion.cantidadAsignada }}</td>
+          <td>{{ asignacion.observaciones || '-' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav *ngIf="pages.length > 1" class="pagination-container">
+    <ul class="pagination">
+      <li (click)="setPage(currentPage - 1)" [class.disabled]="currentPage === 1">«</li>
+      <li
+        *ngFor="let p of pages"
+        (click)="setPage(p)"
+        [class.active]="currentPage === p"
+      >
+        {{ p }}
+      </li>
+      <li (click)="setPage(currentPage + 1)" [class.disabled]="currentPage === pages.length">»</li>
+    </ul>
+  </nav>
+</div>

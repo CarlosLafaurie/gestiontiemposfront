@@ -25,6 +25,13 @@ nav {
   border-radius: 4px;
 }
 
+.th-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  justify-content: center;
+}
+
 ul {
   list-style: none;
   display: flex;

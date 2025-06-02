@@ -1,0 +1,142 @@
+.inventario-admin {
+  max-width: 1300px;
+  margin: 20px auto;
+  padding: 1px;
+  padding-bottom: 7%;
+  text-align: center;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+#title {
+  padding-top: 2%;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Contenedor del buscador */
+.search-and-add-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.search-container {
+  flex: 1;
+  text-align: center;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 70%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Tabla */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.table thead {
+  background-color: #333;
+  color: #fff;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Paginación */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pagination li {
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination li.active {
+  background-color: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+.pagination li:not(.active):hover {
+  background-color: #e9ecef;
+}
+
+.pagination li.disabled {
+  pointer-events: none;
+  color: #aaa;
+  border-color: #eee;
+  background-color: #f8f9fa;
+  cursor: default;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .search-input {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventario-admin {
+    padding: 10px;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+}

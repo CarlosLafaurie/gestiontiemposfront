@@ -12,7 +12,12 @@
   <table border="1" class="table table-bordered">
     <thead class="table-dark">
       <tr>
-        <th>Seleccionar</th>
+        <th>
+        <label class="th-checkbox-label">
+          <input type="checkbox" [(ngModel)]="todosSeleccionados" (change)="toggleSeleccionarTodos()">
+          Seleccionar
+        </label>
+        </th>
         <th>Cédula</th>
         <th>Nombre Completo</th>
         <th>Cargo</th>

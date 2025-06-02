@@ -1,3 +1,4 @@
+<!-- src/app/components/inventario/inventario.component.html -->
 <app-navbar></app-navbar>
 
 <div class="inventario-admin">
@@ -25,24 +26,32 @@
           <th>#</th>
           <th>Código</th>
           <th>Herramienta</th>
+          <th>Número de Serie</th>
           <th>Cantidad</th>
           <th>Último Mto.</th>
           <th>Próximo Mto.</th>
           <th>Ubicación</th>
           <th>Responsable</th>
+          <th>Fecha Compra</th>
+          <th>Proveedor</th>
+          <th>Garantía</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let material of materialesFiltrados; let i = index">
+        <tr *ngFor="let material of materialesFiltrados | slice:(currentPage - 1) * pageSize : currentPage * pageSize; let i = index; trackBy: trackById">
           <td>{{ i + 1 }}</td>
           <td>{{ material.codigo }}</td>
           <td>{{ material.herramienta }}</td>
+          <td>{{ material.numeroSerie || '-' }}</td>
           <td>{{ material.cantidad }}</td>
-          <td>{{ material.fechaUltimoMantenimiento }}</td>
-          <td>{{ material.fechaProximoMantenimiento }}</td>
+          <td>{{ material.fechaUltimoMantenimiento | date:'short' }}</td>
+          <td>{{ material.fechaProximoMantenimiento | date:'short' }}</td>
           <td>{{ material.ubicacion }}</td>
           <td>{{ material.responsable }}</td>
+          <td>{{ material.fechaCompra ? (material.fechaCompra | date:'shortDate') : '-' }}</td>
+          <td>{{ material.proveedor }}</td>
+          <td>{{ material.garantia }}</td>
           <td class="container-row">
             <button (click)="mostrarFormularioMaterial(material)" class="btn-editar">
               <i class="bx bxs-edit"></i>
@@ -56,64 +65,116 @@
     </table>
   </div>
 
+  <nav *ngIf="pages.length > 1" class="pagination-container">
+    <ul class="pagination">
+      <li (click)="setPage(currentPage - 1)" [class.disabled]="currentPage === 1">«</li>
+      <li
+        *ngFor="let p of pages"
+        (click)="setPage(p)"
+        [class.active]="currentPage === p"
+      >
+        {{ p }}
+      </li>
+      <li (click)="setPage(currentPage + 1)" [class.disabled]="currentPage === pages.length">»</li>
+    </ul>
+  </nav>
+
   <div *ngIf="mostrarFormulario" class="modal">
     <div class="modal-content">
       <h3>{{ esEdicion ? 'Editar Material' : 'Nuevo Material' }}</h3>
 
-      <label>Código:</label>
-      <input [(ngModel)]="materialActual.codigo" type="text" required />
+      <form (ngSubmit)="guardarMaterial()">
 
-      <label>Herramienta:</label>
-      <input [(ngModel)]="materialActual.herramienta" type="text" required />
+        <div class="form-row">
+          <div class="form-group">
+            <label>Código:</label>
+            <input [(ngModel)]="materialActual.codigo" name="codigo" type="text" required />
+          </div>
 
-      <label>Cantidad:</label>
-      <input [(ngModel)]="materialActual.cantidad" type="number" min="1" required />
-
-      <label>Número de Serie:</label>
-      <input [(ngModel)]="materialActual.numeroSerie" type="text" />
-
-      <label>Empresa Mto.:</label>
-      <input [(ngModel)]="materialActual.empresaMantenimiento" type="text" />
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Fecha Último Mto.:</label>
-          <input [(ngModel)]="materialActual.fechaUltimoMantenimiento" type="date" />
+          <div class="form-group">
+            <label>Número de Serie:</label>
+            <input [(ngModel)]="materialActual.numeroSerie" name="numeroSerie" type="text" />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Fecha Próximo Mto.:</label>
-          <input [(ngModel)]="materialActual.fechaProximoMantenimiento" type="date" />
-        </div>
-      </div>
 
-      <label>Observaciones:</label>
-      <textarea [(ngModel)]="materialActual.observaciones"></textarea>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>Ubicación:</label>
-          <select [(ngModel)]="materialActual.ubicacion" class="form-select">
-            <option *ngFor="let obra of obras" [value]="obra.nombreObra">
-              {{ obra.nombreObra }}
-            </option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Responsable:</label>
-          <select [(ngModel)]="materialActual.responsable" class="form-select">
-            <option *ngFor="let u of responsables" [value]="u.nombreCompleto">
-              {{ u.nombreCompleto }}
-            </option>
-          </select>
-        </div>
-      </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Herramienta:</label>
+            <input [(ngModel)]="materialActual.herramienta" name="herramienta" type="text" required />
+          </div>
 
-      <button (click)="guardarMaterial()" class="btn-guardar">
-        <i class="bx bx-save"></i>
-      </button>
-      <button (click)="cerrarFormulario()" class="btn-cancelar">
-        <i class="bx bx-x-circle"></i>
-      </button>
+          <div class="form-group">
+            <label>Cantidad:</label>
+            <input [(ngModel)]="materialActual.cantidad" name="cantidad" type="number" min="1" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Empresa Mto.:</label>
+          <input [(ngModel)]="materialActual.empresaMantenimiento" name="empresaMantenimiento" type="text" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha Último Mto.:</label>
+            <input [(ngModel)]="materialActual.fechaUltimoMantenimiento" name="fechaUltimoMantenimiento" type="date" />
+          </div>
+          <div class="form-group">
+            <label>Fecha Próximo Mto.:</label>
+            <input [(ngModel)]="materialActual.fechaProximoMantenimiento" name="fechaProximoMantenimiento" type="date" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Observaciones:</label>
+          <textarea [(ngModel)]="materialActual.observaciones" name="observaciones"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ubicación:</label>
+            <select [(ngModel)]="materialActual.ubicacion" name="ubicacion" class="form-select">
+              <option *ngFor="let obra of obras" [value]="obra.nombreObra">
+                {{ obra.nombreObra }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Responsable:</label>
+            <select [(ngModel)]="materialActual.responsable" name="responsable" class="form-select">
+              <option *ngFor="let u of responsables" [value]="u.nombreCompleto">
+                {{ u.nombreCompleto }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha Compra:</label>
+            <input [(ngModel)]="materialActual.fechaCompra" name="fechaCompra" type="date" />
+          </div>
+          <div class="form-group">
+            <label>Proveedor:</label>
+            <input [(ngModel)]="materialActual.proveedor" name="proveedor" type="text" />
+          </div>
+          <div class="form-group">
+            <label>Garantía (meses):</label>
+            <input [(ngModel)]="materialActual.garantia" name="garantia" type="number" min="0" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-guardar">
+            <i class="bx bx-save"></i> Guardar
+          </button>
+          <button type="button" (click)="cerrarFormulario()" class="btn-cancelar">
+            <i class="bx bx-x-circle"></i> Cancelar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+
 </div>

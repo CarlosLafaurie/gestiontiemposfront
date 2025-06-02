@@ -1,3 +1,4 @@
+// src/app/services/inventario.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -8,15 +9,18 @@ export interface Inventario {
   codigo: string;
   herramienta: string;
   numeroSerie: string;
-  fechaUltimoMantenimiento: string;
+  fechaUltimoMantenimiento: string | null;
+  fechaProximoMantenimiento: string | null;
   empresaMantenimiento: string;
-  fechaProximoMantenimiento: string;
+  fechaCompra: string | null;
+  proveedor: string;
+  garantia: number;
   observaciones: string;
   ubicacion: string;
   responsable: string;
-  cantidad: number;  
+  estado: string;
+  cantidad: number;
 }
-
 
 @Injectable({
   providedIn: 'root'
@@ -30,15 +34,19 @@ export class InventarioService {
     return this.http.get<Inventario[]>(this.apiUrl);
   }
 
-  agregarItem(item: Inventario): Observable<any> {
-    return this.http.post(this.apiUrl, item);
+  agregarItem(item: Inventario): Observable<Inventario> {
+    return this.http.post<Inventario>(this.apiUrl, item);
   }
 
-  actualizarItem(item: Inventario): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${item.id}`, item);
+  actualizarItem(item: Inventario): Observable<Inventario> {
+    return this.http.put<Inventario>(`${this.apiUrl}/${item.id}`, item);
   }
 
-  eliminarItem(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  eliminarItem(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+ obtenerPorResponsable(nombreResponsable: string): Observable<Inventario[]> {
+  return this.http.get<Inventario[]>(`${this.apiUrl}/por-responsable/${encodeURIComponent(nombreResponsable)}`);
+}
 }

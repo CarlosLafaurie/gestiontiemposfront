@@ -52,6 +52,10 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/inventario']);
   }
 
+  inventarioInterno(): void {
+    this.router.navigate(['/inventario-interno']);
+  }
+
   solicitudes(): void {
     this.router.navigate(['/solicitudes']);
   }
