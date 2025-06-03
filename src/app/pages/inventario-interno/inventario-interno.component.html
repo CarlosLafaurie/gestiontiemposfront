@@ -10,47 +10,58 @@
         type="text"
         placeholder="Buscar inventario..."
         [(ngModel)]="searchQuery"
+        (ngModelChange)="setPage(1)"
         class="search-input"
       />
     </div>
   </div>
 
   <div class="table-responsive">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Código</th>
-          <th>Herramienta</th>
-          <th>Número de Serie</th>
-          <th>Cantidad</th>
-          <th>Ubicación</th>
-          <th>Responsable</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="
-            let item of inventarioPaginado;
-            let i = index;
-            trackBy: trackById
-          "
-        >
-          <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-          <td>{{ item.codigo }}</td>
-          <td>{{ item.herramienta }}</td>
-          <td>{{ item.numeroSerie || '-' }}</td>
-          <td>{{ item.cantidad }}</td>
-          <td>{{ item.ubicacion }}</td>
-          <td>{{ item.responsable }}</td>
-        </tr>
-        <tr *ngIf="inventarioPaginado.length === 0">
-          <td colspan="8" style="text-align: center; padding: 16px;">
-            No se encontraron elementos.
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <table class="table">
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Herramienta</th>
+      <th>Número de Serie</th>
+      <th>Cantidad</th>
+      <th>Ubicación</th>
+      <th>Responsable</th>
+      <th>Usando</th>
+      <th>Observaciones</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let fila of filasMezcladas; trackBy: trackById"
+        [class.fila-padre]="fila.tipo === 'padre'"
+        [class.fila-hijo]="fila.tipo === 'hijo'">
+      <td>{{ fila.codigo || '-' }}</td>
+      <td>{{ fila.herramienta || '-' }}</td>
+      <td>{{ fila.numeroSerie || '-' }}</td>
+      <td>{{ fila.cantidad ?? '-' }}</td>
+      <td>
+        {{ fila.tipo === 'padre' ? fila.ubicacion : '-' }}
+      </td>
+      <td>
+        {{ fila.tipo === 'padre' ? fila.responsable : '-' }}
+      </td>
+      <td>{{ fila.usando || '-' }}</td>
+      <td>{{ fila.observaciones || '-' }}</td>
+      <td>
+        <!-- Tu botón Asignar -->
+        <button class="btn btn-primary btn-sm" (click)="mostrarFormularioAsignacion(fila)">
+          Asignar
+        </button>
+      </td>
+    </tr>
+    <tr *ngIf="!filasMezcladas || filasMezcladas.length === 0">
+      <td colspan="9" style="text-align: center; padding: 16px;">
+        No se encontraron elementos.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
   </div>
 
   <nav *ngIf="pages.length > 1" class="pagination-container">
@@ -73,4 +84,79 @@
       </li>
     </ul>
   </nav>
+
+  <!-- FORMULARIO DE ASIGNACIÓN -->
+  <div *ngIf="mostrarFormulario" class="formulario-asignacion">
+    <h3>{{ esEdicion ? 'Editar Asignación' : 'Nueva Asignación' }}</h3>
+
+    <form (ngSubmit)="guardarAsignacion()">
+      <div class="form-group">
+        <label>Herramienta:</label>
+        <input type="text" [value]="herramientaNombre" disabled class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label>Número de Serie:</label>
+        <input type="text" [value]="numeroSerie || '-'" disabled class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label>Cantidad Disponible:</label>
+        <input type="number" [value]="cantidad" disabled class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label>Cantidad a Asignar:</label>
+        <input
+          type="number"
+          [(ngModel)]="registroActual.cantidadAsignada"
+          name="cantidadAsignada"
+          min="1"
+          [max]="cantidad"
+          required
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Usando:</label>
+        <input
+          type="text"
+          [(ngModel)]="registroActual.usando"
+          name="usando"
+          class="form-control"
+          placeholder="Ej. En obra, taller, etc."
+          (input)="filtrarUsando()"
+          autocomplete="off"
+          [attr.list]="'empleados-list'"
+        />
+        <datalist id="empleados-list">
+          <option *ngFor="let emp of usandoFiltrado" [value]="emp.nombreCompleto"></option>
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label>Observaciones:</label>
+        <textarea
+          [(ngModel)]="registroActual.observaciones"
+          name="observaciones"
+          rows="3"
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <div class="botones-formulario">
+        <button type="submit" class="btn btn-success">
+          {{ esEdicion ? 'Guardar Cambios' : 'Guardar Asignación' }}
+        </button>
+        <button
+          type="button"
+          (click)="mostrarFormulario = false"
+          class="btn btn-secondary"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
