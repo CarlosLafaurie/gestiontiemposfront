@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { NavbarComponent } from "../../navbar/navbar.component";
 import { jwtDecode } from 'jwt-decode';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, BotonRegresarComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })

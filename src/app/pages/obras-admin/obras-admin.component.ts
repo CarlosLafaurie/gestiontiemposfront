@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ObraService, Obra } from '../../services/obras.service';
 import { UserService } from '../../services/user.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-obras-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, BotonRegresarComponent],
   templateUrl: './obras-admin.component.html',
   styleUrls: ['./obras-admin.component.css']
 })

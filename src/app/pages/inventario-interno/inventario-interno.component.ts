@@ -6,13 +6,14 @@ import { InventarioService, Inventario } from '../../services/inventario.service
 import { InventarioInternoService, InventarioInterno } from '../../services/inventario-interno.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-inventario-interno',
   templateUrl: './inventario-interno.component.html',
   styleUrls: ['./inventario-interno.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent]
+  imports: [CommonModule, FormsModule, NavbarComponent, BotonRegresarComponent]
 })
 export class InventarioInternoComponent implements OnInit {
   registros: InventarioInterno[] = [];

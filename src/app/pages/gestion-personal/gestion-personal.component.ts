@@ -8,12 +8,13 @@ import { ListaTiemposComponent } from '../../lista-tiempos/lista-tiempos.compone
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { forkJoin } from 'rxjs';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-gestion-personal',
   templateUrl: './gestion-personal.component.html',
   styleUrls: ['./gestion-personal.component.css'],
-  imports: [FormsModule, CommonModule, ListaTiemposComponent, NavbarComponent]
+  imports: [FormsModule, CommonModule, ListaTiemposComponent, NavbarComponent, BotonRegresarComponent]
 })
 export class GestionPersonalComponent implements OnInit {
   nombreObra: string = '';

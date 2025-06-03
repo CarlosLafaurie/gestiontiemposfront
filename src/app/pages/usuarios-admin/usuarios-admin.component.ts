@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { ObraService, Obra } from '../../services/obras.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-usuarios-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, BotonRegresarComponent],
   templateUrl: './usuarios-admin.component.html',
   styleUrls: ['./usuarios-admin.component.css']
 })

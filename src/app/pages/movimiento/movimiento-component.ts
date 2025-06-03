@@ -5,6 +5,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { CrearMovimientoComponent } from '../../crear-movimiento/crear-movimiento.component';
 import { MovimientoService, Movimiento } from '../../services/movimiento-service.service';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-movimiento',
@@ -13,8 +14,9 @@ import { MovimientoService, Movimiento } from '../../services/movimiento-service
     CommonModule,
     FormsModule,
     MatDialogModule,
-    NavbarComponent
-  ],
+    NavbarComponent,
+    BotonRegresarComponent
+],
   templateUrl: './movimiento-component.html',
   styleUrls: ['./movimiento-component.css']
 })

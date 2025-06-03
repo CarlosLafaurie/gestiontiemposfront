@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { RegistroJornadaService, ResumenEmpleado } from '../../services/registrojornada.service';
 import { ExcelService } from '../../services/excel.service.ts.service';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 interface EmpleadoAgrupado {
   nombreCompleto: string;
@@ -18,7 +19,7 @@ interface EmpleadoAgrupado {
 @Component({
   selector: 'tiempos-admin',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, BotonRegresarComponent],
   templateUrl: './tiempos-admin.component.html',
   styleUrls: ['./tiempos-admin.component.css']
 })

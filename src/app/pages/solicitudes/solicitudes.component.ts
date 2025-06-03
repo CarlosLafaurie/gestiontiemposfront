@@ -4,11 +4,12 @@ import { FormsModule   } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule} from '@angular/material/button';
 import { NavbarComponent } from '../../navbar/navbar.component';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 import {
   SolicitudService,
   Solicitud,
-  EstadoSolicitud
+  EstadoSolicitud,
 } from '../../services/solicitud.service';
 import { AuthService       } from '../../services/auth.service';
 import { InventarioService, Inventario } from '../../services/inventario.service';
@@ -20,7 +21,7 @@ import { ObraService, Obra }  from '../../services/obras.service';
   imports: [
     CommonModule, FormsModule,
     MatTableModule, MatButtonModule,
-    NavbarComponent
+    NavbarComponent, BotonRegresarComponent
   ],
   templateUrl: './solicitudes.component.html',
   styleUrls:   ['./solicitudes.component.css']
@@ -31,7 +32,7 @@ export class SolicitudesComponent implements OnInit {
   private invService = inject(InventarioService);
   private obraService= inject(ObraService);
 
-  EstadoSolicitud = EstadoSolicitud; 
+  EstadoSolicitud = EstadoSolicitud;
 
   esAdmin = false;
   esResponsable = false;

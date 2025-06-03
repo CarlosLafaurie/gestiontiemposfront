@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { TiempoAusentismo, AusentismoService } from '../../services/documento-permiso.service';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-permisos-admin',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, FormsModule],
+  imports: [CommonModule, NavbarComponent, FormsModule, BotonRegresarComponent],
   templateUrl: './permisos-admin.component.html',
   styleUrls: ['./permisos-admin.component.css']
 })

@@ -4,11 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ObraService, Obra } from '../../services/obras.service';
 import { AuthService } from '../../services/auth.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-detalle-obra',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, BotonRegresarComponent],
   templateUrl: './detalle-obra.component.html',
   styleUrls: ['./detalle-obra.component.css']
 })
@@ -49,11 +50,6 @@ export class DetalleObraComponent {
     } else {
       console.error('❌ ID de obra inválido:', this.route.snapshot.paramMap.get('id'));
     }
-  }
-
-  volver() {
-    console.log('🔙 Volviendo a la pantalla principal');
-    this.router.navigate(['/home']);
   }
 
   irAGestionPersonal() {

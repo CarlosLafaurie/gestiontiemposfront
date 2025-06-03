@@ -5,11 +5,12 @@ import { EmpleadoService, Empleado } from '../../services/empleado-service.servi
 import { ObraService, Obra } from '../../services/obras.service';
 import { UserService } from '../../services/user.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-empleados-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, BotonRegresarComponent],
   templateUrl: './empleados-admin.component.html',
   styleUrls: ['./empleados-admin.component.css']
 })

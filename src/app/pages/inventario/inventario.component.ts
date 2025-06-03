@@ -8,13 +8,14 @@ import { InventarioService, Inventario } from '../../services/inventario.service
 import { AuthService } from '../../services/auth.service';
 import { ObraService, Obra } from '../../services/obras.service';
 import { UserService, User } from '../../services/user.service';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NavbarComponent]
+  imports: [FormsModule, CommonModule, NavbarComponent, BotonRegresarComponent]
 })
 export class InventarioComponent implements OnInit {
   materiales: Inventario[] = [];

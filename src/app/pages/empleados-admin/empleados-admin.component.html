@@ -1,4 +1,5 @@
 <app-navbar></app-navbar>
+<app-boton-regresar></app-boton-regresar>
 
 <div class="empleados-admin">
   <h2 id="title">Administración de Empleados</h2>
@@ -67,7 +68,7 @@
     <div class="modal-content">
       <h3>{{ esEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}</h3>
       <div class="form-grid">
-        
+
         <label>Cédula:</label>
         <input [(ngModel)]="empleadoActual.cedula" type="text" required>
 

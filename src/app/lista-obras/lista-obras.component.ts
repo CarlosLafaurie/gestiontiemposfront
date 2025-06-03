@@ -75,11 +75,4 @@ export class ListaObrasComponent implements OnInit {
     this.router.navigate(['/obra', id]);
   }
 
-  eliminarObra(id: number) {
-    if (confirm('¿Estás seguro de que quieres eliminar esta obra?')) {
-      this.obraService.deleteObra(id).subscribe(() => {
-        this.obtenerObras();
-      });
-    }
-  }
 }
