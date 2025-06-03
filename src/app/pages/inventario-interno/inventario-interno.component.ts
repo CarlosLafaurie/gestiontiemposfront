@@ -39,132 +39,54 @@ export class InventarioInternoComponent implements OnInit {
 
   ngOnInit(): void {
     const userData = this.authService.getUserData();
-    if (userData) {
-      this.usuario = userData;
-      this.rol = userData.rol || null;
-      this.obraUsuario = userData.obra || null;
-      this.cargarInventarioPadre();
-    }
+    if (!userData) return;
+
+    // Guardamos todos los datos del usuario decodificado del token
+    this.usuario = userData;
+
+    // Extraemos el rol, obra y nombre del responsable
+    this.rol =
+      userData.rol ||
+      userData['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+      null;
+
+    this.obraUsuario = userData.obra || null;
+
+    const nombreResponsable =
+      userData['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || '';
+
+    this.cargarInventarioPadre(nombreResponsable);
   }
 
-  cargarInventarioPadre(): void {
-    const callback = {
-      next: (data: Inventario[]) => {
-        this.inventarioPadre = data;
-        this.cargarRegistros(); // ← después de tener padre
-      },
-      error: (err: unknown) => { console.error('[Inventario Padre] Error al obtener inventario:', err);
-     }
-
-    };
-
-    if (this.rol === 'responsable' && this.usuario?.nombre) {
-      this.inventarioService.obtenerPorResponsable(this.usuario.nombre).subscribe(callback);
-    } else {
-      this.inventarioService.obtenerInventario().subscribe(callback);
-    }
-  }
-
-  cargarRegistros(): void {
-    this.inventarioInternoService.obtenerTodos().subscribe({
-      next: (data: InventarioInterno[]) => {
-        // Filtrar registros cuyo inventarioId esté en inventarioPadre
-        const idsPadre = this.inventarioPadre.map(p => p.id);
-        this.registros = data.filter(r => idsPadre.includes(r.inventarioId));
-        this.filtrarAsignaciones();
-      },
-      error: err => console.error('[Inventario Interno] Error al cargar:', err)
-    });
-  }
-
-  filtrarAsignaciones(): void {
-    const q = this.searchQuery.trim().toLowerCase();
-    let filtrados = this.registros;
-
-    if (this.rol === 'responsable' && this.obraUsuario) {
-      filtrados = filtrados.filter(r => r.obra.toLowerCase() === this.obraUsuario!.toLowerCase());
-    }
-
-    this.registrosFiltrados = filtrados.filter(r =>
-      r.obra.toLowerCase().includes(q) ||
-      r.responsableObra.toLowerCase().includes(q) ||
-      r.usando?.toLowerCase().includes(q) ||
-      r.observaciones?.toLowerCase().includes(q) ||
-      r.equipo?.nombre?.toLowerCase().includes(q) ||
-      r.equipo?.marca?.toLowerCase().includes(q)
+  private cargarInventarioPadre(nombreResponsable: string): void {
+    console.log(
+      '[Inventario Padre] Solicitando inventario filtrado por responsable:',
+      nombreResponsable
     );
 
-    this.currentPage = 1;
-  }
-
-  mostrarFormularioRegistro(registro?: InventarioInterno): void {
-    if (registro) {
-      if (this.rol === 'responsable' && registro.obra !== this.obraUsuario) {
-        alert('No tienes permiso para editar este registro.');
-        return;
-      }
-      this.registroActual = { ...registro };
-      this.esEdicion = true;
-    } else {
-      this.registroActual = this.nuevoRegistro();
-      if (this.rol === 'responsable') {
-        this.registroActual.obra = this.obraUsuario || '';
-        this.registroActual.responsableObra = this.usuario?.nombre || '';
-      }
-      this.esEdicion = false;
-    }
-
-    this.mostrarFormulario = true;
-  }
-
-  cerrarFormulario(): void {
-    this.mostrarFormulario = false;
-  }
-
-  guardarRegistro(): void {
-    if (!this.registroActual.obra || !this.registroActual.responsableObra || !this.registroActual.equipo.nombre) {
-      alert('Por favor, completa todos los campos requeridos.');
-      return;
-    }
-
-    if (this.rol === 'responsable' && this.registroActual.obra !== this.obraUsuario) {
-      alert('No puedes guardar un registro para una obra diferente.');
-      return;
-    }
-
-    // Establecer relación con inventario padre (por obra)
-    const padreRelacionado = this.inventarioPadre.find(p => p.ubicacion.toLowerCase() === this.registroActual.obra.toLowerCase());
-    if (!padreRelacionado) {
-      alert('No se encontró un inventario padre relacionado con la obra.');
-      return;
-    }
-
-    this.registroActual.inventarioId = padreRelacionado.id;
-
-    const obs = this.esEdicion
-      ? this.inventarioInternoService.actualizarItem(this.registroActual)
-      : this.inventarioInternoService.agregarItem(this.registroActual);
-
-    obs.subscribe({
-      next: () => {
-        this.cargarRegistros();
-        this.cerrarFormulario();
+    this.inventarioService.obtenerPorResponsable(nombreResponsable).subscribe({
+      next: (data: Inventario[]) => {
+        console.log('[Inventario Padre] Datos obtenidos (filtrados):', data);
+        this.inventarioPadre = data;
+        this.currentPage = 1;
       },
-      error: err => console.error('[guardarRegistro] Error:', err)
+      error: (err: unknown) => {
+        console.error('[Inventario Padre] Error al obtener inventario filtrado:', err);
+      }
     });
   }
 
-  eliminarRegistro(id: number): void {
-    if (!confirm('¿Eliminar este registro?')) return;
-
-    this.inventarioInternoService.eliminarItem(id).subscribe({
-      next: () => this.cargarRegistros(),
-      error: err => console.error('[eliminarRegistro] Error:', err)
-    });
-  }
-
-  logout(): void {
-    this.router.navigate(['/login']);
+  get inventarioPaginado(): Inventario[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    const filtrados = this.inventarioPadre.filter(item =>
+      item.codigo.toLowerCase().includes(q) ||
+      item.herramienta.toLowerCase().includes(q) ||
+      (item.numeroSerie || '').toLowerCase().includes(q) ||
+      item.ubicacion.toLowerCase().includes(q) ||
+      item.responsable.toLowerCase().includes(q)
+    );
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtrados.slice(start, start + this.pageSize);
   }
 
   setPage(page: number): void {
@@ -173,12 +95,25 @@ export class InventarioInternoComponent implements OnInit {
   }
 
   get pages(): number[] {
-    const total = Math.ceil(this.registrosFiltrados.length / this.pageSize);
-    return Array.from({ length: total }, (_, i) => i + 1);
+    const q = this.searchQuery.trim().toLowerCase();
+    const totalItems = this.inventarioPadre.filter(item =>
+      item.codigo.toLowerCase().includes(q) ||
+      item.herramienta.toLowerCase().includes(q) ||
+      (item.numeroSerie || '').toLowerCase().includes(q) ||
+      item.ubicacion.toLowerCase().includes(q) ||
+      item.responsable.toLowerCase().includes(q)
+    ).length;
+    const totalPages = Math.ceil(totalItems / this.pageSize);
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
-  trackById(_: number, item: InventarioInterno): number {
+  trackById(_: number, item: Inventario): number {
     return item.id;
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   private nuevoRegistro(): InventarioInterno {

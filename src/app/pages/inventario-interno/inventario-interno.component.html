@@ -1,15 +1,14 @@
 <app-navbar></app-navbar>
 
 <div class="inventario-admin">
-  <h2 id="title">Asignaciones de Inventario</h2>
+  <h2 id="title">Inventario Principal Asignado</h2>
 
   <div class="search-and-add-container">
     <div class="search-container">
       <input
         type="text"
-        placeholder="Buscar asignación..."
+        placeholder="Buscar inventario..."
         [(ngModel)]="searchQuery"
-        (ngModelChange)="filtrarAsignaciones()"
         class="search-input"
       />
     </div>
@@ -20,33 +19,34 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Equipo</th>
+          <th>Código</th>
+          <th>Herramienta</th>
           <th>Número de Serie</th>
-          <th>Marca</th>
           <th>Cantidad</th>
-          <th>Unidades</th>
-          <th>Obra</th>
-          <th>Responsable de Obra</th>
-          <th>Usando</th>
-          <th>Cantidad Asignada</th>
-          <th>Observaciones</th>
+          <th>Ubicación</th>
+          <th>Responsable</th>
         </tr>
       </thead>
       <tbody>
         <tr
-          *ngFor="let asignacion of registrosFiltrados | slice:(currentPage - 1) * pageSize : currentPage * pageSize; let i = index; trackBy: trackById"
+          *ngFor="
+            let item of inventarioPaginado;
+            let i = index;
+            trackBy: trackById
+          "
         >
           <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-          <td>{{ asignacion.equipo.nombre }}</td>
-          <td>{{ asignacion.equipo.numeroSerie || '-' }}</td>
-          <td>{{ asignacion.equipo.marca || '-' }}</td>
-          <td>{{ asignacion.equipo.cantidad }}</td>
-          <td>{{ asignacion.equipo.unidades || '-' }}</td>
-          <td>{{ asignacion.obra }}</td>
-          <td>{{ asignacion.responsableObra }}</td>
-          <td>{{ asignacion.usando || '-' }}</td>
-          <td>{{ asignacion.cantidadAsignada }}</td>
-          <td>{{ asignacion.observaciones || '-' }}</td>
+          <td>{{ item.codigo }}</td>
+          <td>{{ item.herramienta }}</td>
+          <td>{{ item.numeroSerie || '-' }}</td>
+          <td>{{ item.cantidad }}</td>
+          <td>{{ item.ubicacion }}</td>
+          <td>{{ item.responsable }}</td>
+        </tr>
+        <tr *ngIf="inventarioPaginado.length === 0">
+          <td colspan="8" style="text-align: center; padding: 16px;">
+            No se encontraron elementos.
+          </td>
         </tr>
       </tbody>
     </table>
@@ -54,7 +54,9 @@
 
   <nav *ngIf="pages.length > 1" class="pagination-container">
     <ul class="pagination">
-      <li (click)="setPage(currentPage - 1)" [class.disabled]="currentPage === 1">«</li>
+      <li (click)="setPage(currentPage - 1)" [class.disabled]="currentPage === 1">
+        «
+      </li>
       <li
         *ngFor="let p of pages"
         (click)="setPage(p)"
@@ -62,7 +64,12 @@
       >
         {{ p }}
       </li>
-      <li (click)="setPage(currentPage + 1)" [class.disabled]="currentPage === pages.length">»</li>
+      <li
+        (click)="setPage(currentPage + 1)"
+        [class.disabled]="currentPage === pages.length"
+      >
+        »
+      </li>
     </ul>
   </nav>
 </div>
