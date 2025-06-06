@@ -2,17 +2,18 @@
   import { HttpClient } from '@angular/common/http';
   import { Observable } from 'rxjs';
   import { environment } from '../../environments/environments';
+  import { Inventario } from './inventario.model';
 
-export interface InventarioInterno {
-  id: number;
-  inventarioId: number;
-  obra: string;
-  responsableObra: string;
-  usando: string;
-  cantidadAsignada: number;
-  observaciones: string;
+  export interface InventarioInterno {
+    id?: number;
+    inventarioId: number;
+     inventario?: Inventario; 
+    obra: string;
+    responsableObra: string;
+    usando: string;
+    cantidadAsignada: number;
+    observaciones: string;
   }
-
 
   @Injectable({
     providedIn: 'root'
