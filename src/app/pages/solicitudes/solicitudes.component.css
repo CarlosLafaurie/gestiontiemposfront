@@ -83,7 +83,8 @@
 }
 
 .btn-aprobar,
-.btn-rechazar {
+.btn-rechazar,
+.btn-comprado {
   height: 32px;
   line-height: 1;
   padding: 0 12px;
@@ -117,6 +118,20 @@
   background-color: #e7a1a9;
   cursor: not-allowed;
 }
+
+.btn-comprado {
+  background-color: #dcbd35;
+  color: #fff;
+}
+.btn-comprado:hover:not(:disabled) {
+  background-color: #b7c823;
+  transform: translateY(-1px);
+}
+.btn-comprado:disabled {
+  background-color: #e2e7a1;
+  cursor: not-allowed;
+}
+
 
 .form-row {
   display: flex;

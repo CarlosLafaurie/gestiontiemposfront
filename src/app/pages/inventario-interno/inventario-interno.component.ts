@@ -299,7 +299,10 @@ export class InventarioInternoComponent implements OnInit {
     };
   }
 
-  cerrarModal() {
-    this.mostrarFormulario = false;
-  }
+ cerrarModal() {
+  this.mostrarFormulario = false;
+  this.esEdicion = false;
+  this.registroActual = this.nuevoRegistro();
+}
+
 }

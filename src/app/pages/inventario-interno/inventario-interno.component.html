@@ -11,7 +11,7 @@
         placeholder="Buscar inventario..."
         [(ngModel)]="searchQuery"
         (ngModelChange)="setPage(1)"
-        class="form-control"
+        class="search-input"
       />
     </div>
   </div>
@@ -91,50 +91,41 @@
   </nav>
 </div>
 
-<!-- ===========================
-     Modal/Cuadro de Asignación (Angular puro)
-     Aparece solo cuando mostrarFormulario === true
-     =========================== -->
-<div *ngIf="mostrarFormulario" class="modal-backdrop-custom">
-  <div class="modal-container-custom">
-    <!-- Encabezado -->
-    <div class="modal-header-custom">
+<div *ngIf="mostrarFormulario" class="modal">
+  <div class="modal-content">
+    <!-- Encabezado del modal -->
+    <div class="modal-header-custom" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
       <h5 class="modal-title">
         {{ esEdicion ? 'Editar Asignación' : 'Nueva Asignación' }}
       </h5>
-      <button class="btn-cerrar" (click)="cerrarModal()">✕</button>
+      <button class="btn-cerrar" (click)="cerrarModal()" style="background: transparent; border: none; font-size: 1.25rem; cursor: pointer;">
+        ✕
+      </button>
     </div>
 
-    <!-- Cuerpo -->
-    <div class="modal-body-custom formulario-modal-custom">
+    <!-- Cuerpo del modal: formulario -->
+    <div class="modal-body-custom">
       <form (ngSubmit)="guardarAsignacion()">
-        <div class="row mb-2">
-          <div class="col-md-6">
-            <label class="form-label">Herramienta:</label>
-            <input type="text"
-                   [value]="herramientaNombre"
-                   disabled
-                   class="form-control" />
+        <!-- Primera fila: Herramienta y Número de Serie -->
+        <div class="form-grid">
+          <div>
+            <label>Herramienta:</label>
+            <input type="text" [value]="herramientaNombre" disabled />
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Número de Serie:</label>
-            <input type="text"
-                   [value]="numeroSerie || '-'"
-                   disabled
-                   class="form-control" />
+          <div>
+            <label>Número de Serie:</label>
+            <input type="text" [value]="numeroSerie || '-'" disabled />
           </div>
         </div>
 
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label class="form-label">Cantidad Disponible:</label>
-            <input type="number"
-                   [value]="cantidad"
-                   disabled
-                   class="form-control" />
+        <!-- Segunda fila: Cantidad Disponible / Cantidad a Asignar -->
+        <div class="form-grid">
+          <div>
+            <label>Cantidad Disponible:</label>
+            <input type="number" [value]="cantidad" disabled />
           </div>
-          <div class="col-md-8">
-            <label class="form-label">Cantidad a Asignar:</label>
+          <div>
+            <label>Cantidad a Asignar:</label>
             <input
               type="number"
               [(ngModel)]="registroActual.cantidadAsignada"
@@ -142,19 +133,18 @@
               min="1"
               [max]="cantidad"
               required
-              class="form-control"
             />
           </div>
         </div>
 
-        <div class="row mb-3">
-          <div class="col-md-8">
-            <label class="form-label">Usando:</label>
+        <!-- Tercera fila: Usando / Responsable Obra -->
+        <div class="form-grid">
+          <div>
+            <label>Usando:</label>
             <input
               type="text"
               [(ngModel)]="registroActual.usando"
               name="usando"
-              class="form-control"
               placeholder="Ej. En obra, taller, etc."
               (input)="filtrarUsando()"
               autocomplete="off"
@@ -164,39 +154,30 @@
               <option *ngFor="let emp of usandoFiltrado" [value]="emp.nombreCompleto"></option>
             </datalist>
           </div>
-          <div class="col-md-4">
-            <label class="form-label">Responsable Obra:</label>
-            <input
-              type="text"
-              [value]="nombreResponsable"
-              disabled
-              class="form-control"
-            />
+          <div>
+            <label>Responsable Obra:</label>
+            <input type="text" [value]="nombreResponsable" disabled />
           </div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">Observaciones:</label>
+        <!-- Observaciones en toda la ancho -->
+        <div>
+          <label>Observaciones:</label>
           <textarea
             [(ngModel)]="registroActual.observaciones"
             name="observaciones"
             rows="3"
-            class="form-control"
           ></textarea>
         </div>
       </form>
     </div>
 
-    <!-- Pie de modal -->
-    <div class="modal-footer-custom">
-      <button type="button"
-              class="btn btn-secondary me-2"
-              (click)="cerrarModal()">
+    <!-- Pie de modal: botones -->
+    <div class="modal-buttons" style="margin-top: 1.5rem;">
+      <button type="button" class="btn-cancelar" (click)="cerrarModal()">
         Cancelar
       </button>
-      <button type="button"
-              class="btn-guardar btn-sm"
-              (click)="guardarAsignacion(); cerrarModal()">
+      <button type="button" class="btn-guardar" (click)="guardarAsignacion(); cerrarModal()">
         {{ esEdicion ? 'Guardar Cambios' : 'Guardar Asignación' }}
       </button>
     </div>

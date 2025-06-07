@@ -5,8 +5,9 @@ import { environment } from '../../environments/environments';
 
 export enum EstadoSolicitud {
   Pendiente  = 'Pendiente',
-  Aprobada   = 'Aprobada', 
-  Rechazada  = 'Rechazada'
+  Aprobada   = 'Aprobada',
+  Rechazada  = 'Rechazada',
+  Comprado  = 'Comprado',
 }
 
 export interface Solicitud {

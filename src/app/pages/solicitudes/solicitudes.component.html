@@ -79,6 +79,7 @@
       <option [ngValue]="EstadoSolicitud.Pendiente">Pendientes</option>
       <option [ngValue]="EstadoSolicitud.Aprobada">Aprobadas</option>
       <option [ngValue]="EstadoSolicitud.Rechazada">Rechazadas</option>
+      <option [ngValue]="EstadoSolicitud.Comprado">Compradas</option>
     </select>
   </div>
 
@@ -120,6 +121,11 @@
                     [disabled]="s.estado !== EstadoSolicitud.Pendiente"
                     (click)="cambiarEstado(s, EstadoSolicitud.Rechazada)">
               Rechazar
+            </button>
+             <button class="btn-comprado"
+                     [disabled]="s.estado !== EstadoSolicitud.Aprobada"
+                     (click)="cambiarEstado(s, EstadoSolicitud.Comprado)">
+              Comprado
             </button>
           </td>
         </tr>
