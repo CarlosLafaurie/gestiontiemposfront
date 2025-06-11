@@ -59,4 +59,8 @@ export class PanelDeControlComponent implements OnInit {
     });
   }
 
+  irAInventarios(): void {
+    this.router.navigate(['/inventarios']).then(success => {
+    });
+  }
 }

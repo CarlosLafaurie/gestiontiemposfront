@@ -23,4 +23,5 @@ export class HomeComponent implements OnInit {
       this.usuario = userData.nombreCompleto || null;
     }
   }
+
 }

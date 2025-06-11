@@ -35,7 +35,6 @@ export class InventarioInternoComponent implements OnInit {
   registros: InventarioInterno[] = [];
   inventarioPadre: Inventario[]    = [];
 
-  // Mezcla “padre” + “hijo” en líneas únicas
   get filasMezcladas(): FilaMezclada[] {
     const filas: FilaMezclada[] = [];
 
@@ -75,7 +74,6 @@ export class InventarioInternoComponent implements OnInit {
         });
       }
     });
-
     return filas;
   }
 

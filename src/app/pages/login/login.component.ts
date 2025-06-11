@@ -25,25 +25,33 @@ export class LoginComponent {
     });
   }
 
-  onSubmit() {
-    if (this.loginForm.invalid) return;
+onSubmit() {
+  if (this.loginForm.invalid) return;
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (response) => {
+  this.authService.login(this.loginForm.value).subscribe({
+    next: () => {
+      const userData = this.authService.getUserData();
+      const role = userData?.rol;
 
-        if (response?.token) {
-          this.authService.saveToken(response.token);
-          console.log("Token guardado correctamente.");
-          this.router.navigate(['/home']);
-        } else {
-          console.error("Error: No se recibió token en la respuesta.");
-          alert('Error en la autenticación. Intenta nuevamente.');
-        }
-      },
-      error: (err) => {
-        console.error('Error en login:', err);
-        alert('Credenciales incorrectas');
-      },
-    });
-  }
+      if (!role) {
+        console.error("No se pudo obtener el rol del token.");
+        alert('Error al obtener los datos del usuario.');
+        return;
+      }
+
+      console.log("Token guardado. Rol:", role);
+
+      if (role === 'admin') {
+        this.router.navigate(['/panel-control']);
+      } else {
+        this.router.navigate(['/home']);
+      }
+    },
+    error: (err) => {
+      console.error('Error en login:', err);
+      alert('Credenciales incorrectas');
+    },
+  });
+}
+
 }
