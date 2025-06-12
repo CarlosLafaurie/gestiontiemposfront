@@ -37,7 +37,7 @@ export class InventariosComponent {
     this.obraService.getObras().subscribe({
       next: (data) => {
         this.obras = data;
-        this.obrasFiltradas = data; // todas las obras, sin filtros
+        this.obrasFiltradas = data;
       },
       error: (err) => {
         console.error('Error al obtener las obras:', err);
@@ -45,8 +45,14 @@ export class InventariosComponent {
     });
   }
 
-  irAInventarioInterno(nombreObra: string): void {
-    const nombreSanitizado = encodeURIComponent(nombreObra);
-    this.router.navigate(['/inventario-interno', nombreSanitizado]);
-  }
+ irAInventarioInterno(nombreObra: string): void {
+  console.log('Obra original:', nombreObra);
+  const nombreSanitizado = encodeURIComponent(nombreObra);
+  console.log('Obra sanitizada para URL:', nombreSanitizado);
+
+  this.router.navigate(['/inventario-interno', nombreSanitizado]).then((success) => {
+    console.log('Navegación exitosa:', success);
+  });
+}
+
 }

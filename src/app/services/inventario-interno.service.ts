@@ -7,7 +7,7 @@
   export interface InventarioInterno {
     id?: number;
     inventarioId: number;
-     inventario?: Inventario; 
+     inventario?: Inventario;
     obra: string;
     responsableObra: string;
     usando: string;
@@ -47,3 +47,4 @@
       return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
   }
+  

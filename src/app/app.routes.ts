@@ -38,7 +38,7 @@ export const routes: Routes = [
   { path: 'inventario', component: InventarioComponent, canActivate: [authGuard] },
   { path: 'movimientos', component: MovimientoComponent, canActivate: [authGuard, adminGuard] },
   { path: 'solicitudes', component: SolicitudesComponent, canActivate: [authGuard] },
-  { path: 'inventario-interno', component: InventarioInternoComponent, canActivate: [authGuard] },
+  { path: 'inventario-interno/:nombreObra', component: InventarioInternoComponent, canActivate: [authGuard] },
   { path: 'inventarios', component: InventariosComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

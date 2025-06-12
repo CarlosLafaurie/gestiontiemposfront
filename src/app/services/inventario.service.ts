@@ -46,7 +46,9 @@ export class InventarioService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
- obtenerPorResponsable(nombreResponsable: string): Observable<Inventario[]> {
-  return this.http.get<Inventario[]>(`${this.apiUrl}/por-responsable/${encodeURIComponent(nombreResponsable)}`);
-}
+  obtenerPorObra(nombreObra: string): Observable<Inventario[]> {
+    const url = `${this.apiUrl}/por-obra/${encodeURIComponent(nombreObra)}`;
+    console.log('InventarioService.obtenerPorObra()', url);
+    return this.http.get<Inventario[]>(url);
+  }
 }
