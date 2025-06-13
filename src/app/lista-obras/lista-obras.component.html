@@ -1,15 +1,17 @@
+<div id="title"><h2>Listado de obras</h2></div>
+
 <div class="container">
     <p *ngIf="obrasFiltradas.length === 0" class="no-data">
       No hay obras disponibles.
     </p>
 
     <div class="container" id="cards">
-  <div class="card" *ngFor="let obra of obrasFiltradas">
+  <div class="card" *ngFor="let obra of obrasFiltradas"  [ngClass]="{'responsable': rol === 'responsable', 'cliente': rol === 'cliente' }">
     <div class="card-header">
      <h3>{{ obra.nombreObra }}</h3>
     </div>
     <div class="card-body">
-      <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>
+      <p><strong>Responsable:</strong> {{ obra.responsable }}</p>
       <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
        <button  class="btn" (click)="verDetalles(obra.id)"><i class='bx bx-user' style='color:#ffffff' ></i> Ver Detalles</button>
     </div>

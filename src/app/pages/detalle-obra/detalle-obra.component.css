@@ -14,7 +14,7 @@
     background: #fff;
   }
 
-  h2 {
+  h1 {
     text-align: center;
     color: #333;
   }
@@ -24,22 +24,30 @@
     margin: 10px 0;
   }
 
-  button {
+  .btn {
     display: block;
     width: 100%;
     padding: 10px;
     margin-top: 20px;
     border: none;
     border-radius: 5px;
-    background: rgba(186,207,18,255);
+    background-color: #28a745;
     color: white;
     font-size: 16px;
     cursor: pointer;
   }
 
-  button:hover {
-    background-color: #075e04;
-  }
+.btn:hover {
+  background-color: #075e04;
+}
+
+#inventario {
+  background-color: #2855a7;
+}
+
+#inventario:hover {
+  background-color: #1e208a;
+}
 
 @media (max-width: 768px) {
   .container {

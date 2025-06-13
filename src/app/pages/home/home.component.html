@@ -1,6 +1,6 @@
 <app-navbar></app-navbar>
 
- <h2 class="title">Bienvenido</h2>
+ <h1 id="title">Bienvenido</h1>
     <p *ngIf="rol === 'admin'"><b>Usuario admin.</b> Tienes acceso total al sistema.</p>
     <p *ngIf="rol === 'cliente'"><b>Usuario cliente.</b> Aquí puedes explorar tus proyectos.</p>
     <p *ngIf="rol === 'responsable'"><b>Usuario de Gestión.</b> Eres responsable de la gestión interna.</p>
@@ -14,15 +14,3 @@
     <app-lista-obras [rol]="rol" [usuario]="usuario"></app-lista-obras>
   </div>
 </div>
-
-
-<div class="container" id="cards">
-  <div class="card">
-    <div class="card-header">
-      <h3>Inventario interno</h3>
-    </div>
-    <div class="card-body">
-      <p>Gestion de administracion del sistema.</p>
-      <button class="btn" ><i class='bx bx-user' style='color:#ffffff' > </i> <b> entrar</b></button>
-    </div>
-  </div>

@@ -105,6 +105,10 @@
     width: calc(50% - 20px);
   }
 
+  .btn {
+    height: 60px;
+  }
+
   .container {
     padding-bottom: 18%;
   }

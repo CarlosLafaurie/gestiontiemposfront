@@ -84,7 +84,7 @@
     width: 100%;
     max-width: 350px;
     height: auto;
-    min-height: 320px;
+    min-height: 260px;
   }
 
   .card-body {
@@ -103,6 +103,11 @@
 @media (max-width: 768px) {
   .card {
     width: calc(50% - 20px);
+  }
+
+  .btn{
+    height: 60px;
+    margin-bottom: 3%;
   }
 
   .container {

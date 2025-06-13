@@ -61,4 +61,14 @@ export class DetalleObraComponent {
       console.warn('⚠️ No se puede redirigir porque no hay obra cargada.');
     }
   }
+
+  irAInventarioInterno(nombreObra: string): void {
+  console.log('Obra original:', nombreObra);
+  const nombreSanitizado = encodeURIComponent(nombreObra);
+  console.log('Obra sanitizada para URL:', nombreSanitizado);
+
+  this.router.navigate(['/inventario-interno', nombreSanitizado]).then((success) => {
+    console.log('Navegación exitosa:', success);
+  });
+}
 }
