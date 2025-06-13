@@ -1,5 +1,5 @@
 .container {
-  padding: 2%;
+  padding: 0%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -17,11 +17,14 @@
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  width: 250px;
+  width: 300px;
+  height: 245px;
   padding: 0;
   margin: auto;
   transition: box-shadow 0.3s ease;
@@ -33,14 +36,17 @@
 
 .card-header {
   background-color: #f5f5f5;
-  padding: 10px 15px;
   border-bottom: 1px solid #ddd;
   text-align: center;
 }
 
 .card-body {
-  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   text-align: center;
+  padding: 5px;
 }
 
 /* ----- Contenedor de tarjetas ----- */
@@ -53,28 +59,35 @@
   background-color: #28a745;
   color: #fff;
   border: none;
-  padding: 8px 16px;
-  margin-top: 10px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.3s ease;
+  margin-top: auto;
+  margin: auto;
+  width: 70%;
 }
 
 .btn:hover {
   background-color: #075e04;
 }
 
-/* ----- Responsive ----- */
 @media (max-width: 480px) {
   .container {
     padding: 10px;
     gap: 15px;
-    margin-bottom: 20%;
+    margin-bottom: 0%;
   }
 
   .card {
     width: 100%;
     max-width: 350px;
+    min-height: 320px;
+  }
+
+  .card-body {
+    padding: 1px;
   }
 
   #title h1 {
@@ -82,7 +95,7 @@
   }
 
   #cards {
-    padding-bottom: 20%;
+    padding-bottom: 2%;
   }
 }
 

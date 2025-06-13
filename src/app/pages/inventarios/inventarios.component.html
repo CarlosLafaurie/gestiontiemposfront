@@ -11,7 +11,7 @@
       <h3>Inventario principal</h3>
     </div>
     <div class="card-body">
-      <p>Gestionar inventario principal.</p>
+      <p>Gestionar inventario principal de herramientas electricas.</p>
       <button class="btn" (click)="irAInventarioPadre()"><i class='bx bx-user' style='color:#ffffff' > </i> <b> Gestionar Usuarios</b></button>
     </div>
   </div>
@@ -25,7 +25,7 @@
   <div class="container" id="cards">
     <div class="card" *ngFor="let obra of obrasFiltradas">
       <div class="card-header">
-        <h3>Invenatario {{ obra.nombreObra }}</h3>
+        <h3>Inventario {{ obra.nombreObra }}</h3>
       </div>
       <div class="card-body">
         <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>

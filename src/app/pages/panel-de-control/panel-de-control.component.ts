@@ -4,12 +4,11 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
-import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 @Component({
   selector: 'app-panel-de-control',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, BotonRegresarComponent],
+  imports: [CommonModule, NavbarComponent],
   templateUrl: './panel-de-control.component.html',
   styleUrls: ['./panel-de-control.component.css']
 })
