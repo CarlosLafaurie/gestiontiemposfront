@@ -169,4 +169,15 @@ export class InventarioComponent implements OnInit {
       cantidad: 1
     };
   }
+
+  irAInventarioInterno(nombreObra: string): void {
+  console.log('Obra original:', nombreObra);
+  const nombreSanitizado = encodeURIComponent(nombreObra);
+  console.log('Obra sanitizada para URL:', nombreSanitizado);
+
+  this.router.navigate(['/inventario-interno', nombreSanitizado]).then((success) => {
+    console.log('Navegación exitosa:', success);
+  });
+}
+
 }

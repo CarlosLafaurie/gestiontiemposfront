@@ -48,7 +48,9 @@
           <td>{{ material.cantidad }}</td>
           <td>{{ material.fechaUltimoMantenimiento | date:'short' }}</td>
           <td>{{ material.fechaProximoMantenimiento | date:'short' }}</td>
-          <td>{{ material.ubicacion }}</td>
+        <td id="enlace" (click)="irAInventarioInterno(material.ubicacion)" class="td-clickable">
+          {{ material.ubicacion }}
+        </td>
           <td>{{ material.responsable }}</td>
           <td>{{ material.fechaCompra ? (material.fechaCompra | date:'shortDate') : '-' }}</td>
           <td>{{ material.proveedor }}</td>
