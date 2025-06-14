@@ -80,6 +80,7 @@
 }
 
 #enlace {
+  cursor: pointer;
   color: #007bff;
 }
 
