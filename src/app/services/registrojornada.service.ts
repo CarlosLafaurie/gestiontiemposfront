@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
 
 export interface ResumenEmpleado {
-  fecha: string; 
+  fecha: string;
   horaEntrada: string;
   horaSalida: string;
   nombreCompleto: string;
@@ -25,10 +25,23 @@ export class RegistroJornadaService {
 
   constructor(private http: HttpClient) {}
 
-  obtenerResumenHoras(usarFestivos: boolean = false): Observable<ResumenEmpleado[]> {
-    const url = usarFestivos
-      ? `${this.apiUrl}/resumenhoras?usarFestivos=true`
-      : `${this.apiUrl}/resumenhoras`;
-    return this.http.get<ResumenEmpleado[]>(url);
+  obtenerResumenHoras(
+    usarFestivos: boolean = false,
+    fechaInicio?: string,
+    fechaFin?: string,
+  ): Observable<ResumenEmpleado[]> {
+    let params = new HttpParams();
+    if (usarFestivos) {
+      params = params.set('usarFestivos', 'true');
+    }
+    if (fechaInicio) {
+      params = params.set('fechaInicio', fechaInicio);
+    }
+    if (fechaFin) {
+      params = params.set('fechaFin', fechaFin);
+    }
+
+
+    return this.http.get<ResumenEmpleado[]>(`${this.apiUrl}/resumenhoras`, { params });
   }
 }

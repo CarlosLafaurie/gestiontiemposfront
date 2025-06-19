@@ -1,5 +1,6 @@
+import { FormsModule } from '@angular/forms';
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { RegistroJornadaService, ResumenEmpleado } from '../../services/registrojornada.service';
 import { ExcelService } from '../../services/excel.service.ts.service';
@@ -19,7 +20,7 @@ interface EmpleadoAgrupado {
 @Component({
   selector: 'tiempos-admin',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, BotonRegresarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, BotonRegresarComponent, NgFor],
   templateUrl: './tiempos-admin.component.html',
   styleUrls: ['./tiempos-admin.component.css']
 })
@@ -35,7 +36,11 @@ export class TiemposAdminComponent implements OnInit {
     festivos: string;
   }> = [];
 
-  private datosOriginales: ResumenEmpleado[] = []; // ✅ datos sin transformar
+  private datosOriginales: ResumenEmpleado[] = [];
+
+  fechaInicio: string = '';
+  fechaFin: string = '';
+  usarFestivos: boolean = false;
 
   private jornadaService = inject(RegistroJornadaService);
   private excelService = inject(ExcelService);
@@ -45,17 +50,30 @@ export class TiemposAdminComponent implements OnInit {
     this.cargarResumen();
   }
 
-  private cargarResumen(): void {
-    console.log('📡 Llamando a obtenerResumenHoras()...');
-    this.jornadaService.obtenerResumenHoras(true).subscribe({
+  cargarResumen(): void {
+    console.log('📥 Método cargarResumen() invocado');
+    console.log('🕓 Fecha inicio seleccionada:', this.fechaInicio);
+    console.log('🕓 Fecha fin seleccionada:', this.fechaFin);
+    console.log('📅 ¿Usar festivos?:', this.usarFestivos);
+
+    if (!this.fechaInicio || !this.fechaFin) {
+      console.warn('⚠️ Debes seleccionar ambas fechas.');
+      return;
+    }
+
+    console.log('📡 Solicitando datos al backend...');
+    this.jornadaService.obtenerResumenHoras(this.usarFestivos, this.fechaInicio, this.fechaFin).subscribe({
       next: (data: ResumenEmpleado[]) => {
-        console.log('✅ Datos crudos recibidos del backend:', data);
+        console.log('✅ Datos recibidos del backend:', data);
+        this.datosOriginales = data;
 
-        this.datosOriginales = data; // ✅ Guardamos los datos sin transformar
-
+        console.log('🧮 Agrupando datos por empleado...');
         const agrupado = data.reduce((acc: EmpleadoAgrupado[], r: ResumenEmpleado) => {
+          console.log('➕ Procesando registro:', r);
+
           let e = acc.find(x => x.nombreCompleto === r.nombreCompleto);
           if (!e) {
+            console.log(`🆕 Nuevo empleado encontrado: ${r.nombreCompleto}`);
             e = {
               nombreCompleto: r.nombreCompleto,
               totalHoras: 0,
@@ -68,28 +86,42 @@ export class TiemposAdminComponent implements OnInit {
             };
             acc.push(e);
           }
+
           e.totalHoras += r.horasTrabajadas;
           e.horasDiurnas += r.horasDiurnas;
           e.horasNocturnas += r.horasNocturnas;
           e.horasExtrasDiurnas += r.horasExtrasDiurnas;
           e.horasExtrasNocturnas += r.horasExtrasNocturnas;
-          if (r.trabajoDomingo) e.dominicales = true;
-          if (r.trabajoFestivo) e.festivos = true;
+          if (r.trabajoDomingo) {
+            console.log(`📌 ${r.nombreCompleto} trabajó domingo.`);
+            e.dominicales = true;
+          }
+          if (r.trabajoFestivo) {
+            console.log(`📌 ${r.nombreCompleto} trabajó festivo.`);
+            e.festivos = true;
+          }
+
           return acc;
         }, []);
 
-        this.resumenEmpleados = agrupado.map((e) => ({
-          nombreCompleto: e.nombreCompleto,
-          totalHoras: e.totalHoras.toFixed(2),
-          horasDiurnas: e.horasDiurnas.toFixed(2),
-          horasNocturnas: e.horasNocturnas.toFixed(2),
-          horasExtrasDiurnas: e.horasExtrasDiurnas.toFixed(2),
-          horasExtrasNocturnas: e.horasExtrasNocturnas.toFixed(2),
-          dominicales: e.dominicales ? 'Sí' : 'No',
-          festivos: e.festivos ? 'Sí' : 'No'
-        }));
+        console.log('✅ Datos agrupados:', agrupado);
 
-        console.log('🔧 resumenEmpleados agrupado y mapeado:', this.resumenEmpleados);
+        this.resumenEmpleados = agrupado.map((e) => {
+          const mapeado = {
+            nombreCompleto: e.nombreCompleto,
+            totalHoras: e.totalHoras.toFixed(2),
+            horasDiurnas: e.horasDiurnas.toFixed(2),
+            horasNocturnas: e.horasNocturnas.toFixed(2),
+            horasExtrasDiurnas: e.horasExtrasDiurnas.toFixed(2),
+            horasExtrasNocturnas: e.horasExtrasNocturnas.toFixed(2),
+            dominicales: e.dominicales ? 'Sí' : 'No',
+            festivos: e.festivos ? 'Sí' : 'No'
+          };
+          console.log('🧾 Resumen empleado:', mapeado);
+          return mapeado;
+        });
+
+        console.log('🏁 Finalizó la carga de resumenEmpleados:', this.resumenEmpleados);
       },
       error: err => {
         console.error('❌ Error al cargar resumen de horas:', err);
@@ -98,7 +130,9 @@ export class TiemposAdminComponent implements OnInit {
   }
 
   exportarExcel(): void {
-    console.log('📤 Exportando a Excel, resumenEmpleados:', this.resumenEmpleados)
+    console.log('📤 Exportando a Excel...');
+    console.log('🗃️ Datos originales:', this.datosOriginales);
     this.excelService.exportarExcel(this.datosOriginales);
+    console.log('✅ Exportación finalizada');
   }
 }
