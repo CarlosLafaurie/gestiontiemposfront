@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { EmpleadoService, Empleado } from '../../services/empleado-service.service';
 import { TiemposService, Tiempo } from '../../services/tiempos.service.service';
@@ -12,85 +12,91 @@ import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.comp
 
 @Component({
   selector: 'app-gestion-personal',
+  standalone: true,
+  imports: [
+    FormsModule,
+    CommonModule,
+    ListaTiemposComponent,
+    NavbarComponent,
+    BotonRegresarComponent
+  ],
   templateUrl: './gestion-personal.component.html',
-  styleUrls: ['./gestion-personal.component.css'],
-  imports: [FormsModule, CommonModule, ListaTiemposComponent, NavbarComponent, BotonRegresarComponent]
+  styleUrls: ['./gestion-personal.component.css']
 })
 export class GestionPersonalComponent implements OnInit {
-  nombreObra: string = '';
-  responsable: string = '';
-  rol: string = '';
+  responsable = '';
+  rol = '';
   empleados: Empleado[] = [];
   empleadosFiltrados: Empleado[] = [];
-  empleadosSeleccionados: any[] = [];
+  empleadosSeleccionados: { id: number; nombre: string }[] = [];
   guardandoTiempos = false;
-  searchQuery: string = '';
-  todosSeleccionados: boolean = false;
+  searchQuery = '';
+  todosSeleccionados = false;
 
-
-  private route = inject(ActivatedRoute);
   private empleadoService = inject(EmpleadoService);
   private authService = inject(AuthService);
   private router = inject(Router);
   private tiemposService = inject(TiemposService);
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      this.nombreObra = params.get('nombreObra')?.replace(/-/g, ' ') || '';
-      this.obtenerEmpleados();
-    });
+    this.obtenerTodosEmpleados();
 
     const usuario = localStorage.getItem('usuario');
     if (usuario) {
-      const usuarioParseado = JSON.parse(usuario);
-      this.responsable = usuarioParseado.nombreCompleto;
-      this.rol = usuarioParseado.rol;
+      const { nombreCompleto, rol } = JSON.parse(usuario);
+      this.responsable = nombreCompleto;
+      this.rol = rol;
     }
   }
 
-  obtenerEmpleados(): void {
-    this.empleadoService.obtenerEmpleados().subscribe((data) => {
-      this.empleados = data.map(emp => ({ ...emp, seleccionado: false }));
-      this.filtrarEmpleados();
+  private obtenerTodosEmpleados(): void {
+    this.empleadoService.obtenerEmpleados(1, 150).subscribe(data => {
+      console.log('Total empleados cargados:', data.length);
+      this.empleados = data;
+      this.applySort();
+      this.aplicarFiltro();
     });
   }
 
   filtrarEmpleados(): void {
-    const obraFiltro = this.nombreObra.trim().toLowerCase();
-
-    // Filtrar por obra primero
-    this.empleadosFiltrados = this.empleados.filter(empleado =>
-      empleado.obra.trim().toLowerCase() === obraFiltro
-    );
-
-    // Aplicar la búsqueda dentro de los empleados ya filtrados
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
-      this.empleadosFiltrados = this.empleadosFiltrados.filter(u =>
-        (u.nombreCompleto && u.nombreCompleto.toLowerCase().includes(q)) ||
-        (u.responsable && u.responsable.toLowerCase().includes(q)) ||
-        (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
-        (u.cedula && u.cedula.toLowerCase().includes(q)) ||
-        (u.cargo && u.cargo.toLowerCase().includes(q)) ||
-        (u.obra && u.obra.toLowerCase().includes(q))
-      );
-    }
+    this.aplicarFiltro();
   }
 
-toggleSeleccionarTodos(): void {
-  this.empleadosFiltrados.forEach(emp => emp.seleccionado = this.todosSeleccionados);
+  private aplicarFiltro(): void {
+    const q = this.searchQuery.trim().toLowerCase();
+    this.empleadosFiltrados = q
+      ? this.empleados.filter(emp =>
+          emp.nombreCompleto.toLowerCase().includes(q) ||
+          emp.cedula.toLowerCase().includes(q) ||
+          emp.cargo.toLowerCase().includes(q) ||
+          emp.obra.toLowerCase().includes(q) ||
+          emp.responsable.toLowerCase().includes(q) ||
+          (emp.responsableSecundario || '').toLowerCase().includes(q)
+        )
+      : [...this.empleados];
+  }
+
+  private applySort(): void {
+    this.empleados.sort((a, b) =>
+      a.nombreCompleto.localeCompare(b.nombreCompleto, undefined, { sensitivity: 'base' })
+    );
+  }
+
+  toggleSeleccionarTodos(): void {
+  this.empleadosFiltrados.forEach(emp => (emp.seleccionado = this.todosSeleccionados));
   this.gestionarTiempos();
 }
 
-verificarSeleccionIndividual(): void {
-  const total = this.empleadosFiltrados.length;
-  const seleccionados = this.empleadosFiltrados.filter(emp => emp.seleccionado).length;
-  this.todosSeleccionados = total > 0 && seleccionados === total;
-  this.gestionarTiempos();
-}
+
+  verificarSeleccionIndividual(): void {
+    this.todosSeleccionados = this.empleadosFiltrados.every(emp => emp.seleccionado);
+    this.gestionarTiempos();
+  }
 
   gestionarTiempos(): void {
-    this.empleadosSeleccionados = this.empleadosFiltrados.filter(e => e.seleccionado).map(e => ({ id: e.id, nombre: e.nombreCompleto }));
+    this.empleadosSeleccionados = this.empleadosFiltrados
+      .filter(emp => emp.seleccionado)
+      .map(emp => ({ id: emp.id, nombre: emp.nombreCompleto }));
   }
 
   registrarIngreso(): void {
@@ -109,9 +115,11 @@ verificarSeleccionIndividual(): void {
         fechaHoraEntrada: accion === 'ingreso' ? new Date().toISOString() : null,
         fechaHoraSalida: accion === 'salida' ? new Date().toISOString() : null,
         comentarios: '',
-        permisosEspeciales: '',
+        permisosEspeciales: ''
       };
-      return accion === 'ingreso' ? this.tiemposService.registrarIngreso(tiempo) : this.tiemposService.registrarSalida(tiempo);
+      return accion === 'ingreso'
+        ? this.tiemposService.registrarIngreso(tiempo)
+        : this.tiemposService.registrarSalida(tiempo);
     });
 
     forkJoin(observables).subscribe({
@@ -119,7 +127,7 @@ verificarSeleccionIndividual(): void {
         alert(`✅ ${accion === 'ingreso' ? 'Ingresos' : 'Salidas'} registradas correctamente.`);
         window.location.reload();
       },
-      error: (err) => {
+      error: err => {
         console.error(`❌ Error al registrar ${accion}`, err);
         alert(`❌ Error al registrar ${accion}.`);
       },
