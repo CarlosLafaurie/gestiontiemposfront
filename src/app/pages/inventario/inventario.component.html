@@ -27,10 +27,9 @@
           <th>#</th>
           <th>Código</th>
           <th>Herramienta</th>
+          <th>Marca</th>
           <th>Número de Serie</th>
           <th>Cantidad</th>
-          <th>Último Mto.</th>
-          <th>Próximo Mto.</th>
           <th>Ubicación</th>
           <th>Responsable</th>
           <th>Fecha Compra</th>
@@ -44,10 +43,9 @@
           <td>{{ i + 1 }}</td>
           <td>{{ material.codigo }}</td>
           <td>{{ material.herramienta }}</td>
+          <td>{{ material.marca || '-' }}</td>
           <td>{{ material.numeroSerie || '-' }}</td>
           <td>{{ material.cantidad }}</td>
-          <td>{{ material.fechaUltimoMantenimiento | date:'short' }}</td>
-          <td>{{ material.fechaProximoMantenimiento | date:'short' }}</td>
         <td id="enlace" (click)="irAInventarioInterno(material.ubicacion)" class="td-clickable">
           {{ material.ubicacion }}
         </td>
@@ -100,7 +98,6 @@
           </div>
         </div>
 
-
         <div class="form-row">
           <div class="form-group">
             <label>Herramienta:</label>
@@ -113,9 +110,16 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Empresa Mto.:</label>
-          <input [(ngModel)]="materialActual.empresaMantenimiento" name="empresaMantenimiento" type="text" />
+        <div class="from-row">
+          <div class="form-group">
+            <label>Empresa Mto.:</label>
+            <input [(ngModel)]="materialActual.empresaMantenimiento" name="empresaMantenimiento" type="text" />
+          </div>
+
+          <div class="form-group">
+            <label>Número de Serie:</label>
+            <input [(ngModel)]="materialActual.numeroSerie" name="numeroSerie" type="text" />
+          </div>
         </div>
 
         <div class="form-row">

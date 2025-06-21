@@ -1,4 +1,3 @@
-// src/app/components/inventario/inventario.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -32,7 +31,7 @@ export class InventarioComponent implements OnInit {
   responsables: User[] = [];
 
   // *** PAGINACIÓN ***
-  pageSize = 10;
+  pageSize = 30;
   currentPage = 1;
 
   private inventarioService = inject(InventarioService);
@@ -80,12 +79,24 @@ export class InventarioComponent implements OnInit {
     this.materialesFiltrados = this.materiales.filter(item =>
       item.codigo.toLowerCase().includes(q) ||
       item.herramienta.toLowerCase().includes(q) ||
+      item.marca.toLowerCase().includes(q) ||
       (item.numeroSerie || '').toLowerCase().includes(q) ||
       item.responsable.toLowerCase().includes(q) ||
       item.ubicacion.toLowerCase().includes(q) ||
       item.estado.toLowerCase().includes(q)
     );
-    // al filtrar, volvemos a la página 1
+
+    // Ordenar por código ascendente (numérico o alfanumérico)
+    this.materialesFiltrados.sort((a, b) => {
+      const na = Number(a.codigo);
+      const nb = Number(b.codigo);
+      if (!isNaN(na) && !isNaN(nb)) {
+        return na - nb;
+      }
+      return a.codigo.localeCompare(b.codigo, undefined, { numeric: true });
+    });
+
+    // Al filtrar, volvemos a la página 1
     this.currentPage = 1;
   }
 
@@ -156,6 +167,7 @@ export class InventarioComponent implements OnInit {
       codigo: '',
       herramienta: '',
       numeroSerie: '',
+      marca: '',
       fechaUltimoMantenimiento: null,
       fechaProximoMantenimiento: null,
       empresaMantenimiento: '',
@@ -171,13 +183,12 @@ export class InventarioComponent implements OnInit {
   }
 
   irAInventarioInterno(nombreObra: string): void {
-  console.log('Obra original:', nombreObra);
-  const nombreSanitizado = encodeURIComponent(nombreObra);
-  console.log('Obra sanitizada para URL:', nombreSanitizado);
+    console.log('Obra original:', nombreObra);
+    const nombreSanitizado = encodeURIComponent(nombreObra);
+    console.log('Obra sanitizada para URL:', nombreSanitizado);
 
-  this.router.navigate(['/inventario-interno', nombreSanitizado]).then((success) => {
-    console.log('Navegación exitosa:', success);
-  });
-}
-
+    this.router.navigate(['/inventario-interno', nombreSanitizado]).then(success => {
+      console.log('Navegación exitosa:', success);
+    });
+  }
 }

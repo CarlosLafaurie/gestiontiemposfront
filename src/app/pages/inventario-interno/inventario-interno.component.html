@@ -23,6 +23,7 @@
         <tr>
           <th>Código</th>
           <th>Herramienta</th>
+          <th>Marca</th>
           <th>Número de Serie</th>
           <th>Cantidad</th>
           <th>Ubicación</th>
@@ -37,6 +38,7 @@
             [class.fila-padre]="fila.tipo === 'padre'">
           <td>{{ fila.codigo  || '-' }}</td>
           <td>{{ fila.herramienta || '-' }}</td>
+          <td>{{ fila.marca        || '-' }}</td>
           <td>{{ fila.numeroSerie || '-' }}</td>
           <td>{{ fila.cantidad       ?? '-' }}</td>
           <td>{{ fila.ubicacion     || '-' }}</td>
@@ -116,6 +118,10 @@
           <div>
             <label>Número de Serie:</label>
             <input type="text" [value]="numeroSerie || '-'" disabled />
+          </div>
+          <div>
+            <label>Marca:</label>
+            <input type="text" [value]="marca || '-'" disabled />
           </div>
         </div>
 

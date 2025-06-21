@@ -15,6 +15,7 @@ interface FilaMezclada {
   internoId?: number;
   codigo?: string;
   herramienta?: string;
+  marca?: string;
   numeroSerie?: string;
   cantidad?: number;
   ubicacion?: string;
@@ -41,6 +42,7 @@ export class InventarioInternoComponent implements OnInit {
   obraUsuario: string | null = null;
   registroActual: InventarioInterno = this.nuevoRegistro();
   herramientaNombre = '';
+  marca = '';
   numeroSerie = '';
   cantidad = 0;
   esEdicion = false;
@@ -141,6 +143,7 @@ export class InventarioInternoComponent implements OnInit {
       observaciones: fila.observaciones || ''
     };
     this.herramientaNombre = fila.herramienta!;
+    this.marca = fila.marca || '';
     this.numeroSerie = fila.numeroSerie!;
     this.cantidad = fila.cantidad!;
     this.mostrarFormulario = true;
@@ -202,6 +205,7 @@ export class InventarioInternoComponent implements OnInit {
       internoId: h?.id,
       codigo: p.codigo,
       herramienta: p.herramienta,
+      marca: p.marca,
       numeroSerie: p.numeroSerie,
       cantidad: p.cantidad,
       ubicacion: p.ubicacion,
@@ -218,6 +222,7 @@ export class InventarioInternoComponent implements OnInit {
     const lista = this.inventarioPadre.filter(i =>
       i.codigo.toLowerCase().includes(q) ||
       i.herramienta.toLowerCase().includes(q) ||
+      i.marca.toLowerCase().includes(q) ||
       (i.numeroSerie || '').toLowerCase().includes(q) ||
       i.ubicacion.toLowerCase().includes(q)
     );

@@ -3,6 +3,7 @@ export interface Inventario {
   codigo: string;
   herramienta: string;
   numeroSerie: string;
+  marca: string;
   fechaUltimoMantenimiento: string | null;
   fechaProximoMantenimiento: string | null;
   empresaMantenimiento: string;

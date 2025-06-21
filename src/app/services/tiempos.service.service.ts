@@ -22,7 +22,6 @@ export class TiemposService {
 
   constructor(private http: HttpClient) {}
 
-  // ========== INGRESOS ==========
   obtenerIngresos(): Observable<Tiempo[]> {
     return this.http.get<Tiempo[]>(this.apiIngresos).pipe(
       catchError(err => throwError(() => err))
@@ -62,7 +61,6 @@ export class TiemposService {
     );
   }
 
-  // ========== SALIDAS ==========
   obtenerSalidas(): Observable<Tiempo[]> {
     return this.http.get<Tiempo[]>(this.apiSalidas).pipe(
       catchError(err => throwError(() => err))
