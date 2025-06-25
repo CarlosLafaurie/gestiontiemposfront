@@ -76,11 +76,12 @@ export class GestionPersonalComponent implements OnInit {
       : [...this.empleados];
   }
 
-  private applySort(): void {
+ private applySort(): void {
     this.empleados.sort((a, b) =>
-      a.nombreCompleto.localeCompare(b.nombreCompleto, undefined, { sensitivity: 'base' })
+      a.obra.localeCompare(b.obra, undefined, { sensitivity: 'base' })
     );
   }
+
 
   toggleSeleccionarTodos(): void {
   this.empleadosFiltrados.forEach(emp => (emp.seleccionado = this.todosSeleccionados));
