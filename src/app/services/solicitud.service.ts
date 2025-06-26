@@ -10,16 +10,21 @@ export enum EstadoSolicitud {
   Comprado  = 'Comprado',
 }
 
+export interface SolicitudItem {
+  inventarioId: number;
+  cantidad: number;
+}
+
 export interface Solicitud {
   id?: number;
-  inventarioId: number;
   solicitante: string;
   obra: string;
-  cantidad: number;
   fechaSolicitud: string;
   observaciones?: string;
   estado: EstadoSolicitud;
+  items: SolicitudItem[]; // ⬅️ ahora es un array de herramientas
 }
+
 
 @Injectable({ providedIn: 'root' })
 export class SolicitudService {

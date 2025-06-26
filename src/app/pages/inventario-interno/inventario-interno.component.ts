@@ -93,23 +93,39 @@ export class InventarioInternoComponent implements OnInit {
 
   /** Obtiene los registros internos filtrados por obra */
   private cargarRegistrosInternos(): void {
-    if (!this.obraUsuario) return;
-    this.inventarioInternoService.obtenerPorObra(this.obraUsuario).subscribe({
-      next: data => this.registros = data,
-      error: err => console.error('Error internos ▶', err)
-    });
-  }
+  if (!this.obraUsuario) return;
+
+  this.inventarioInternoService.obtenerPorObra(this.obraUsuario).subscribe({
+    next: data => {
+      const vistos = new Set<string>();
+      this.registros = data.filter(r => {
+        const clave = `${r.inventarioId}-${r.usando?.toLowerCase().trim()}-${r.obra?.toLowerCase().trim()}`;
+        if (vistos.has(clave)) return false;
+        vistos.add(clave);
+        return true;
+      });
+    },
+    error: err => console.error('Error internos ▶', err)
+  });
+}
+
 
   /** Obtiene el inventario padre filtrado por obra */
-  private cargarInventarioPadre(nombreObra: string): void {
-    this.inventarioService.obtenerPorObra(nombreObra).subscribe({
-      next: data => {
-        this.inventarioPadre = data;
-        this.currentPage = 1;
-      },
-      error: err => console.error('Error padre ▶', err)
-    });
-  }
+ private cargarInventarioPadre(nombreObra: string): void {
+  this.inventarioService.obtenerPorObra(nombreObra).subscribe({
+    next: data => {
+      const idsUnicos = new Set<number>();
+      this.inventarioPadre = data.filter(i => {
+        if (idsUnicos.has(i.id)) return false;
+        idsUnicos.add(i.id);
+        return true;
+      });
+      this.currentPage = 1;
+    },
+    error: err => console.error('Error padre ▶', err)
+  });
+}
+
 
   /** Carga lista de empleados para autocomplete */
   private cargarEmpleados(): void {
@@ -185,18 +201,21 @@ export class InventarioInternoComponent implements OnInit {
   }
 
   /** Fusiona padre + hijos para el template */
-  get filasMezcladas(): FilaMezclada[] {
-    const filas: FilaMezclada[] = [];
-    this.inventarioPaginado.forEach(padre => {
-      const hijos = this.registros.filter(h => h.inventarioId === padre.id);
-      if (hijos.length) {
-        hijos.forEach(hijo => filas.push(this.crearFila(padre, hijo)));
-      } else {
-        filas.push(this.crearFila(padre, null));
-      }
-    });
-    return filas;
-  }
+ get filasMezcladas(): FilaMezclada[] {
+  const filas: FilaMezclada[] = [];
+
+  this.inventarioPaginado.forEach(padre => {
+    // Obtener todos los registros internos para este inventarioId
+    const hijos = this.registros
+      .filter(h => h.inventarioId === padre.id)
+      .sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+
+    const ultimo = hijos[0] || null; // Solo el último registro, o null si no hay
+    filas.push(this.crearFila(padre, ultimo));
+  });
+
+  return filas;
+}
 
   private crearFila(p: Inventario, h: InventarioInterno | null): FilaMezclada {
     return {

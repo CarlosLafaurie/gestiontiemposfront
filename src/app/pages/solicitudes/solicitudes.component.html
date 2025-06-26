@@ -1,80 +1,111 @@
+<!-- solicitudes.component.html -->
 <app-navbar></app-navbar>
 <app-boton-regresar></app-boton-regresar>
 
 <div class="solicitudes-admin container mt-4">
   <h2 id="title">Gestión de Solicitudes</h2>
 
-  <!-- Formulario (solo responsable) -->
-  <div *ngIf="esResponsable && !esAdmin" class="formulario-solicitud">
+  <!-- Formulario (admin o responsable) -->
+  <div *ngIf="esResponsable || esAdmin" class="formulario-solicitud">
     <h4>Nueva Solicitud</h4>
     <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="herramienta" class="form-label">Herramienta</label>
-          <select id="herramienta"
-                  class="form-select"
-                  required
-                  name="inventarioId"
-                  [(ngModel)]="nueva.inventarioId">
-            <option [value]="0" disabled>Seleccione...</option>
-            <option *ngFor="let it of inventario" [value]="it.id">
+
+       <div class="form-group">
+          <label class="form-label">Obra</label>
+          <ng-container *ngIf="esAdmin; else obraTxt">
+            <select class="form-select" [(ngModel)]="nueva.obra" name="obra" required>
+              <option value="" disabled>Seleccione obra...</option>
+              <option *ngFor="let o of obras" [value]="o.nombreObra">
+                {{ o.nombreObra }}
+              </option>
+            </select>
+          </ng-container>
+          <ng-template #obraTxt>
+            <input type="text" class="form-control" [value]="nueva.obra" readonly />
+          </ng-template>
+        </div>
+
+      <!-- Filtro y selección de herramienta -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Herramienta</label>
+          <input type="text" id="filtroHerramienta"
+                 class="form-control mb-2" placeholder="Buscar herramienta..."
+                 [(ngModel)]="filtroHerramienta" name="filtroHerramienta" (ngModelChange)="filtrarHerramientas()" />
+          <select class="form-select" id="select" [(ngModel)]="itemTemp.inventarioId" name="tempInventarioId" required>
+            <option [value]="0" disabled>Seleccione herramienta...</option>
+            <option *ngFor="let it of inventarioFiltrado" [value]="it.id">
               {{ it.herramienta }} ({{ it.ubicacion }})
             </option>
           </select>
         </div>
-        <div class="col-md-6 mb-3">
-          <label for="cantidad" class="form-label">Cantidad</label>
-          <input id="cantidad"
-                 type="number"
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" id="cantidad">
+          <label class="form-label">Cantidad</label>
+          <input type="number"
                  class="form-control"
-                 required
                  min="1"
-                 name="cantidad"
-                 [(ngModel)]="nueva.cantidad">
+                 [(ngModel)]="itemTemp.cantidad"
+                 name="tempCantidad"
+                 required />
+
+        <div class="form-group">
+          <button type="button" class="btn btn-secondary" (click)="agregarItem()">
+            Agregar
+          </button>
+        </div>
+       </div>
+       </div>
+
+      <!-- Lista de herramientas agregadas -->
+      <div *ngIf="nueva.items.length > 0" class="table-responsive mb-3">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Herramienta</th>
+              <th>Cantidad</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of nueva.items; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ getHerramienta(item.inventarioId) }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm" (click)="eliminarItem(i)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Obra y comentario -->
+      <div class="form-row">
+
+        <div class="form-group">
+          <label class="form-label">Comentario</label>
+          <textarea class="form-control" rows="3" name="observaciones" [(ngModel)]="nueva.observaciones"></textarea>
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="obra" class="form-label">Obra</label>
-          <select id="obra"
-                  class="form-select"
-                  required
-                  name="obra"
-                  [(ngModel)]="nueva.obra">
-            <option value="" disabled>Seleccione obra...</option>
-            <option *ngFor="let o of obras" [value]="o.nombreObra">
-              {{ o.nombreObra }} (Cliente: {{ o.clienteObra }})
-            </option>
-          </select>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="observaciones" class="form-label">Comentario</label>
-          <textarea id="observaciones"
-                    class="form-control"
-                    rows="3"
-                    name="observaciones"
-                    [(ngModel)]="nueva.observaciones">
-          </textarea>
+      <!-- Botón de envío -->
+      <div class="form-row">
+        <div class="form-group">
+          <button type="submit" class="btn-guardar" [disabled]="formSolicitud.invalid || !nueva.items.length">Solicitar</button>
         </div>
       </div>
-
-      <button type="submit"
-              class="btn btn-primary"
-              [disabled]="formSolicitud.invalid">
-        Solicitar
-      </button>
     </form>
   </div>
 
-  <!-- Filtro (solo admin) -->
-  <div *ngIf="esAdmin" class="mt-4">
+  <!-- Filtro Estado -->
+  <div *ngIf="esAdmin" class="filtro-estado">
     <label for="filtroEstado" class="form-label">Ver:</label>
-    <select id="filtroEstado"
-            class="form-select w-auto d-inline-block ms-2"
-            name="filtroEstado"
-            [(ngModel)]="filtroEstado"
-            (ngModelChange)="aplicarFiltro()">
+    <select id="filtroEstado" class="form-select w-auto d-inline-block ms-2" name="filtroEstado"
+            [(ngModel)]="filtroEstado" (ngModelChange)="aplicarFiltro()">
       <option [ngValue]="''">Todas</option>
       <option [ngValue]="EstadoSolicitud.Pendiente">Pendientes</option>
       <option [ngValue]="EstadoSolicitud.Aprobada">Aprobadas</option>
@@ -100,33 +131,22 @@
       </thead>
       <tbody>
         <tr *ngFor="let s of filtradas; let i = index"
-            [ngClass]="{
-              'row-aprobada': s.estado === EstadoSolicitud.Aprobada,
-              'row-rechazada': s.estado === EstadoSolicitud.Rechazada
-            }">
+            [ngClass]="{'row-aprobada': s.estado === EstadoSolicitud.Aprobada, 'row-rechazada': s.estado === EstadoSolicitud.Rechazada}">
           <td>{{ i + 1 }}</td>
-          <td>{{ getHerramienta(s.inventarioId) }}</td>
-          <td>{{ s.cantidad }}</td>
+          <td>
+            <ul class="mb-0 ps-3"><li *ngFor="let item of s.items">{{ getHerramienta(item.inventarioId) }}</li></ul>
+          </td>
+          <td>
+            <ul class="mb-0 ps-3"><li *ngFor="let item of s.items">{{ item.cantidad }}</li></ul>
+          </td>
           <td>{{ s.obra }}</td>
           <td>{{ s.solicitante }}</td>
           <td>{{ s.fechaSolicitud | date:'short' }}</td>
           <td>{{ s.estado }}</td>
           <td *ngIf="esAdmin" class="acciones-cell">
-            <button class="btn-aprobar"
-                    [disabled]="s.estado !== EstadoSolicitud.Pendiente"
-                    (click)="cambiarEstado(s, EstadoSolicitud.Aprobada)">
-              Aprobar
-            </button>
-            <button class="btn-rechazar"
-                    [disabled]="s.estado !== EstadoSolicitud.Pendiente"
-                    (click)="cambiarEstado(s, EstadoSolicitud.Rechazada)">
-              Rechazar
-            </button>
-             <button class="btn-comprado"
-                     [disabled]="s.estado !== EstadoSolicitud.Aprobada"
-                     (click)="cambiarEstado(s, EstadoSolicitud.Comprado)">
-              Comprado
-            </button>
+            <button class="btn-aprobar" [disabled]="s.estado !== EstadoSolicitud.Pendiente" (click)="cambiarEstado(s, EstadoSolicitud.Aprobada)">Aprobar</button>
+            <button class="btn-rechazar" [disabled]="s.estado !== EstadoSolicitud.Pendiente" (click)="cambiarEstado(s, EstadoSolicitud.Rechazada)">Rechazar</button>
+            <button class="btn-comprado" [disabled]="s.estado !== EstadoSolicitud.Aprobada" (click)="cambiarEstado(s, EstadoSolicitud.Comprado)">Comprado</button>
           </td>
         </tr>
       </tbody>
@@ -134,8 +154,6 @@
   </div>
 
   <ng-template #sinDatos>
-    <div class="alert alert-info text-center mt-3">
-      No hay solicitudes para mostrar.
-    </div>
+    <div class="alert alert-info text-center mt-3">No hay solicitudes para mostrar.</div>
   </ng-template>
 </div>

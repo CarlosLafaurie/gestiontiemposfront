@@ -83,6 +83,9 @@
   <div *ngIf="mostrarFormulario" class="modal">
     <div class="modal-content">
       <h3>{{ esEdicion ? 'Editar Material' : 'Nuevo Material' }}</h3>
+      <div *ngIf="mensaje" [ngClass]="{'mensaje-exito': tipoMensaje === 'success', 'mensaje-error': tipoMensaje === 'error'}">
+        {{ mensaje }}
+      </div>
 
       <form (ngSubmit)="guardarMaterial()">
 

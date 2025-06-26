@@ -23,6 +23,8 @@ export class InventarioComponent implements OnInit {
 
   mostrarFormulario: boolean = false;
   esEdicion: boolean = false;
+  mensaje: string = '';
+  tipoMensaje: 'success' | 'error' | '' = '';
 
   materialActual: Inventario = this.crearNuevoItem();
 
@@ -133,20 +135,36 @@ export class InventarioComponent implements OnInit {
     this.mostrarFormulario = false;
   }
 
-  guardarMaterial(): void {
-    console.log('[InventarioComponent] guardarMaterial:', this.materialActual);
-    const obs = this.esEdicion
-      ? this.inventarioService.actualizarItem(this.materialActual)
-      : this.inventarioService.agregarItem(this.materialActual);
+guardarMaterial(): void {
+  console.log('[InventarioComponent] guardarMaterial:', this.materialActual);
+  const obs = this.esEdicion
+    ? this.inventarioService.actualizarItem(this.materialActual)
+    : this.inventarioService.agregarItem(this.materialActual);
 
-    obs.subscribe({
-      next: () => {
-        this.obtenerInventario();
+  obs.subscribe({
+    next: () => {
+      this.mostrarMensaje('Guardado exitosamente', 'success');
+      this.obtenerInventario();
+      setTimeout(() => {
         this.cerrarFormulario();
-      },
-      error: err => console.error(err)
-    });
-  }
+      }, 3000);
+    },
+    error: err => {
+      console.error(err);
+      this.mostrarMensaje('Error al guardar', 'error');
+    }
+  });
+}
+
+mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
+  this.mensaje = mensaje;
+  this.tipoMensaje = tipo;
+  setTimeout(() => {
+    this.mensaje = '';
+    this.tipoMensaje = '';
+  }, 3000);
+}
+
 
   eliminarMaterial(id: number): void {
     if (!confirm('¿Eliminar material?')) return;
