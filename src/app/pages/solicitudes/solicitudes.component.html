@@ -10,7 +10,7 @@
     <h4>Nueva Solicitud</h4>
     <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
 
-       <div class="form-group">
+       <div class="form-group" id="solicitante">
           <label class="form-label">Obra</label>
           <ng-container *ngIf="esAdmin; else obraTxt">
             <select class="form-select" [(ngModel)]="nueva.obra" name="obra" required>
@@ -32,7 +32,9 @@
           <input type="text" id="filtroHerramienta"
                  class="form-control mb-2" placeholder="Buscar herramienta..."
                  [(ngModel)]="filtroHerramienta" name="filtroHerramienta" (ngModelChange)="filtrarHerramientas()" />
-          <select class="form-select" id="select" [(ngModel)]="itemTemp.inventarioId" name="tempInventarioId" required>
+      </div>
+      <div class="form-row">
+                 <select class="form-select" id="select" [(ngModel)]="itemTemp.inventarioId" name="tempInventarioId" required>
             <option [value]="0" disabled>Seleccione herramienta...</option>
             <option *ngFor="let it of inventarioFiltrado" [value]="it.id">
               {{ it.herramienta }} ({{ it.ubicacion }})
@@ -50,13 +52,14 @@
                  [(ngModel)]="itemTemp.cantidad"
                  name="tempCantidad"
                  required />
-
-        <div class="form-group">
-          <button type="button" class="btn btn-secondary" (click)="agregarItem()">
-            Agregar
-          </button>
         </div>
-       </div>
+       <div class="form-row">
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" (click)="agregarItem()">
+              Agregar
+            </button>
+          </div>
+        </div>
        </div>
 
       <!-- Lista de herramientas agregadas -->
@@ -73,7 +76,7 @@
           <tbody>
             <tr *ngFor="let item of nueva.items; let i = index">
               <td>{{ i + 1 }}</td>
-              <td>{{ getHerramienta(item.inventarioId) }}</td>
+              <td> {{ getHerramienta(item.inventarioId) }}</td>
               <td>{{ item.cantidad }}</td>
               <td>
                 <button type="button" class="btn btn-danger btn-sm" (click)="eliminarItem(i)">Eliminar</button>
@@ -115,13 +118,12 @@
   </div>
 
   <!-- Tabla de solicitudes -->
-  <div *ngIf="filtradas.length > 0; else sinDatos" class="table-responsive mt-3">
+  <div *ngIf="filtradas.length > 0; else sinDatos" class="table-responsive mt-3" id="tablaSolicitudes">
     <table class="table align-middle">
       <thead class="table-dark">
         <tr>
           <th>#</th>
-          <th>Herramienta</th>
-          <th>Cant.</th>
+          <th>Herramienta / cantidad</th>
           <th>Obra</th>
           <th>Solicitante</th>
           <th>Fecha</th>
@@ -134,25 +136,21 @@
             [ngClass]="{'row-aprobada': s.estado === EstadoSolicitud.Aprobada, 'row-rechazada': s.estado === EstadoSolicitud.Rechazada}">
           <td>{{ i + 1 }}</td>
           <td>
-            <ul class="mb-0 ps-3"><li *ngFor="let item of s.items">{{ getHerramienta(item.inventarioId) }}</li></ul>
-          </td>
-          <td>
-            <ul class="mb-0 ps-3"><li *ngFor="let item of s.items">{{ item.cantidad }}</li></ul>
+            <ul class="mb-0 ps-3"><li *ngFor="let item of s.items">  {{ getHerramienta(item.inventarioId) }} - {{ item.cantidad }}</li></ul>
           </td>
           <td>{{ s.obra }}</td>
           <td>{{ s.solicitante }}</td>
           <td>{{ s.fechaSolicitud | date:'short' }}</td>
           <td>{{ s.estado }}</td>
           <td *ngIf="esAdmin" class="acciones-cell">
-            <button class="btn-aprobar" [disabled]="s.estado !== EstadoSolicitud.Pendiente" (click)="cambiarEstado(s, EstadoSolicitud.Aprobada)">Aprobar</button>
+            <button class="btn-aprobar"  [disabled]="s.estado === EstadoSolicitud.Aprobada || s.estado === EstadoSolicitud.Rechazada" (click)="cambiarEstado(s, EstadoSolicitud.Aprobada)">Aprobar</button>
             <button class="btn-rechazar" [disabled]="s.estado !== EstadoSolicitud.Pendiente" (click)="cambiarEstado(s, EstadoSolicitud.Rechazada)">Rechazar</button>
-            <button class="btn-comprado" [disabled]="s.estado !== EstadoSolicitud.Aprobada" (click)="cambiarEstado(s, EstadoSolicitud.Comprado)">Comprado</button>
+           <button class="btn-comprado" [disabled]="s.estado !== EstadoSolicitud.Pendiente" (click)="cambiarEstado(s, EstadoSolicitud.Comprado)">Comprado</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-
   <ng-template #sinDatos>
     <div class="alert alert-info text-center mt-3">No hay solicitudes para mostrar.</div>
   </ng-template>

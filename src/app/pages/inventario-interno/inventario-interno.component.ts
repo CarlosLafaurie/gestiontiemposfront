@@ -111,15 +111,17 @@ export class InventarioInternoComponent implements OnInit {
 
 
   /** Obtiene el inventario padre filtrado por obra */
- private cargarInventarioPadre(nombreObra: string): void {
+private cargarInventarioPadre(nombreObra: string): void {
   this.inventarioService.obtenerPorObra(nombreObra).subscribe({
     next: data => {
       const idsUnicos = new Set<number>();
-      this.inventarioPadre = data.filter(i => {
-        if (idsUnicos.has(i.id)) return false;
-        idsUnicos.add(i.id);
-        return true;
-      });
+      this.inventarioPadre = data
+        .filter(i => i.estado?.toLowerCase() !== 'inactivo')
+        .filter(i => {
+          if (idsUnicos.has(i.id)) return false;
+          idsUnicos.add(i.id);
+          return true;
+        });
       this.currentPage = 1;
     },
     error: err => console.error('Error padre ▶', err)

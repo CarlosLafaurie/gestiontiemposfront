@@ -68,28 +68,29 @@ export class SolicitudesComponent implements OnInit {
   };
 
   ngOnInit() {
-    const ud = this.auth.getUserData() || {};
-    this.usuarioActual = ud.nombreCompleto || '';
-    const rol = String(ud.rol || '').toLowerCase();
-    this.esAdmin = rol === 'admin';
-    this.esResponsable = rol === 'responsable';
+  const ud = this.auth.getUserData() || {};
+  this.usuarioActual = ud.nombreCompleto || '';
+  const rol = String(ud.rol || '').toLowerCase();
+  this.esAdmin = rol === 'admin';
+  this.esResponsable = rol === 'responsable';
 
-    if (this.esResponsable && ud.obra) {
-      this.nueva.obra = ud.obra;
-    }
-    if (this.esAdmin) this.displayedColumns.push('acciones');
+  if (this.esResponsable && ud.obra) {
+    this.nueva.obra = ud.obra;
+  }
 
-    this.loadInventario();
-    this.loadObras();
+  if (this.esAdmin) this.displayedColumns.push('acciones');
+
+  this.loadObras();
+  this.loadInventarioYDespuesSolicitudes();
+}
+
+loadInventarioYDespuesSolicitudes() {
+  this.invService.obtenerInventario().subscribe(list => {
+    this.inventario = list;
+    this.filtrarHerramientas();
     this.cargarSolicitudes();
-  }
-
-  loadInventario() {
-    this.invService.obtenerInventario().subscribe(list => {
-      this.inventario = list;
-      this.filtrarHerramientas();
-    });
-  }
+  });
+}
 
   loadObras() {
     this.obraService.getObras().subscribe(list => {
@@ -105,12 +106,26 @@ export class SolicitudesComponent implements OnInit {
     );
   }
 
-  cargarSolicitudes() {
-    this.service.getSolicitudes().subscribe(list => {
-      this.solicitudes = list;
-      this.aplicarFiltro();
+cargarSolicitudes() {
+  this.service.getSolicitudes().subscribe(list => {
+    console.log('📥 Solicitudes recibidas desde el backend:', list);
+
+    this.solicitudes = list;
+
+    // Verificamos que cada solicitud tenga items válidos
+    list.forEach((s, i) => {
+      console.log(`🔍 Solicitud [${i}] - Solicitante: ${s.solicitante}, Obra: ${s.obra}`);
+      console.log(`🧾 Items:`, s.items);
+
+      s.items.forEach((item, j) => {
+        console.log(`   ➤ Item [${j}]: inventarioId=${item.inventarioId}, cantidad=${item.cantidad}`);
+      });
     });
-  }
+
+    this.aplicarFiltro();
+  });
+}
+
 
   aplicarFiltro() {
     const arr = this.solicitudes.filter(s =>
@@ -121,32 +136,51 @@ export class SolicitudesComponent implements OnInit {
       : arr.filter(s => s.solicitante === this.usuarioActual);
   }
 
-  agregarItem() {
-    if (!this.itemTemp.inventarioId || this.itemTemp.cantidad < 1) {
-      alert('Seleccione una herramienta válida y cantidad mayor a 0.');
-      return;
-    }
-    this.nueva.items.push({ ...this.itemTemp });
-    this.itemTemp = { inventarioId: 0, cantidad: 1 };
+ agregarItem() {
+  const existe = this.nueva.items.some(item => item.inventarioId === this.itemTemp.inventarioId);
+  if (existe) {
+    alert('Ya se agregó esta herramienta.');
+    return;
+  }
+  if (!this.itemTemp.inventarioId || this.itemTemp.cantidad < 1) {
+    alert('Seleccione una herramienta válida y cantidad mayor a 0.');
+    return;
+  }
+  this.nueva.items.push({ ...this.itemTemp });
+  this.itemTemp = { inventarioId: 0, cantidad: 1 };
   }
 
   eliminarItem(index: number) {
     this.nueva.items.splice(index, 1);
   }
 
-  crearSolicitud() {
-    if (!this.nueva.obra || this.nueva.items.length === 0) {
-      alert('Debe seleccionar una obra y al menos una herramienta.');
-      return;
-    }
-    this.nueva.solicitante = this.usuarioActual;
-    this.nueva.fechaSolicitud = new Date().toISOString();
-    this.nueva.estado = EstadoSolicitud.Pendiente;
-    this.service.crearSolicitud(this.nueva).subscribe(() => {
-      this.nueva = { solicitante: '', obra: '', fechaSolicitud: new Date().toISOString(), observaciones: '', estado: EstadoSolicitud.Pendiente, items: [] };
-      this.cargarSolicitudes();
+ crearSolicitud() {
+  if (!this.nueva.obra || this.nueva.items.length === 0) {
+    alert('Debe seleccionar una obra y al menos una herramienta.');
+    return;
+  }
+
+  this.nueva.solicitante = this.usuarioActual;
+  this.nueva.fechaSolicitud = new Date().toISOString();
+  this.nueva.estado = EstadoSolicitud.Pendiente;
+  this.service.crearSolicitud(this.nueva).subscribe({
+    next: () => {
+      this.nueva = {
+        solicitante: '',
+        obra: '',
+        fechaSolicitud: new Date().toISOString(),
+        observaciones: '',
+        estado: EstadoSolicitud.Pendiente,
+        items: []
+      };
+        this.cargarSolicitudes();
+      },
+      error: err => {
+        console.error('❌ Error al crear solicitud:', err);
+      }
     });
   }
+
 
   cambiarEstado(s: Solicitud, nuevo: EstadoSolicitud) {
     if (!s.id) return;
@@ -155,8 +189,9 @@ export class SolicitudesComponent implements OnInit {
     });
   }
 
-  getHerramienta(id: number): string {
-    const it = this.inventario.find(x => x.id === id);
+  getHerramienta(id: number | string): string {
+    const it = this.inventario.find(x => x.id === Number(id));
     return it ? it.herramienta : '(desconocida)';
   }
+
 }
