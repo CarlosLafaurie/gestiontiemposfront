@@ -70,6 +70,14 @@
   width: 70%;
 }
 
+#revision {
+  background-color: rgb(12, 12, 201);
+}
+
+#revision:hover {
+  background-color: rgb(10, 10, 170);
+}
+
 .btn:hover {
   background-color: #075e04;
 }

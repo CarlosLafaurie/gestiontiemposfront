@@ -17,6 +17,7 @@ import { MovimientoComponent } from './pages/movimiento/movimiento-component';
 import { SolicitudesComponent } from './pages/solicitudes/solicitudes.component';
 import { InventarioInternoComponent } from './pages/inventario-interno/inventario-interno.component';
 import { InventariosComponent } from './pages/inventarios/inventarios.component';
+import { RevisionInventarioComponent } from './pages/revision-inventario/revision-inventario.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 
@@ -40,5 +41,6 @@ export const routes: Routes = [
   { path: 'solicitudes', component: SolicitudesComponent, canActivate: [authGuard] },
   { path: 'inventario-interno/:nombreObra', component: InventarioInternoComponent, canActivate: [authGuard] },
   { path: 'inventarios', component: InventariosComponent, canActivate: [authGuard] },
+  { path: 'revision-inventario', component: RevisionInventarioComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

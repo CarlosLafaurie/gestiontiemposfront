@@ -55,4 +55,9 @@ export class InventariosComponent {
   });
 }
 
+  revision(): void {
+    this.router.navigate(['/revision-inventario']);
+  }
+
+
 }
