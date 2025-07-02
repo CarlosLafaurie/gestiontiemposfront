@@ -1,17 +1,16 @@
+// documento-permiso.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environments';
 
 export interface TiempoAusentismo {
-  id?: number;
+  id: number;
   nombreEmpleado: string;
   comentarios: string;
-  permisosEspeciales?: string;
   fechaInicio: string;
   fechaFin: string;
-  rutaDocumento?: string;
-  archivo?: File | null;
+  nombreArchivo?: string; // viene del backend como nombre del PDF
 }
 
 @Injectable({
@@ -34,7 +33,7 @@ export class AusentismoService {
     return this.http.get<TiempoAusentismo>(`${this.apiUrl}/${id}`);
   }
 
-  actualizarDocumento(id: number, data: FormData): Observable<void> {
+  actualizarDocumento(id: number, data: TiempoAusentismo): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, data);
   }
 
@@ -42,11 +41,11 @@ export class AusentismoService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  verPDF(fileName: string): Observable<Blob> {
-    return this.http.get(`${environment.apiUrl}/Pdf/ver/${fileName}`, { responseType: 'blob' });
+  verPDF(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/ver/${id}`, { responseType: 'blob' });
   }
 
-  descargarPDF(fileName: string): Observable<Blob> {
-    return this.http.get(`${environment.apiUrl}/Pdf/descargar/${fileName}`, { responseType: 'blob' });
+  descargarPDF(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/descargar/${id}`, { responseType: 'blob' });
   }
 }

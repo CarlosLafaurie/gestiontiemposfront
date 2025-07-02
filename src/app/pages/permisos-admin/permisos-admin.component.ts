@@ -22,14 +22,13 @@ export class PermisosAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarDocumentos();
-
   }
 
   cargarDocumentos(): void {
     this.ausentismoService.getDocumentos().subscribe({
       next: (data) => {
         this.documentos = data;
-        this.documentosFiltrados = [...this.documentos];
+        this.documentosFiltrados = [...data];
       },
       error: (err) => {
         console.error("❌ Error al obtener documentos:", err);
@@ -38,19 +37,15 @@ export class PermisosAdminComponent implements OnInit {
   }
 
   filtrarPermisos(): void {
-    if (!this.searchQuery) {
-      this.documentosFiltrados = this.documentos;
-    } else {
-      const q = this.searchQuery.toLowerCase();
-
-      this.documentosFiltrados = this.documentos.filter(doc =>
-        (doc.nombreEmpleado && doc.nombreEmpleado.toLowerCase().includes(q)) ||
-        (doc.comentarios && doc.comentarios.toLowerCase().includes(q)) ||
-        (doc.permisosEspeciales && doc.permisosEspeciales.toLowerCase().includes(q)) ||
-        (doc.fechaInicio && doc.fechaInicio.toLowerCase().includes(q)) ||
-        (doc.fechaFin && doc.fechaFin.toLowerCase().includes(q))
-      );
-    }
+    const q = this.searchQuery.toLowerCase();
+    this.documentosFiltrados = !q
+      ? this.documentos
+      : this.documentos.filter(doc =>
+          doc.nombreEmpleado?.toLowerCase().includes(q) ||
+          doc.comentarios?.toLowerCase().includes(q) ||
+          doc.fechaInicio?.toLowerCase().includes(q) ||
+          doc.fechaFin?.toLowerCase().includes(q)
+        );
   }
 
   editar(documento: TiempoAusentismo): void {
@@ -58,39 +53,18 @@ export class PermisosAdminComponent implements OnInit {
   }
 
   guardarCambios(): void {
-    if (this.documentoEditando?.id) {
-      // Crear un nuevo objeto FormData
-      const formData = new FormData();
+    if (!this.documentoEditando?.id) return;
 
-      // Añadir los datos de TiempoAusentismo al FormData
-      formData.append('nombreEmpleado', this.documentoEditando.nombreEmpleado);
-      formData.append('comentarios', this.documentoEditando.comentarios);
-      if (this.documentoEditando.permisosEspeciales) {
-        formData.append('permisosEspeciales', this.documentoEditando.permisosEspeciales);
+    this.ausentismoService.actualizarDocumento(this.documentoEditando.id, this.documentoEditando).subscribe({
+      next: () => {
+        this.documentoEditando = null;
+        this.cargarDocumentos();
+      },
+      error: (err) => {
+        console.error("❌ Error al guardar cambios:", err);
       }
-      formData.append('fechaInicio', this.documentoEditando.fechaInicio);
-      formData.append('fechaFin', this.documentoEditando.fechaFin);
-      if (this.documentoEditando.rutaDocumento) {
-        formData.append('rutaDocumento', this.documentoEditando.rutaDocumento);
-      }
-      // Si tienes un archivo que enviar, puedes agregarlo de la siguiente forma:
-      if (this.documentoEditando.archivo) {
-        formData.append('archivo', this.documentoEditando.archivo, this.documentoEditando.archivo.name);
-      }
-
-      // Ahora, pasamos el FormData al servicio
-      this.ausentismoService.actualizarDocumento(this.documentoEditando.id, formData).subscribe({
-        next: () => {
-          this.documentoEditando = null;
-          this.cargarDocumentos();
-        },
-        error: (err) => {
-          console.error("❌ Error al guardar cambios:", err);
-        }
-      });
-    }
+    });
   }
-
 
   cancelarEdicion(): void {
     this.documentoEditando = null;
@@ -105,39 +79,33 @@ export class PermisosAdminComponent implements OnInit {
     }
   }
 
-  descargar(documento: TiempoAusentismo): void {
-    const ruta = documento.rutaDocumento;
-    const fileName = ruta?.split('\\').pop();
-    if (fileName) {
-      this.ausentismoService.descargarPDF(fileName).subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          a.click();
-          window.URL.revokeObjectURL(url);
-        },
-        error: (err) => {
-          console.error("❌ Error al descargar PDF:", err);
-        }
-      });
-    }
+  ver(documento: TiempoAusentismo): void {
+    this.ausentismoService.verPDF(documento.id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      },
+      error: (err) => {
+        console.error("❌ Error al ver PDF:", err);
+      }
+    });
   }
 
-  ver(documento: TiempoAusentismo): void {
-    const ruta = documento.rutaDocumento;
-    const fileName = ruta?.split('\\').pop();
-    if (fileName) {
-      this.ausentismoService.verPDF(fileName).subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
-          window.open(url, '_blank');
-        },
-        error: (err) => {
-          console.error("❌ Error al visualizar PDF:", err);
-        }
-      });
-    }
+descargar(documento: TiempoAusentismo): void {
+    if (!documento.nombreArchivo) return; // <- previene el error
+
+    this.ausentismoService.descargarPDF(documento.id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = documento.nombreArchivo!; // <- usamos el "!" porque ya validamos que existe
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error("❌ Error al descargar PDF:", err);
+      }
+    });
   }
 }
