@@ -64,7 +64,22 @@ export class GestionPersonalComponent implements OnInit {
       }
 
       this.applySort();
+      this.cargarTiemposParaTodos();
       this.aplicarFiltro();
+    });
+  }
+
+  private cargarTiemposParaTodos(): void {
+    this.empleados.forEach(emp => {
+      this.tiemposService.obtenerUltimoIngresoPorEmpleado(emp.id).subscribe({
+        next: ingreso => emp.fechaHoraEntrada = ingreso?.fechaHoraEntrada ?? null,
+        error: () => emp.fechaHoraEntrada = null
+      });
+
+      this.tiemposService.obtenerUltimaSalidaPorEmpleado(emp.id).subscribe({
+        next: salida => emp.fechaHoraSalida = salida?.fechaHoraSalida ?? null,
+        error: () => emp.fechaHoraSalida = null
+      });
     });
   }
 

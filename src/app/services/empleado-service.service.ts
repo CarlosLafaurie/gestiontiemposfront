@@ -18,6 +18,8 @@
     fechaInicioContrato: string;
     fechaFinContrato: string;
     seleccionado?: boolean;
+    fechaHoraEntrada?: string | null;
+    fechaHoraSalida?: string | null;
   }
 
 
