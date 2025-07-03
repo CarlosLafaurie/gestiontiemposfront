@@ -32,6 +32,7 @@ export class GestionPersonalComponent implements OnInit {
   guardandoTiempos = false;
   searchQuery = '';
   todosSeleccionados = false;
+  obra: string = '';
 
   private empleadoService = inject(EmpleadoService);
   private authService = inject(AuthService);
@@ -43,20 +44,30 @@ export class GestionPersonalComponent implements OnInit {
 
     const usuario = localStorage.getItem('usuario');
     if (usuario) {
-      const { nombreCompleto, rol } = JSON.parse(usuario);
+      const { nombreCompleto, rol, obra } = JSON.parse(usuario);
       this.responsable = nombreCompleto;
       this.rol = rol;
+      if (rol === 'responsable') {
+        this.obra = obra;
+      }
     }
   }
 
   private obtenerTodosEmpleados(): void {
     this.empleadoService.obtenerEmpleados(1, 150).subscribe(data => {
       console.log('Total empleados cargados:', data.length);
-      this.empleados = data;
+
+      if (this.rol === 'responsable' && this.obra) {
+        this.empleados = data.filter(emp => emp.obra === this.obra);
+      } else {
+        this.empleados = data;
+      }
+
       this.applySort();
       this.aplicarFiltro();
     });
   }
+
 
   filtrarEmpleados(): void {
     this.aplicarFiltro();
@@ -76,18 +87,16 @@ export class GestionPersonalComponent implements OnInit {
       : [...this.empleados];
   }
 
- private applySort(): void {
+  private applySort(): void {
     this.empleados.sort((a, b) =>
-      a.obra.localeCompare(b.obra, undefined, { sensitivity: 'base' })
+      a.nombreCompleto.localeCompare(b.nombreCompleto, undefined, { sensitivity: 'base' })
     );
   }
-
 
   toggleSeleccionarTodos(): void {
   this.empleadosFiltrados.forEach(emp => (emp.seleccionado = this.todosSeleccionados));
   this.gestionarTiempos();
 }
-
 
   verificarSeleccionIndividual(): void {
     this.todosSeleccionados = this.empleadosFiltrados.every(emp => emp.seleccionado);
