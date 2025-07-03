@@ -75,14 +75,12 @@ export class GestionPersonalComponent implements OnInit {
         next: ingreso => emp.fechaHoraEntrada = ingreso?.fechaHoraEntrada ?? null,
         error: () => emp.fechaHoraEntrada = null
       });
-
       this.tiemposService.obtenerUltimaSalidaPorEmpleado(emp.id).subscribe({
         next: salida => emp.fechaHoraSalida = salida?.fechaHoraSalida ?? null,
         error: () => emp.fechaHoraSalida = null
       });
     });
   }
-
 
   filtrarEmpleados(): void {
     this.aplicarFiltro();
@@ -109,9 +107,9 @@ export class GestionPersonalComponent implements OnInit {
   }
 
   toggleSeleccionarTodos(): void {
-  this.empleadosFiltrados.forEach(emp => (emp.seleccionado = this.todosSeleccionados));
-  this.gestionarTiempos();
-}
+    this.empleadosFiltrados.forEach(emp => (emp.seleccionado = this.todosSeleccionados));
+    this.gestionarTiempos();
+  }
 
   verificarSeleccionIndividual(): void {
     this.todosSeleccionados = this.empleadosFiltrados.every(emp => emp.seleccionado);
