@@ -16,6 +16,15 @@ nav {
   margin-bottom: 1%;
 }
 
+.fila-solo-ingreso {
+  background-color: #fff8dc !important; /* Amarillo claro */
+}
+
+.fila-ingreso-salida {
+  background-color: #d0f0c0 !important; /* Verde claro */
+}
+
+
 .search-input {
   width: 100%;
   max-width: 70%;

@@ -166,4 +166,29 @@ export class GestionPersonalComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  esFechaDeHoy(fechaStr: string | null): boolean {
+    if (!fechaStr) return false;
+
+    const fecha = new Date(fechaStr);
+    const hoy = new Date();
+
+    const fechaNormalizada = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+    const hoyNormalizado = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+
+    return fechaNormalizada.getTime() === hoyNormalizado.getTime();
+  }
+
+  obtenerClaseFila(empleado: Empleado): string {
+    const tieneIngresoHoy = this.esFechaDeHoy(empleado.fechaHoraEntrada?? null);
+    const tieneSalidaHoy = this.esFechaDeHoy(empleado.fechaHoraSalida?? null);
+
+    if (tieneIngresoHoy && tieneSalidaHoy) {
+      return 'fila-ingreso-salida';
+    } else if (tieneIngresoHoy) {
+      return 'fila-solo-ingreso';
+    } else {
+      return '';
+    }
+  }
 }

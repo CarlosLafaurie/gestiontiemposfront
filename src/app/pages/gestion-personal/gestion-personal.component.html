@@ -43,7 +43,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let empleado of empleadosFiltrados">
+        <tr *ngFor="let empleado of empleadosFiltrados" [ngClass]="obtenerClaseFila(empleado)">
           <td>
             <input
               type="checkbox"
