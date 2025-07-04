@@ -13,6 +13,12 @@
       class="search-input">
   </div>
 
+<select [(ngModel)]="estadoSeleccionado" (ngModelChange)="cargarObrasPorEstado()">
+  <option value="todos">Todas</option>
+  <option value="Activo">Activas</option>
+  <option value="Inactivo">Inactivas</option>
+</select>
+
   <table class="table">
     <thead>
       <tr>

@@ -11,7 +11,7 @@ export interface Obra {
   clienteObra: string;
   estado?: string;
   costoObra: number;
-  ubicacion: string; 
+  ubicacion: string;
 }
 
 
@@ -26,11 +26,16 @@ export class ObraService {
   getObras(): Observable<Obra[]> {
     return this.http.get<Obra[]>(this.apiUrl).pipe( );
   }
+
   getObra(id: number): Observable<Obra> {
     return this.http.get<Obra>(`${this.apiUrl}/${id}`);
   }
 
-  createObra(obra: Omit<Obra, 'id'>): Observable<Obra> {
+  getObrasInactivas(): Observable<Obra[]> {
+  return this.http.get<Obra[]>(`${this.apiUrl}/inactivas`);
+}
+
+ createObra(obra: Omit<Obra, 'id'>): Observable<Obra> {
     return this.http.post<Obra>(this.apiUrl, obra);
   }
 

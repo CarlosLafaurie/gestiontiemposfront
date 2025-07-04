@@ -20,6 +20,7 @@ export class ObrasAdminComponent implements OnInit {
   responsablesSecundarios: { id: number | null; nombre: string }[] = [];
   clientes: { id: number | null; nombre: string }[] = [];
   searchQuery: string = '';
+  estadoSeleccionado: 'activo' | 'inactivo' | 'todos' = 'activo';
 
   mostrarFormulario = false;
   esEdicion = false;
@@ -38,20 +39,44 @@ export class ObrasAdminComponent implements OnInit {
   private userService = inject(UserService);
 
   ngOnInit(): void {
-    this.cargarObras();
+    this.cargarObrasPorEstado();
     this.cargarResponsables();
     this.cargarClientes();
   }
 
-  cargarObras(): void {
+  cargarObrasPorEstado(): void {
+  if (this.estadoSeleccionado.toLowerCase() === 'activo') {
     this.obraService.getObras().subscribe({
       next: (data) => {
         this.obras = data;
         this.filtrarObras();
       },
-      error: (err) => console.error('❌ Error al obtener obras:', err)
+      error: (err) => console.error('❌ Error al obtener obras activas:', err)
+    });
+  } else if (this.estadoSeleccionado.toLowerCase() === 'inactivo') {
+    this.obraService.getObrasInactivas().subscribe({
+      next: (data) => {
+        this.obras = data;
+        this.filtrarObras();
+      },
+      error: (err) => console.error('❌ Error al obtener obras inactivas:', err)
+    });
+  } else {
+    this.obraService.getObras().subscribe({
+      next: (activas) => {
+        this.obraService.getObrasInactivas().subscribe({
+          next: (inactivas) => {
+            this.obras = [...activas, ...inactivas];
+            this.filtrarObras();
+          },
+          error: (err) => console.error('❌ Error al obtener inactivas:', err)
+        });
+      },
+      error: (err) => console.error('❌ Error al obtener activas:', err)
     });
   }
+}
+
 
   cargarResponsables(): void {
     this.userService.getAllUsers().subscribe({
@@ -86,19 +111,24 @@ export class ObrasAdminComponent implements OnInit {
     });
   }
 
-  filtrarObras(): void {
-    if (!this.searchQuery) {
-      this.obrasFiltrados = this.obras;
-    } else {
-      const q = this.searchQuery.toLowerCase();
-      this.obrasFiltrados = this.obras.filter(u =>
-        (u.nombreObra && u.nombreObra.toLowerCase().includes(q)) ||
-        (u.responsable && u.responsable.toLowerCase().includes(q)) ||
-        (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
-        (u.clienteObra && u.clienteObra.toLowerCase().includes(q))
-      );
-    }
+ filtrarObras(): void {
+  const q = this.searchQuery.toLowerCase();
+    this.obrasFiltrados = this.obras.filter(u => {
+      const coincideBusqueda =
+        (!this.searchQuery ||
+          (u.nombreObra && u.nombreObra.toLowerCase().includes(q)) ||
+          (u.responsable && u.responsable.toLowerCase().includes(q)) ||
+          (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
+          (u.clienteObra && u.clienteObra.toLowerCase().includes(q)));
+
+      const coincideEstado =
+        this.estadoSeleccionado === 'todos' ||
+        (u.estado?.toLowerCase() === this.estadoSeleccionado.toLowerCase());
+
+      return coincideBusqueda && coincideEstado;
+    });
   }
+
 
   eliminarObra(id: number): void {
     if (confirm('¿Estás seguro de que deseas eliminar esta obra?')) {
@@ -149,6 +179,16 @@ export class ObrasAdminComponent implements OnInit {
     };
   }
 
+  cargarObrasInactivas(): void {
+    this.obraService.getObrasInactivas().subscribe({
+      next: (data) => {
+        this.obras = data;
+        this.filtrarObras();
+      },
+      error: (err) => console.error('❌ Error al obtener obras inactivas:', err)
+    });
+  }
+
   guardarObra(): void {
     if (!this.obraActual.nombreObra) {
       console.error('❌ El nombre de la obra es obligatorio');
@@ -176,7 +216,7 @@ export class ObrasAdminComponent implements OnInit {
       this.obraService.editObra(obraAEnviar.id, obraAEnviar).subscribe({
         next: () => {
           console.log('✅ Obra actualizada correctamente');
-          this.cargarObras();
+          this.cargarObrasPorEstado();
           this.cerrarFormulario();
         },
         error: (error) => {
@@ -198,7 +238,7 @@ export class ObrasAdminComponent implements OnInit {
       this.obraService.createObra(obraNueva).subscribe({
         next: () => {
           console.log('✅ Obra agregada correctamente');
-          this.cargarObras();
+          this.cargarObrasPorEstado ();
           this.cerrarFormulario();
         },
         error: (error) => {
