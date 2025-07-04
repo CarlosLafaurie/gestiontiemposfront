@@ -168,6 +168,27 @@ i {
   background-color: #218838;
 }
 
+#divsolicitud {
+margin-bottom: 1.5%;
+}
+
+#solicitud {
+  padding: 1%;
+  border-color: none;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  margin: auto;
+}
+
+#solicitud:hover {
+  background-color: #218838;
+}
+
 /* Botón edit amarillo */
 #eliminar {
   background-color: #ff4444;

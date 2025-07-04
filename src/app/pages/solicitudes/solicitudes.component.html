@@ -37,7 +37,7 @@
                  <select class="form-select" id="select" [(ngModel)]="itemTemp.inventarioId" name="tempInventarioId" required>
             <option [value]="0" disabled>Seleccione herramienta...</option>
             <option *ngFor="let it of inventarioFiltrado" [value]="it.id">
-              {{ it.herramienta }} ({{ it.ubicacion }})
+              {{ it.codigo }} - {{ it.herramienta }} ({{ it.ubicacion }})
             </option>
           </select>
         </div>
@@ -76,7 +76,7 @@
           <tbody>
             <tr *ngFor="let item of nueva.items; let i = index">
               <td>{{ i + 1 }}</td>
-              <td> {{ getHerramienta(item.inventarioId) }}</td>
+              <td>{{ getHerramienta(item.inventarioId, true) }}</td>
               <td>{{ item.cantidad }}</td>
               <td>
                 <button type="button" class="btn btn-danger btn-sm" (click)="eliminarItem(i)">Eliminar</button>
@@ -136,7 +136,7 @@
             [ngClass]="{'row-aprobada': s.estado === EstadoSolicitud.Aprobada, 'row-rechazada': s.estado === EstadoSolicitud.Rechazada}">
           <td>{{ i + 1 }}</td>
           <td>
-            <ul class="mb-0 ps-3"><li *ngFor="let item of s.items">  {{ getHerramienta(item.inventarioId) }} - {{ item.cantidad }}</li></ul>
+            <ul class="mb-0 ps-3"><li *ngFor="let item of s.items"> {{ getHerramienta(item.inventarioId, true) }} - {{ item.cantidad }}</li></ul>
           </td>
           <td>{{ s.obra }}</td>
           <td>{{ s.solicitante }}</td>

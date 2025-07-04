@@ -262,6 +262,10 @@ private cargarInventarioPadre(nombreObra: string): void {
     );
   }
 
+  irASolicitudes(): void {
+    this.router.navigate(['/solicitudes']);
+  }
+
   trackById(_: number, f: FilaMezclada): any {
     return f.internoId ?? f.id;
   }

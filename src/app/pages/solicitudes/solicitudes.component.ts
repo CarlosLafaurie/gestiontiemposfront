@@ -189,9 +189,11 @@ cargarSolicitudes() {
     });
   }
 
-  getHerramienta(id: number | string): string {
+ getHerramienta(id: number | string, mostrarCodigo = false): string {
     const it = this.inventario.find(x => x.id === Number(id));
-    return it ? it.herramienta : '(desconocida)';
+    if (!it) return '(desconocida)';
+    return mostrarCodigo ? `${it.codigo} - ${it.herramienta}` : it.herramienta;
   }
+
 
 }
