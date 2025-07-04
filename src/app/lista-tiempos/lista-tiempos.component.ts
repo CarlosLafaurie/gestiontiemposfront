@@ -71,16 +71,18 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
     }));
   }
 
-  actualizarHoras() {
-    this.listaTiempos.forEach(t => {
-      if (!this.fechaHoraGlobal) return;
-      if (this.tipoRegistro === 'entrada') {
-        t.fechaHoraEntrada = this.fechaHoraGlobal;
-      } else {
-        t.fechaHoraSalida = this.fechaHoraGlobal;
-      }
-    });
-  }
+ actualizarHoras() {
+  this.listaTiempos.forEach(t => {
+    if (!this.fechaHoraGlobal) return;
+    if (this.tipoRegistro === 'entrada') {
+      t.fechaHoraEntrada = this.fechaHoraGlobal;
+      t.fechaHoraSalida = null;
+    } else {
+      t.fechaHoraSalida = this.fechaHoraGlobal;
+      t.fechaHoraEntrada = null;
+    }
+  });
+}
 
   esValidoParaGuardar(): boolean {
     return this.listaTiempos.some(t => t.fechaHoraEntrada || t.fechaHoraSalida);
