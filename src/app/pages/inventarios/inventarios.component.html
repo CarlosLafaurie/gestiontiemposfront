@@ -4,35 +4,57 @@
 <div id="title">
   <h1>Bienvenido al centro de gestión de inventarios</h1>
 </div>
-
-<div class="container" id="cards">
-  <div class="card">
-    <div class="card-header">
-      <h3>Inventario principal</h3>
+<div id="cards">
+  <!-- Contenedor de tarjetas fijas -->
+  <div class="container" id="cards">
+    <!-- Card: Inventario principal -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Inventario principal</h3>
+      </div>
+      <div class="card-body">
+        <p>Gestionar inventario principal de herramientas eléctricas.</p>
+        <button class="btn" (click)="irAInventarioPadre()">
+          <i class='bx bx-user' style='color:#ffffff'></i> <b>Gestionar Usuarios</b>
+        </button>
+        <button class="btn" id="revision" (click)="revision()">
+          <i class='bx bx-objects-horizontal-left'></i> <b>Revisión de inventario</b>
+        </button>
+      </div>
     </div>
-    <div class="card-body">
-      <p>Gestionar inventario principal de herramientas electricas.</p>
-      <button class="btn" (click)="irAInventarioPadre()"><i class='bx bx-user' style='color:#ffffff' > </i> <b> Gestionar Usuarios</b></button>
-      <button class="btn" id="revision" (click)="revision()"><i class='bx bx-objects-horizontal-left'></i> <b> Revision de inventario</b></button>
+
+    <!-- Card: Solicitudes -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Solicitudes de Herramientas</h3>
+      </div>
+      <div class="card-body">
+        <p>Gestión de solicitudes de herramientas del inventario.</p>
+        <button class="btn" (click)="irASolicitudes()">
+          <i class='bx bx-user' style='color:#ffffff'></i> <b>Gestionar solicitudes</b>
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- Contenedor de tarjetas dinámicas por obra -->
   <div class="container">
-  <p *ngIf="obrasFiltradas.length === 0" class="no-data">
-    No hay obras disponibles.
-  </p>
+    <p *ngIf="obrasFiltradas.length === 0" class="no-data">
+      No hay obras disponibles.
+    </p>
 
-  <div class="container" id="cards">
-    <div class="card" *ngFor="let obra of obrasFiltradas">
-      <div class="card-header">
-        <h3>Inventario {{ obra.nombreObra }}</h3>
-      </div>
-      <div class="card-body">
-        <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>
-        <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
-        <button class="btn" (click)="irAInventarioInterno(obra.nombreObra)">
-          <i class='bx bx-user' style='color:#ffffff'></i> Ver Inventario
-        </button>
+    <div class="container" id="cards">
+      <div class="card" *ngFor="let obra of obrasFiltradas">
+        <div class="card-header">
+          <h3>Inventario {{ obra.nombreObra }}</h3>
+        </div>
+        <div class="card-body">
+          <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>
+          <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
+          <button class="btn" (click)="irAInventarioInterno(obra.nombreObra)">
+            <i class='bx bx-user' style='color:#ffffff'></i> Ver Inventario
+          </button>
+        </div>
       </div>
     </div>
   </div>

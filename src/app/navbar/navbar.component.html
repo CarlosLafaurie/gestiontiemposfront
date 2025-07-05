@@ -3,7 +3,6 @@
     <li><a (click)="home()"><i class='bx bx-home-alt-2'></i></a></li>
     <li><button (click)="profile()"><i class='bx bx-user'></i></button></li>
     <li *ngIf="isAdmin()"><a (click)="panel()"><i class='bx bx-book-content'></i></a></li>
-    <li *ngIf="isAdmin() || isResponsable()" ><a (click)="solicitudes()"><i class='bx bx-message-dots'></i></a></li>
     <li id="logout"><button (click)="logout()"><i class='bx bx-log-out'></i></button></li>
   </ul>
 </nav>

@@ -126,15 +126,16 @@ cargarSolicitudes() {
   });
 }
 
-
   aplicarFiltro() {
-    const arr = this.solicitudes.filter(s =>
-      !this.filtroEstado || s.estado === this.filtroEstado
-    );
+    const arr = this.solicitudes
+      .filter(s => !this.filtroEstado || s.estado === this.filtroEstado)
+      .sort((a, b) => new Date(b.fechaSolicitud).getTime() - new Date(a.fechaSolicitud).getTime());
+
     this.filtradas = this.esAdmin
       ? arr
       : arr.filter(s => s.solicitante === this.usuarioActual);
   }
+
 
  agregarItem() {
   const existe = this.nueva.items.some(item => item.inventarioId === this.itemTemp.inventarioId);

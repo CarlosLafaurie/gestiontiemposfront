@@ -46,18 +46,21 @@ export class InventariosComponent {
   }
 
  irAInventarioInterno(nombreObra: string): void {
-  console.log('Obra original:', nombreObra);
-  const nombreSanitizado = encodeURIComponent(nombreObra);
-  console.log('Obra sanitizada para URL:', nombreSanitizado);
+    console.log('Obra original:', nombreObra);
+    const nombreSanitizado = encodeURIComponent(nombreObra);
+    console.log('Obra sanitizada para URL:', nombreSanitizado);
 
-  this.router.navigate(['/inventario-interno', nombreSanitizado]).then((success) => {
-    console.log('Navegación exitosa:', success);
-  });
-}
+    this.router.navigate(['/inventario-interno', nombreSanitizado]).then((success) => {
+      console.log('Navegación exitosa:', success);
+    });
+  }
+
+    irASolicitudes(): void {
+    this.router.navigate(['/solicitudes']);
+  }
 
   revision(): void {
     this.router.navigate(['/revision-inventario']);
   }
 
-
-}
+} 

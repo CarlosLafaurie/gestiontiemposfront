@@ -48,8 +48,4 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  solicitudes(): void {
-    this.router.navigate(['/solicitudes']);
-  }
-
 }
