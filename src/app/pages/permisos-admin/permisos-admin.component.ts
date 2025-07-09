@@ -55,7 +55,12 @@ export class PermisosAdminComponent implements OnInit {
   guardarCambios(): void {
     if (!this.documentoEditando?.id) return;
 
-    this.ausentismoService.actualizarDocumento(this.documentoEditando.id, this.documentoEditando).subscribe({
+    const documentoActualizado: TiempoAusentismo = {
+      ...this.documentoEditando,
+      nombreArchivo: this.documentoEditando.nombreArchivo?.trim() || 'SinArchivo'
+    };
+
+    this.ausentismoService.actualizarDocumento(documentoActualizado.id, documentoActualizado).subscribe({
       next: () => {
         this.documentoEditando = null;
         this.cargarDocumentos();
@@ -91,7 +96,7 @@ export class PermisosAdminComponent implements OnInit {
     });
   }
 
-descargar(documento: TiempoAusentismo): void {
+  descargar(documento: TiempoAusentismo): void {
     if (!documento.nombreArchivo) return; // <- previene el error
 
     this.ausentismoService.descargarPDF(documento.id).subscribe({
