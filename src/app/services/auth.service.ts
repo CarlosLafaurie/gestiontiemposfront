@@ -18,11 +18,30 @@ export class AuthService {
     return this.http.post<{ token: string }>(this.apiUrl, credentials).pipe(
       tap(response => {
         const token = response.token;
+
         this.saveToken(token);
+
         const decoded: any = jwtDecode(token);
-        decoded.rol = decoded.rol || decoded.role || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || null;
-        localStorage.setItem(this.USER_KEY, JSON.stringify(decoded));
-         if (decoded.obraId) {
+        console.log('🎯 Decodificado:', decoded);
+
+        const nombre = decoded.nombreCompleto
+          || decoded.name
+          || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
+          || null;
+
+        const rol = decoded.rol
+          || decoded.role
+          || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
+          || null;
+
+        const userInfo = {
+          nombreCompleto: nombre,
+          rol: rol
+        };
+
+        localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
+
+        if (decoded.obraId) {
           localStorage.setItem("obra-id", decoded.obraId.toString());
         }
       })
@@ -45,5 +64,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem("obra-id");
   }
 }
