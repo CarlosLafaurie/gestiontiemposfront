@@ -35,7 +35,7 @@
       <tr *ngFor="let obra of obrasFiltrados; let i = index">
         <td>{{ i + 1 }}</td>
         <td>{{ obra.nombreObra }}</td>
-        <td>{{ obra.responsable ? obra.responsable : 'Sin responsable' }}</td>
+        <td>{{ obra.responsable?.nombreCompleto || 'Sin responsable' }}</td>
         <td>{{ obra.responsableSecundario ? obra.responsableSecundario : 'Sin responsable Secundario' }}</td>
         <td>{{ obra.clienteObra ? obra.clienteObra : 'Sin cliente' }}</td>
         <td>{{ obra.ubicacion ? obra.ubicacion : 'Sin ubicación' }}</td>
@@ -64,15 +64,16 @@
 
       <label>Responsable:</label>
       <select [(ngModel)]="obraActual.responsable" required>
-        <option *ngFor="let resp of responsables" [value]="resp.nombre">
-          {{ resp.nombre }}
+        <option [ngValue]="null">Sin responsable</option>
+        <option *ngFor="let resp of responsables" [ngValue]="resp">
+          {{ resp?.nombreCompleto }}
         </option>
       </select>
 
       <label>Responsable Secundario:</label>
       <select [(ngModel)]="obraActual.responsableSecundario">
-        <option *ngFor="let resp of responsables" [value]="resp.nombre">
-          {{ resp.nombre }}
+        <option *ngFor="let resp of responsables" [value]="resp?.nombreCompleto">
+          {{ resp?.nombreCompleto }}
         </option>
       </select>
 

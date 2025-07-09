@@ -5,6 +5,7 @@ import { ObraService, Obra } from '../../services/obras.service';
 import { UserService } from '../../services/user.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
+import { User } from '../../services/user.service';
 
 @Component({
   selector: 'app-obras-admin',
@@ -16,7 +17,8 @@ import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.comp
 export class ObrasAdminComponent implements OnInit {
   obras: Obra[] = [];
   obrasFiltrados: Obra[] = [];
-  responsables: { id: number | null; nombre: string }[] = [];
+  responsables: (User | null)[] = [];
+
   responsablesSecundarios: { id: number | null; nombre: string }[] = [];
   clientes: { id: number | null; nombre: string }[] = [];
   searchQuery: string = '';
@@ -24,10 +26,10 @@ export class ObrasAdminComponent implements OnInit {
 
   mostrarFormulario = false;
   esEdicion = false;
-  obraActual: Omit<Obra, 'id'> & { id?: number, responsableSecundario?: string } = {
+  obraActual: Omit<Obra, 'id'> & { id?: number; responsableSecundario?: string } = {
     id: undefined,
     nombreObra: '',
-    responsable: 'Sin responsable',
+    responsable: null,
     responsableSecundario: 'Sin responsable Secundario',
     clienteObra: 'Sin cliente',
     estado: 'Activo',
@@ -87,7 +89,9 @@ export class ObrasAdminComponent implements OnInit {
             id: user.id,
             nombre: user.nombreCompleto || 'Nombre no disponible'
           }));
-        this.responsables = [{ id: null, nombre: 'Sin responsable' }, ...listaResponsables];
+      this.responsables = [null, ...data
+        .filter(user => user.rol?.toLowerCase() === 'responsable')
+      ];
         this.responsablesSecundarios = [{ id: null, nombre: 'Sin responsable Secundario' }, ...listaResponsables];
       },
       error: (err) => console.error('❌ Error al obtener responsables:', err)
@@ -117,10 +121,9 @@ export class ObrasAdminComponent implements OnInit {
       const coincideBusqueda =
         (!this.searchQuery ||
           (u.nombreObra && u.nombreObra.toLowerCase().includes(q)) ||
-          (u.responsable && u.responsable.toLowerCase().includes(q)) ||
+          (u.responsable?.nombreCompleto?.toLowerCase().includes(q)) ||
           (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
           (u.clienteObra && u.clienteObra.toLowerCase().includes(q)));
-
       const coincideEstado =
         this.estadoSeleccionado === 'todos' ||
         (u.estado?.toLowerCase() === this.estadoSeleccionado.toLowerCase());
@@ -128,7 +131,6 @@ export class ObrasAdminComponent implements OnInit {
       return coincideBusqueda && coincideEstado;
     });
   }
-
 
   eliminarObra(id: number): void {
     if (confirm('¿Estás seguro de que deseas eliminar esta obra?')) {
@@ -146,20 +148,22 @@ export class ObrasAdminComponent implements OnInit {
   mostrarFormularioObra(obra: Obra | null = null): void {
     this.mostrarFormulario = true;
     this.esEdicion = !!obra;
+
     if (obra) {
       this.obraActual = {
         ...obra,
-        responsable: obra.responsable ? obra.responsable : 'Sin responsable',
-        responsableSecundario: obra.hasOwnProperty('responsableSecundario') && obra['responsableSecundario'] ? obra['responsableSecundario'] : 'Sin responsable Secundario',
-        clienteObra: obra.clienteObra ? obra.clienteObra : 'Sin cliente'
+        responsable: obra.responsable ?? null,
+        responsableSecundario: obra.responsableSecundario || 'Sin responsable Secundario',
+        clienteObra: obra.clienteObra || 'Sin cliente'
       };
     } else {
       this.obraActual = {
         id: undefined,
         nombreObra: '',
-        responsable: 'Sin responsable',
+        responsable: null, // ✅
         responsableSecundario: 'Sin responsable Secundario',
         clienteObra: 'Sin cliente',
+        estado: 'Activo',
         costoObra: 0,
         ubicacion: 'sin definir'
       };
@@ -171,9 +175,10 @@ export class ObrasAdminComponent implements OnInit {
     this.obraActual = {
       id: undefined,
       nombreObra: '',
-      responsable: 'Sin responsable',
+      responsable: null, // ✅
       responsableSecundario: 'Sin responsable Secundario',
       clienteObra: 'Sin cliente',
+      estado: 'Activo',
       costoObra: 0,
       ubicacion: 'sin definir'
     };
@@ -210,7 +215,8 @@ export class ObrasAdminComponent implements OnInit {
         clienteObra: this.obraActual.clienteObra,
         estado: this.obraActual.estado,
         costoObra: this.obraActual.costoObra,
-        ubicacion: this.obraActual.ubicacion
+        ubicacion: this.obraActual.ubicacion,
+        responsableSecundario: this.obraActual.responsableSecundario
       };
       (obraAEnviar as any).responsableSecundario = this.obraActual.responsableSecundario;
       this.obraService.editObra(obraAEnviar.id, obraAEnviar).subscribe({
@@ -225,14 +231,14 @@ export class ObrasAdminComponent implements OnInit {
         }
       });
     } else {
-      const obraNueva: Obra = {
-        id: 0,
+      const obraNueva: Omit<Obra, 'id'> = {
         nombreObra: this.obraActual.nombreObra,
         responsable: this.obraActual.responsable,
         clienteObra: this.obraActual.clienteObra,
         estado: "activo",
         costoObra: this.obraActual.costoObra,
-        ubicacion: this.obraActual.ubicacion
+        ubicacion: this.obraActual.ubicacion,
+        responsableSecundario: this.obraActual.responsableSecundario
       };
       (obraNueva as any).responsableSecundario = this.obraActual.responsableSecundario;
       this.obraService.createObra(obraNueva).subscribe({

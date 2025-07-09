@@ -41,8 +41,9 @@ export class UsuariosAdminComponent implements OnInit {
 
   cargarUsuarios(): void {
     this.userService.getAllUsers().subscribe({
-      next: (data) => { this.usuarios = data;
-         this.filtrarUsuarios();
+      next: (data) => {
+        this.usuarios = data;
+        this.filtrarUsuarios();
       },
       error: (err) => console.error('❌ Error al obtener usuarios:', err)
     });
@@ -57,6 +58,11 @@ export class UsuariosAdminComponent implements OnInit {
     });
   }
 
+  obtenerNombreObraPorId(id: number): string {
+    const obra = this.obras.find(o => o.id === id);
+    return obra ? obra.nombreObra : '---';
+  }
+
   filtrarUsuarios(): void {
     if (!this.searchQuery) {
       this.usuariosFiltrados = this.usuarios;
@@ -67,7 +73,7 @@ export class UsuariosAdminComponent implements OnInit {
         (u.rol && u.rol.toLowerCase().includes(q)) ||
         (u.cedula && u.cedula.toLowerCase().includes(q)) ||
         (u.cargo && u.cargo.toLowerCase().includes(q)) ||
-        (u.obra && u.obra.toLowerCase().includes(q))
+        (this.obtenerNombreObraPorId(u.obraId)?.toLowerCase().includes(q))
       );
     }
   }
@@ -77,19 +83,36 @@ export class UsuariosAdminComponent implements OnInit {
     this.esEdicion = usuario !== null;
 
     if (usuario) {
-      const obraEncontrada = this.obras.find((obra) => obra.nombreObra === usuario.obra);
       this.usuarioActual = {
         ...usuario,
-        obraId: obraEncontrada ? obraEncontrada.id : null
+        contrasena: '',
       };
     } else {
-      this.usuarioActual = { id: 0, cedula: '', nombreCompleto: '', cargo: '', obraId: null, rol: '', estado: 'activo', contrasena: '' };
+      this.usuarioActual = {
+        id: 0,
+        cedula: '',
+        nombreCompleto: '',
+        cargo: '',
+        obraId: null,
+        rol: '',
+        estado: 'activo',
+        contrasena: ''
+      };
     }
   }
 
   cerrarFormulario(): void {
     this.mostrarFormulario = false;
-    this.usuarioActual = { id: 0, cedula: '', nombreCompleto: '', cargo: '', obraId: null, rol: '', estado: 'activo', contrasena: '' };
+    this.usuarioActual = {
+      id: 0,
+      cedula: '',
+      nombreCompleto: '',
+      cargo: '',
+      obraId: null,
+      rol: '',
+      estado: 'activo',
+      contrasena: ''
+    };
   }
 
   guardarUsuario(): void {
@@ -105,18 +128,12 @@ export class UsuariosAdminComponent implements OnInit {
       return;
     }
 
-    const obraSeleccionada = this.obras.find((obra) => obra.id === Number(this.usuarioActual.obraId));
-    if (!obraSeleccionada) {
-      console.error('❌ La obra seleccionada no se encontró.');
-      return;
-    }
-
     const usuarioParaEnviar = {
       id: this.esEdicion ? this.usuarioActual.id : 0,
       cedula: this.usuarioActual.cedula,
       nombreCompleto: this.usuarioActual.nombreCompleto,
       cargo: this.usuarioActual.cargo,
-      obra: obraSeleccionada.nombreObra,
+      obraId: this.usuarioActual.obraId,
       rol: this.usuarioActual.rol,
       contrasenaHash: this.usuarioActual.contrasena,
       estado: this.usuarioActual.estado || 'activo'

@@ -21,13 +21,21 @@ export class ListaObrasComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('🟢 ListaObrasComponent inicializado.');
+    this.establecerUsuarioYRol();
+  }
 
+  establecerUsuarioYRol() {
     if (!this.usuario || !this.rol) {
       const usuarioData = localStorage.getItem('usuario');
       if (usuarioData) {
-        const usuarioObj = JSON.parse(usuarioData);
-        this.usuario = usuarioObj.nombreCompleto;
-        this.rol = usuarioObj.rol;
+        try {
+          const usuarioObj = JSON.parse(usuarioData);
+          this.usuario = usuarioObj.nombreCompleto;
+          this.rol = usuarioObj.rol;
+          console.log(`🔐 Usuario cargado: ${this.usuario}, Rol: ${this.rol}`);
+        } catch (error) {
+          console.error('❌ Error al parsear los datos de usuario:', error);
+        }
       } else {
         console.log('❌ No se encontraron datos de usuario en localStorage.');
       }
@@ -61,7 +69,7 @@ export class ListaObrasComponent implements OnInit {
       this.obrasFiltradas = obras;
     } else if (this.rol === 'responsable') {
       this.obrasFiltradas = obras.filter(obra =>
-        obra.responsable.trim().toLowerCase() === this.usuario?.trim().toLowerCase() ||
+        obra.responsable?.nombreCompleto?.trim().toLowerCase() === this.usuario?.trim().toLowerCase() ||
         (obra.responsableSecundario?.trim().toLowerCase() ?? '') === this.usuario?.trim().toLowerCase()
       );
     } else if (this.rol === 'cliente') {

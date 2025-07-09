@@ -11,7 +11,7 @@
     <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
 
        <div class="form-group" id="solicitante">
-          <label class="form-label">Obra</label>
+          <label class="form-label">Obra destino</label>
           <ng-container *ngIf="esAdmin; else obraTxt">
             <select class="form-select" [(ngModel)]="nueva.obra" name="obra" required>
               <option value="" disabled>Seleccione obra...</option>

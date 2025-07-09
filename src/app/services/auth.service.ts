@@ -22,6 +22,9 @@ export class AuthService {
         const decoded: any = jwtDecode(token);
         decoded.rol = decoded.rol || decoded.role || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || null;
         localStorage.setItem(this.USER_KEY, JSON.stringify(decoded));
+         if (decoded.obraId) {
+          localStorage.setItem("obra-id", decoded.obraId.toString());
+        }
       })
     );
   }

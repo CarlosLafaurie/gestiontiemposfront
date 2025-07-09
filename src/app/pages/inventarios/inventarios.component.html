@@ -15,10 +15,10 @@
       <div class="card-body">
         <p>Gestionar inventario principal de herramientas eléctricas.</p>
         <button class="btn" (click)="irAInventarioPadre()">
-          <i class='bx bx-user' style='color:#ffffff'></i> <b>Gestionar Usuarios</b>
+         <i class='bx bx-objects-vertical-bottom'></i><b> Inventario principal</b>
         </button>
         <button class="btn" id="revision" (click)="revision()">
-          <i class='bx bx-objects-horizontal-left'></i> <b>Revisión de inventario</b>
+          <i class='bx bx-objects-horizontal-left'></i> <b> Revisión de inventario</b>
         </button>
       </div>
     </div>
@@ -31,7 +31,7 @@
       <div class="card-body">
         <p>Gestión de solicitudes de herramientas del inventario.</p>
         <button class="btn" (click)="irASolicitudes()">
-          <i class='bx bx-user' style='color:#ffffff'></i> <b>Gestionar solicitudes</b>
+         <i class='bx bx-message-dots'></i> <b> Gestionar solicitudes</b>
         </button>
       </div>
     </div>
@@ -52,7 +52,7 @@
           <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>
           <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
           <button class="btn" (click)="irAInventarioInterno(obra.nombreObra)">
-            <i class='bx bx-user' style='color:#ffffff'></i> Ver Inventario
+            <i class='bx bx-objects-vertical-bottom'></i> Ver Inventario
           </button>
         </div>
       </div>

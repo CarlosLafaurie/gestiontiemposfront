@@ -2,18 +2,19 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environments';
+import { Obra } from './obras.service';
 
 export interface User {
   id: number;
   cedula: string;
   nombreCompleto: string;
   cargo: string;
-  obra: string;
+  obraId?: number;
   rol: string;
+  obra?: Obra;
   contrasenaHash: string;
   estado: string;
 }
-
 
 @Injectable({
   providedIn: 'root',

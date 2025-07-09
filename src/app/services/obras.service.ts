@@ -2,11 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environments';
+import { User } from './user.service';
 
 export interface Obra {
   id: number;
   nombreObra: string;
-  responsable: string;
+  responsable: User | null;
   responsableSecundario?: string;
   clienteObra: string;
   estado?: string;

@@ -28,7 +28,7 @@
           <td>{{ usuario.rol }}</td>
           <td>{{ usuario.cedula }}</td>
           <td>{{ usuario.cargo }}</td>
-          <td>{{ usuario.obra }}</td>
+          <td>{{ usuario.obra?.nombreObra || '---' }}</td>
           <td class="container-row">
             <button (click)="copiarContrasena(usuario)" class="btn-copiar"><i class='bx bx-copy'></i></button>
             <button (click)="mostrarFormularioUsuario(usuario)" class="btn-editar"><i class='bx bxs-edit'></i></button>
@@ -63,7 +63,8 @@
 
       <label>Obra:</label>
       <select [(ngModel)]="usuarioActual.obraId" required>
-        <option *ngFor="let obra of obras" [value]="obra.id">{{ obra.nombreObra }}</option>
+        <option [ngValue]="null">-- Seleccione una obra --</option>
+        <option *ngFor="let obra of obras" [ngValue]="obra.id">{{ obra.nombreObra }}</option>
       </select>
 
       <label for="contrasena">Contraseña:</label>
