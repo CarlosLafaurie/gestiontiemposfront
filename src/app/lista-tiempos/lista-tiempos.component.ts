@@ -143,7 +143,11 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
       fd.append('PermisosEspeciales', t.permisosEspeciales);
       fd.append('FechaInicio', this.fechaInicioPermiso);
       fd.append('FechaFin', this.fechaFinPermiso);
-      if (t.archivo) fd.append('Archivo', t.archivo);
+      if (t.archivo) {
+        fd.append('Archivo', t.archivo);
+      } else {
+       fd.append('Archivo', new Blob([]), '');
+      }
       return this.ausentismoService.subirDocumentoAusentismo(fd);
     });
     forkJoin(observables).subscribe({
