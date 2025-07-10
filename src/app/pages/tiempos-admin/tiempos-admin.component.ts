@@ -128,9 +128,6 @@ export class TiemposAdminComponent implements OnInit {
   }
 
   exportarExcel(): void {
-    console.log('📤 Exportando a Excel...');
-    console.log('🗃️ Datos originales:', this.datosOriginales);
-    this.excelService.exportarExcel(this.datosOriginales);
-    console.log('✅ Exportación finalizada');
+    this.excelService.generarYExportarExcel();
   }
 }
