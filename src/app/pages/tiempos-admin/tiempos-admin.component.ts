@@ -40,7 +40,6 @@ export class TiemposAdminComponent implements OnInit {
 
   fechaInicio: string = '';
   fechaFin: string = '';
-  usarFestivos: boolean = false;
 
   private jornadaService = inject(RegistroJornadaService);
   private excelService = inject(ExcelService);
@@ -54,7 +53,6 @@ export class TiemposAdminComponent implements OnInit {
     console.log('📥 Método cargarResumen() invocado');
     console.log('🕓 Fecha inicio seleccionada:', this.fechaInicio);
     console.log('🕓 Fecha fin seleccionada:', this.fechaFin);
-    console.log('📅 ¿Usar festivos?:', this.usarFestivos);
 
     if (!this.fechaInicio || !this.fechaFin) {
       console.warn('⚠️ Debes seleccionar ambas fechas.');
@@ -62,7 +60,7 @@ export class TiemposAdminComponent implements OnInit {
     }
 
     console.log('📡 Solicitando datos al backend...');
-    this.jornadaService.obtenerResumenHoras(this.usarFestivos, this.fechaInicio, this.fechaFin).subscribe({
+    this.jornadaService.obtenerResumenHoras(this.fechaInicio, this.fechaFin).subscribe({
       next: (data: ResumenEmpleado[]) => {
         console.log('✅ Datos recibidos del backend:', data);
         this.datosOriginales = data;

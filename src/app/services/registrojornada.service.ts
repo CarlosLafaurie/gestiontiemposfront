@@ -26,21 +26,19 @@ export class RegistroJornadaService {
   constructor(private http: HttpClient) {}
 
   obtenerResumenHoras(
-    usarFestivos: boolean = false,
     fechaInicio?: string,
     fechaFin?: string,
   ): Observable<ResumenEmpleado[]> {
-    let params = new HttpParams();
-    if (usarFestivos) {
-      params = params.set('usarFestivos', 'true');
-    }
+    let params = new HttpParams()
+      .set('usarFestivos', 'true'); // ← se fuerza siempre a true
+
     if (fechaInicio) {
       params = params.set('fechaInicio', fechaInicio);
     }
+
     if (fechaFin) {
       params = params.set('fechaFin', fechaFin);
     }
-
 
     return this.http.get<ResumenEmpleado[]>(`${this.apiUrl}/resumenhoras`, { params });
   }

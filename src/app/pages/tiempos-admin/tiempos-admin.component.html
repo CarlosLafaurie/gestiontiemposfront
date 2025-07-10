@@ -28,21 +28,6 @@
     </div>
 
     <div class="col-md-2">
-      <div class="form-check mt-4">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="usarFestivos"
-          [(ngModel)]="usarFestivos"
-          name="usarFestivos"
-        />
-        <label class="form-check-label" for="usarFestivos">
-          ¿Incluir festivos?
-        </label>
-      </div>
-    </div>
-
-    <div class="col-md-2">
       <button
         type="button"
         class="btn btn-primary w-100"
@@ -66,10 +51,6 @@
           <th>Total Horas</th>
           <th>Diurnas</th>
           <th>Nocturnas</th>
-          <th>Extras Diurnas</th>
-          <th>Extras Nocturnas</th>
-          <th>Dominicales</th>
-          <th>Festivos</th>
         </tr>
       </thead>
       <tbody>
@@ -79,16 +60,11 @@
           <td>{{ emp.totalHoras }}</td>
           <td>{{ emp.horasDiurnas }}</td>
           <td>{{ emp.horasNocturnas }}</td>
-          <td>{{ emp.horasExtrasDiurnas }}</td>
-          <td>{{ emp.horasExtrasNocturnas }}</td>
-          <td>{{ emp.dominicales }}</td>
-          <td>{{ emp.festivos }}</td>
         </tr>
       </tbody>
     </table>
   </ng-container>
 
-  <!-- 🚫 No hay datos -->
   <ng-template #sinDatos>
     <div id="mensaje" class="alert alert-info text-center">
       No hay datos para mostrar.

@@ -16,6 +16,7 @@ export class PermisosAdminComponent implements OnInit {
   documentos: TiempoAusentismo[] = [];
   documentosFiltrados: TiempoAusentismo[] = [];
   documentoEditando: TiempoAusentismo | null = null;
+  archivoSeleccionado: File | null = null;
   searchQuery: string = '';
 
   private ausentismoService = inject(AusentismoService);
@@ -50,29 +51,55 @@ export class PermisosAdminComponent implements OnInit {
 
   editar(documento: TiempoAusentismo): void {
     this.documentoEditando = { ...documento };
+    this.archivoSeleccionado = null;
+  }
+
+  onArchivoSeleccionado(event: any): void {
+    this.archivoSeleccionado = event.target.files[0] || null;
   }
 
   guardarCambios(): void {
     if (!this.documentoEditando?.id) return;
 
-    const documentoActualizado: TiempoAusentismo = {
-      ...this.documentoEditando,
-      nombreArchivo: this.documentoEditando.nombreArchivo?.trim() || 'SinArchivo'
-    };
+    if (this.archivoSeleccionado) {
+      const formData = new FormData();
+      formData.append('NombreEmpleado', this.documentoEditando.nombreEmpleado);
+      formData.append('Comentarios', this.documentoEditando.comentarios || '');
+      formData.append('FechaInicio', this.documentoEditando.fechaInicio);
+      formData.append('FechaFin', this.documentoEditando.fechaFin);
+      formData.append('Archivo', this.archivoSeleccionado);
 
-    this.ausentismoService.actualizarDocumento(documentoActualizado.id, documentoActualizado).subscribe({
-      next: () => {
-        this.documentoEditando = null;
-        this.cargarDocumentos();
-      },
-      error: (err) => {
-        console.error("❌ Error al guardar cambios:", err);
-      }
-    });
+      this.ausentismoService.subirDocumentoAusentismo(formData).subscribe({
+        next: () => {
+          this.documentoEditando = null;
+          this.archivoSeleccionado = null;
+          this.cargarDocumentos();
+        },
+        error: (err) => {
+          console.error("❌ Error al subir nuevo archivo:", err);
+        }
+      });
+    } else {
+      const documentoActualizado: TiempoAusentismo = {
+        ...this.documentoEditando,
+        nombreArchivo: this.documentoEditando.nombreArchivo?.trim() || 'SinArchivo'
+      };
+
+      this.ausentismoService.actualizarDocumento(documentoActualizado.id, documentoActualizado).subscribe({
+        next: () => {
+          this.documentoEditando = null;
+          this.cargarDocumentos();
+        },
+        error: (err) => {
+          console.error("❌ Error al guardar cambios:", err);
+        }
+      });
+    }
   }
 
   cancelarEdicion(): void {
     this.documentoEditando = null;
+    this.archivoSeleccionado = null;
   }
 
   eliminar(id: number): void {
@@ -97,14 +124,14 @@ export class PermisosAdminComponent implements OnInit {
   }
 
   descargar(documento: TiempoAusentismo): void {
-    if (!documento.nombreArchivo) return; // <- previene el error
+    if (!documento.nombreArchivo || documento.nombreArchivo === 'SinArchivo') return;
 
     this.ausentismoService.descargarPDF(documento.id).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = documento.nombreArchivo!; // <- usamos el "!" porque ya validamos que existe
+        a.download = documento.nombreArchivo!;
         a.click();
         window.URL.revokeObjectURL(url);
       },

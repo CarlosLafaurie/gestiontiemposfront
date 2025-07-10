@@ -16,10 +16,18 @@ export class ExcelService {
     private registroJornadaService: RegistroJornadaService
   ) {}
 
-  generarYExportarExcel(usarFestivos: boolean = false) {
-    this.registroJornadaService.obtenerResumenHoras(usarFestivos)
-      .subscribe(resumen => this.exportarExcel(resumen));
-  }
+ generarYExportarExcel() {
+  const hoy = new Date();
+  const hace15Dias = new Date();
+  hace15Dias.setDate(hoy.getDate() - 15);
+
+  const fechaInicio = hace15Dias.toISOString().slice(0, 10);
+  const fechaFin = hoy.toISOString().slice(0, 10);
+
+  this.registroJornadaService.obtenerResumenHoras(fechaInicio, fechaFin)
+    .subscribe(resumen => this.exportarExcel(resumen));
+}
+
 
   exportarExcel(resumenEmpleados: ResumenEmpleado[]) {
     const workbook = XLSX.utils.book_new();
