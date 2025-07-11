@@ -62,4 +62,9 @@ export class PanelDeControlComponent implements OnInit {
     this.router.navigate(['/inventarios']).then(success => {
     });
   }
+
+  irAIngresos(): void {
+    this.router.navigate(['/gestionIngresos/:nombreObra']).then(success => {
+    });
+  }
 }

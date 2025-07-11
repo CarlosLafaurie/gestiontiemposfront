@@ -32,6 +32,10 @@ export class InventariosComponent {
     });
   }
 
+  irAMovimientos(): void {
+    this.router.navigate(['/movimientos']).then(success => {
+    });
+  }
 
     obtenerObras(): void {
     this.obraService.getObras().subscribe({
@@ -63,4 +67,4 @@ export class InventariosComponent {
     this.router.navigate(['/revision-inventario']);
   }
 
-} 
+}
