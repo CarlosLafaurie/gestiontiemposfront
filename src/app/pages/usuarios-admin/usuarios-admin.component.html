@@ -68,10 +68,10 @@
       </select>
 
       <label for="contrasena">Contraseña:</label>
-      <input id="contrasena" type="password" [(ngModel)]="usuarioActual.contrasena" required>
+      <input id="contrasena" type="password" [(ngModel)]="usuarioActual.contrasena" [required]="!esEdicion">
+      <small *ngIf="esEdicion">Si no deseas cambiar la contraseña, deja este campo vacío.</small>
 
-      <button (click)="guardarUsuario()" class="btn-guardar"><i class='bx bx-save' style='color:#ffffff'></i></button>
-      <button (click)="cerrarFormulario()" class="btn-cancelar"><i class='bx bx-x-circle' style='color:#ffffff'></i></button>
-    </div>
+    <button (click)="guardarUsuario()" class="btn-guardar"><i class='bx bx-save' style='color:#ffffff'></i></button>
+    <button (click)="cerrarFormulario()" class="btn-cancelar"><i class='bx bx-x-circle' style='color:#ffffff'></i></button>
   </div>
 </div>

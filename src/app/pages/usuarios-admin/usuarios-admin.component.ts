@@ -126,22 +126,25 @@ export class UsuariosAdminComponent implements OnInit {
       !this.usuarioActual.cargo ||
       !this.usuarioActual.obraId ||
       !this.usuarioActual.rol ||
-      !this.usuarioActual.contrasena
+      (!this.esEdicion && !this.usuarioActual.contrasena)
     ) {
       console.error('❌ Todos los campos son obligatorios');
       return;
     }
 
-    const usuarioParaEnviar = {
+    const usuarioParaEnviar: any = {
       id: this.esEdicion ? this.usuarioActual.id : 0,
       cedula: this.usuarioActual.cedula,
       nombreCompleto: this.usuarioActual.nombreCompleto,
       cargo: this.usuarioActual.cargo,
       obraId: this.usuarioActual.obraId,
       rol: this.usuarioActual.rol,
-      contrasenaHash: this.usuarioActual.contrasena,
       estado: this.usuarioActual.estado || 'activo'
     };
+
+    if (!this.esEdicion || this.usuarioActual.contrasena) {
+      usuarioParaEnviar.contrasenaHash = this.usuarioActual.contrasena;
+    }
 
     if (this.esEdicion) {
       this.userService.updateUser(usuarioParaEnviar.id, usuarioParaEnviar).subscribe({
