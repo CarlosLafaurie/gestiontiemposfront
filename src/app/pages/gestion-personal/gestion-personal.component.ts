@@ -3,12 +3,13 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { EmpleadoService, Empleado } from '../../services/empleado-service.service';
 import { TiemposService, Tiempo } from '../../services/tiempos.service.service';
+import { ObraService, Obra } from '../../services/obras.service';
 import { CommonModule } from '@angular/common';
 import { ListaTiemposComponent } from '../../lista-tiempos/lista-tiempos.component';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../navbar/navbar.component';
-import { forkJoin } from 'rxjs';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-gestion-personal',
@@ -24,32 +25,42 @@ import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.comp
   styleUrls: ['./gestion-personal.component.css']
 })
 export class GestionPersonalComponent implements OnInit {
-  responsable = '';
-  rol = '';
-  empleados: Empleado[] = [];
+  responsable     = '';
+  rol             = '';
+  obraId          = '';
+  obraNombre      = '';
+  empleados       : Empleado[] = [];
   empleadosFiltrados: Empleado[] = [];
   empleadosSeleccionados: { id: number; nombre: string }[] = [];
   guardandoTiempos = false;
-  searchQuery = '';
+  searchQuery      = '';
   todosSeleccionados = false;
-  obra: string = '';
 
+  private authService     = inject(AuthService);
   private empleadoService = inject(EmpleadoService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private tiemposService = inject(TiemposService);
+  private obraService     = inject(ObraService);
+  private tiemposService  = inject(TiemposService);
+  private router          = inject(Router);
 
   ngOnInit(): void {
-    this.obtenerTodosEmpleados();
-
-    const usuario = localStorage.getItem('usuario');
-    if (usuario) {
-      const { nombreCompleto, rol, obra } = JSON.parse(usuario);
+    // 1) Leer datos del usuario
+    const usuarioJson = localStorage.getItem('usuario');
+    if (usuarioJson) {
+      const { nombreCompleto, rol, obra } = JSON.parse(usuarioJson);
       this.responsable = nombreCompleto;
-      this.rol = rol;
-      if (rol === 'responsable') {
-        this.obra = obra;
-      }
+      this.rol         = rol;
+      this.obraId      = (rol === 'responsable') ? obra : '';
+    }
+
+    // 2) Si es responsable, obtenemos el nombre de la obra antes de cargar empleados
+    if (this.rol === 'responsable' && this.obraId) {
+      this.obraService.getObras().subscribe((obras: Obra[]) => {
+        const match = obras.find(o => o.id === +this.obraId);
+        this.obraNombre = match?.nombreObra ?? '';
+        this.obtenerTodosEmpleados();
+      });
+    } else {
+      this.obtenerTodosEmpleados();
     }
   }
 
@@ -57,8 +68,9 @@ export class GestionPersonalComponent implements OnInit {
     this.empleadoService.obtenerEmpleados(1, 150).subscribe(data => {
       console.log('Total empleados cargados:', data.length);
 
-      if (this.rol === 'responsable' && this.obra) {
-        this.empleados = data.filter(emp => emp.obra === this.obra);
+      if (this.rol === 'responsable' && this.obraNombre) {
+        // Filtrar por nombre de obra
+        this.empleados = data.filter(emp => emp.obra === this.obraNombre);
       } else {
         this.empleados = data;
       }
@@ -73,11 +85,11 @@ export class GestionPersonalComponent implements OnInit {
     this.empleados.forEach(emp => {
       this.tiemposService.obtenerUltimoIngresoPorEmpleado(emp.id).subscribe({
         next: ingreso => emp.fechaHoraEntrada = ingreso?.fechaHoraEntrada ?? null,
-        error: () => emp.fechaHoraEntrada = null
+        error: ()      => emp.fechaHoraEntrada = null
       });
       this.tiemposService.obtenerUltimaSalidaPorEmpleado(emp.id).subscribe({
         next: salida => emp.fechaHoraSalida = salida?.fechaHoraSalida ?? null,
-        error: () => emp.fechaHoraSalida = null
+        error: ()      => emp.fechaHoraSalida = null
       });
     });
   }
@@ -136,7 +148,7 @@ export class GestionPersonalComponent implements OnInit {
       const tiempo: Tiempo = {
         empleadoId: empleado.id,
         fechaHoraEntrada: accion === 'ingreso' ? new Date().toISOString() : null,
-        fechaHoraSalida: accion === 'salida' ? new Date().toISOString() : null,
+        fechaHoraSalida:  accion === 'salida' ? new Date().toISOString() : null,
         comentarios: '',
         permisosEspeciales: ''
       };
@@ -167,26 +179,14 @@ export class GestionPersonalComponent implements OnInit {
 
   esFechaDeHoy(fechaStr: string | null): boolean {
     if (!fechaStr) return false;
-
-    const fecha = new Date(fechaStr);
-    const hoy = new Date();
-
-    const fechaNormalizada = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-    const hoyNormalizado = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-
-    return fechaNormalizada.getTime() === hoyNormalizado.getTime();
+    return new Date(fechaStr).toDateString() === new Date().toDateString();
   }
 
-  obtenerClaseFila(empleado: Empleado): string {
-    const tieneIngresoHoy = this.esFechaDeHoy(empleado.fechaHoraEntrada?? null);
-    const tieneSalidaHoy = this.esFechaDeHoy(empleado.fechaHoraSalida?? null);
-
-    if (tieneIngresoHoy && tieneSalidaHoy) {
-      return 'fila-ingreso-salida';
-    } else if (tieneIngresoHoy) {
-      return 'fila-solo-ingreso';
-    } else {
-      return '';
-    }
+  obtenerClaseFila(emp: Empleado): string {
+    const inHoy  = this.esFechaDeHoy(emp.fechaHoraEntrada  ?? null);
+    const outHoy = this.esFechaDeHoy(emp.fechaHoraSalida   ?? null);
+    if (inHoy && outHoy)   return 'fila-ingreso-salida';
+    if (inHoy)             return 'fila-solo-ingreso';
+    return '';
   }
 }

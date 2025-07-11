@@ -14,15 +14,13 @@ export class AuthService {
 
   private http = inject(HttpClient);
 
-  login(credentials: { correo: string; contraseña: string }): Observable<{ token: string }> {
+    login(credentials: { correo: string; contraseña: string }): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(this.apiUrl, credentials).pipe(
       tap(response => {
         const token = response.token;
-
         this.saveToken(token);
 
         const decoded: any = jwtDecode(token);
-        console.log('🎯 Decodificado:', decoded);
 
         const nombre = decoded.nombreCompleto
           || decoded.name
@@ -34,15 +32,20 @@ export class AuthService {
           || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
           || null;
 
+        // Aquí sacamos la obraId del token
+        const obraId = decoded.obraId || null;
+
+        // Ahora guardamos nombre, rol y obraId
         const userInfo = {
           nombreCompleto: nombre,
-          rol: rol
+          rol: rol,
+          obra: obraId   // <-- nuevo
         };
 
         localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
 
-        if (decoded.obraId) {
-          localStorage.setItem("obra-id", decoded.obraId.toString());
+        if (obraId) {
+          localStorage.setItem("obra-id", obraId.toString());
         }
       })
     );

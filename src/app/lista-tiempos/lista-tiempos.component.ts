@@ -58,7 +58,16 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
   }
 
   private generarListaTiempos() {
-    this.listaTiempos = this.empleadosSeleccionados.map(emp => ({
+    const rol = JSON.parse(localStorage.getItem('usuario') || '{}')?.rol;
+    const obraId = localStorage.getItem('obra-id');
+
+    let empleadosFiltrados = this.empleadosSeleccionados;
+
+    if (rol === 'responsable' && obraId) {
+      empleadosFiltrados = this.empleadosSeleccionados.filter(e => String(e.obraId) === obraId);
+    }
+
+    this.listaTiempos = empleadosFiltrados.map(emp => ({
       ingresoId: null,
       salidaId: null,
       empleadoId: emp.id,
