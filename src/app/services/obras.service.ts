@@ -7,13 +7,15 @@ import { User } from './user.service';
 export interface Obra {
   id: number;
   nombreObra: string;
-  responsable: User | null;
-  responsableSecundario?: string;
+  responsableId: number | null; // ✅ antes decía solo "number | undefined"
   clienteObra: string;
-  estado?: string;
+  estado: string;
   costoObra: number;
   ubicacion: string;
+  responsableSecundario?: string;
+  responsableNombre?: string; // si estás usando esto para mostrar
 }
+
 
 
 @Injectable({

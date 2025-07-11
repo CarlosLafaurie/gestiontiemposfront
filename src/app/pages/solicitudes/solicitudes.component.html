@@ -6,7 +6,7 @@
   <h2 id="title">Gestión de Solicitudes</h2>
 
   <!-- Formulario (admin o responsable) -->
-  <div *ngIf="esResponsable || esAdmin" class="formulario-solicitud">
+  <div *ngIf="esResponsable && !esAdmin" class="formulario-solicitud">
     <h4>Nueva Solicitud</h4>
     <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
 

@@ -49,7 +49,7 @@
           <h3>Inventario {{ obra.nombreObra }}</h3>
         </div>
         <div class="card-body">
-          <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>
+          <p><strong>Responsable Principal:</strong> {{ obra.responsableNombre }}</p>
           <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
           <button class="btn" (click)="irAInventarioInterno(obra.nombreObra)">
             <i class='bx bx-objects-vertical-bottom'></i> Ver Inventario

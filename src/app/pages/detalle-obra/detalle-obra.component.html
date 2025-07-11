@@ -6,7 +6,7 @@
     <h1>Detalles de la Obra</h1>
     <div *ngIf="obra; else loading">
       <p><strong>Nombre:</strong> {{ obra.nombreObra }}</p>
-      <p><strong>Responsable Principal:</strong> {{ obra.responsable }}</p>
+      <p><strong>Responsable Principal:</strong> {{ obra.responsableNombre }}</p>
       <p><strong>Responsable Secundario:</strong> {{ obra.responsableSecundario }}</p>
       <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
       <button class="btn" *ngIf="cargo !== 'cliente'" (click)="irAGestionPersonal()">Gestionar Personal</button>

@@ -63,18 +63,17 @@ export class ListaObrasComponent implements OnInit {
   }
 
 
-
   filtrarObras(obras: Obra[]) {
     if (this.rol === 'admin') {
       this.obrasFiltradas = obras;
     } else if (this.rol === 'responsable') {
       this.obrasFiltradas = obras.filter(obra =>
-        obra.responsable?.nombreCompleto?.trim().toLowerCase() === this.usuario?.trim().toLowerCase() ||
-        (obra.responsableSecundario?.trim().toLowerCase() ?? '') === this.usuario?.trim().toLowerCase()
+        (obra.responsableNombre?.trim().toLowerCase() === this.usuario?.trim().toLowerCase()) ||
+        (obra.responsableSecundario?.trim().toLowerCase() === this.usuario?.trim().toLowerCase())
       );
     } else if (this.rol === 'cliente') {
       this.obrasFiltradas = obras.filter(obra =>
-        obra.clienteObra.trim().toLowerCase() === this.usuario?.trim().toLowerCase()
+        obra.clienteObra?.trim().toLowerCase() === this.usuario?.trim().toLowerCase()
       );
     }
   }

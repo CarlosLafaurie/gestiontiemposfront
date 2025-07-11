@@ -35,14 +35,17 @@ export class UsuariosAdminComponent implements OnInit {
   private obraService = inject(ObraService);
 
   ngOnInit(): void {
-    this.cargarUsuarios();
     this.cargarObras();
+    this.cargarUsuarios();
   }
 
   cargarUsuarios(): void {
     this.userService.getAllUsers().subscribe({
       next: (data) => {
-        this.usuarios = data;
+        this.usuarios = data.map(usuario => ({
+          ...usuario,
+          obra: this.obras.find(o => o.id === usuario.obraId) || null
+        }));
         this.filtrarUsuarios();
       },
       error: (err) => console.error('❌ Error al obtener usuarios:', err)
@@ -53,6 +56,7 @@ export class UsuariosAdminComponent implements OnInit {
     this.obraService.getObras().subscribe({
       next: (data) => {
         this.obras = data;
+        this.cargarUsuarios();
       },
       error: (err) => console.error('❌ Error al obtener obras:', err)
     });

@@ -29,7 +29,7 @@ export class ObrasAdminComponent implements OnInit {
   obraActual: Omit<Obra, 'id'> & { id?: number; responsableSecundario?: string } = {
     id: undefined,
     nombreObra: '',
-    responsable: null,
+    responsableId: null,
     responsableSecundario: 'Sin responsable Secundario',
     clienteObra: 'Sin cliente',
     estado: 'Activo',
@@ -117,20 +117,23 @@ export class ObrasAdminComponent implements OnInit {
 
  filtrarObras(): void {
   const q = this.searchQuery.toLowerCase();
-    this.obrasFiltrados = this.obras.filter(u => {
-      const coincideBusqueda =
-        (!this.searchQuery ||
-          (u.nombreObra && u.nombreObra.toLowerCase().includes(q)) ||
-          (u.responsable?.nombreCompleto?.toLowerCase().includes(q)) ||
-          (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
-          (u.clienteObra && u.clienteObra.toLowerCase().includes(q)));
-      const coincideEstado =
-        this.estadoSeleccionado === 'todos' ||
-        (u.estado?.toLowerCase() === this.estadoSeleccionado.toLowerCase());
+  this.obrasFiltrados = this.obras.filter(u => {
+    const responsable = this.responsables.find(r => r?.id === u.responsableId);
 
-      return coincideBusqueda && coincideEstado;
-    });
-  }
+    const coincideBusqueda =
+      (!this.searchQuery ||
+        (u.nombreObra && u.nombreObra.toLowerCase().includes(q)) ||
+        (responsable?.nombreCompleto?.toLowerCase().includes(q)) ||
+        (u.responsableSecundario && u.responsableSecundario.toLowerCase().includes(q)) ||
+        (u.clienteObra && u.clienteObra.toLowerCase().includes(q)));
+
+    const coincideEstado =
+      this.estadoSeleccionado === 'todos' ||
+      (u.estado?.toLowerCase() === this.estadoSeleccionado.toLowerCase());
+
+    return coincideBusqueda && coincideEstado;
+  });
+}
 
   eliminarObra(id: number): void {
     if (confirm('¿Estás seguro de que deseas eliminar esta obra?')) {
@@ -152,7 +155,7 @@ export class ObrasAdminComponent implements OnInit {
     if (obra) {
       this.obraActual = {
         ...obra,
-        responsable: obra.responsable ?? null,
+        responsableId: obra.responsableId ?? null,
         responsableSecundario: obra.responsableSecundario || 'Sin responsable Secundario',
         clienteObra: obra.clienteObra || 'Sin cliente'
       };
@@ -160,7 +163,7 @@ export class ObrasAdminComponent implements OnInit {
       this.obraActual = {
         id: undefined,
         nombreObra: '',
-        responsable: null, // ✅
+        responsableId: null,
         responsableSecundario: 'Sin responsable Secundario',
         clienteObra: 'Sin cliente',
         estado: 'Activo',
@@ -175,7 +178,7 @@ export class ObrasAdminComponent implements OnInit {
     this.obraActual = {
       id: undefined,
       nombreObra: '',
-      responsable: null, // ✅
+      responsableId: null, // ✅
       responsableSecundario: 'Sin responsable Secundario',
       clienteObra: 'Sin cliente',
       estado: 'Activo',
@@ -211,7 +214,7 @@ export class ObrasAdminComponent implements OnInit {
       const obraAEnviar: Obra = {
         id: this.obraActual.id ?? 0,
         nombreObra: this.obraActual.nombreObra,
-        responsable: this.obraActual.responsable,
+        responsableId: this.obraActual.responsableId,
         clienteObra: this.obraActual.clienteObra,
         estado: this.obraActual.estado,
         costoObra: this.obraActual.costoObra,
@@ -233,7 +236,7 @@ export class ObrasAdminComponent implements OnInit {
     } else {
       const obraNueva: Omit<Obra, 'id'> = {
         nombreObra: this.obraActual.nombreObra,
-        responsable: this.obraActual.responsable,
+        responsableId: this.obraActual.responsableId,
         clienteObra: this.obraActual.clienteObra,
         estado: "activo",
         costoObra: this.obraActual.costoObra,
