@@ -67,4 +67,9 @@ export class PanelDeControlComponent implements OnInit {
     this.router.navigate(['/gestionIngresos/:nombreObra']).then(success => {
     });
   }
+
+  irAMetricas(): void {
+    this.router.navigate(['/metricas']).then(success => {
+    });
+  }
 }
