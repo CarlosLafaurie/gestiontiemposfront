@@ -36,7 +36,8 @@ export class EmpleadosAdminComponent implements OnInit {
     telefono: '',
     numeroCuenta: '',
     fechaInicioContrato: '',
-    fechaFinContrato: ''
+    fechaFinContrato: '',
+    ubicacion: ''
   };
 
   paginaActual = 1;
@@ -99,8 +100,14 @@ export class EmpleadosAdminComponent implements OnInit {
       u.cargo?.toLowerCase().includes(q) ||
       u.telefono?.toLowerCase().includes(q) ||
       u.numeroCuenta?.toLowerCase().includes(q) ||
-      u.obra?.toLowerCase().includes(q)
+      u.obra?.toLowerCase().includes(q) ||
+      u.ubicacion?.toLowerCase().includes(q)
     );
+
+    this.empleadosFiltrados.sort((a, b) =>
+    a.nombreCompleto.localeCompare(b.nombreCompleto, undefined, { sensitivity: 'base' })
+    );
+
     this.totalPaginas = Math.ceil(this.empleadosFiltrados.length / this.itemsPorPagina);
     this.paginaActual = 1;
   }

@@ -99,6 +99,14 @@ button {
   background-color: #f1f1f1;
 }
 
+.table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* blanco */
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #77797736; /* azul suave */
+}
+
 .modal {
   position: fixed;
   inset: 0;

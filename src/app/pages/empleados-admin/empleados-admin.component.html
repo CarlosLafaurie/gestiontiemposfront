@@ -21,8 +21,8 @@
           <th>Nombre Completo</th>
           <th>Cargo</th>
           <th>Obra</th>
+          <th>Ubicación</th> 
           <th>Responsable</th>
-          <th>Resp. Secundario</th>
           <th>Salario</th>
           <th>Inicio Contrato</th>
           <th>Fin Contrato</th>
@@ -38,8 +38,8 @@
           <td>{{ empleado.nombreCompleto }}</td>
           <td>{{ empleado.cargo }}</td>
           <td>{{ empleado.obra }}</td>
+          <td>{{ empleado.ubicacion || 'N/A' }}</td> 
           <td>{{ empleado.responsable }}</td>
-          <td>{{ empleado.responsableSecundario || 'Sin responsable' }}</td>
           <td>{{ empleado.salario | number:'1.2-2' }}</td>
           <td>{{ empleado.fechaInicioContrato | date: 'yyyy-MM-dd' }}</td>
           <td>{{ empleado.fechaFinContrato | date: 'yyyy-MM-dd' }}</td>
@@ -73,10 +73,13 @@
         <input [(ngModel)]="empleadoActual.cedula" type="text" required>
 
         <label>Nombre Completo:</label>
-        <input [(ngModel)]="empleadoActual.nombreCompleto" type="text" required>
+        <input [ngModel]="empleadoActual.nombreCompleto" (ngModelChange)="empleadoActual.nombreCompleto = $event.toUpperCase()" type="text" required>
 
         <label>Cargo:</label>
-        <input [(ngModel)]="empleadoActual.cargo" type="text" required>
+        <input  [ngModel]="empleadoActual.cargo" (ngModelChange)="empleadoActual.cargo = $event.toUpperCase()" type="text" required>
+
+        <label>Ubicación:</label>
+        <input [(ngModel)]="empleadoActual.ubicacion" type="text" required>
 
         <label>Obra:</label>
         <select [(ngModel)]="empleadoActual.obra">

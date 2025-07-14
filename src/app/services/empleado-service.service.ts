@@ -20,6 +20,7 @@
     seleccionado?: boolean;
     fechaHoraEntrada?: string | null;
     fechaHoraSalida?: string | null;
+    ubicacion?: string;
   }
 
 

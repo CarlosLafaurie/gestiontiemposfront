@@ -12,6 +12,44 @@ nav {
   padding: 10px;
 }
 
+.info-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin: 1rem 1.5rem 0 0;
+  flex-wrap: wrap;
+}
+
+.info-box {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+/* Colores personalizados */
+.green {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.yellow {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.white {
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid #dee2e6;
+}
+
+
+
 .search-container {
   margin-bottom: 1%;
 }
