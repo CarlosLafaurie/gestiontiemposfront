@@ -28,7 +28,8 @@ export class UsuariosAdminComponent implements OnInit {
     obraId: null,
     rol: '',
     estado: 'activo',
-    contrasena: ''
+    contrasena: '',
+    tipoResponsabilidad: 'Principal' 
   };
 
   private userService = inject(UserService);
@@ -90,6 +91,7 @@ export class UsuariosAdminComponent implements OnInit {
       this.usuarioActual = {
         ...usuario,
         contrasena: '',
+        tipoResponsabilidad: 'Principal'
       };
     } else {
       this.usuarioActual = {
@@ -139,7 +141,8 @@ export class UsuariosAdminComponent implements OnInit {
       cargo: this.usuarioActual.cargo,
       obraId: this.usuarioActual.obraId,
       rol: this.usuarioActual.rol,
-      estado: this.usuarioActual.estado || 'activo'
+      estado: this.usuarioActual.estado || 'activo',
+        tipoResponsabilidad: this.usuarioActual.tipoResponsabilidad
     };
 
     if (!this.esEdicion || this.usuarioActual.contrasena) {

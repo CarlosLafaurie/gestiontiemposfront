@@ -54,6 +54,12 @@
       <label>Cargo:</label>
       <input [(ngModel)]="usuarioActual.cargo" type="text" required>
 
+      <label>Tipo de Responsabilidad:</label>
+      <select [(ngModel)]="usuarioActual.tipoResponsabilidad">
+        <option value="Principal">Responsable Principal</option>
+        <option value="Secundario">Responsable Secundario</option>
+      </select>
+
       <label>Rol:</label>
       <select [(ngModel)]="usuarioActual.rol" required>
         <option value="admin">Admin</option>
