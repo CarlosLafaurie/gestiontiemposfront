@@ -23,6 +23,7 @@
           <th>Obra</th>
           <th>Ubicación</th> 
           <th>Responsable</th>
+          <th>Responsable Secundario</th>
           <th>Salario</th>
           <th>Inicio Contrato</th>
           <th>Fin Contrato</th>
@@ -40,6 +41,7 @@
           <td>{{ empleado.obra }}</td>
           <td>{{ empleado.ubicacion || 'N/A' }}</td> 
           <td>{{ empleado.responsable }}</td>
+          <td>{{ empleado.responsableSecundario || 'N/A' }}</td>
           <td>{{ empleado.salario | number:'1.2-2' }}</td>
           <td>{{ empleado.fechaInicioContrato | date: 'yyyy-MM-dd' }}</td>
           <td>{{ empleado.fechaFinContrato | date: 'yyyy-MM-dd' }}</td>
@@ -81,24 +83,15 @@
         <label>Ubicación:</label>
         <input [(ngModel)]="empleadoActual.ubicacion" type="text" required>
 
-        <label>Obra:</label>
-        <select [(ngModel)]="empleadoActual.obra">
-          <option *ngFor="let obra of obras" [value]="obra.nombreObra">{{ obra.nombreObra }}</option>
+        <select [(ngModel)]="empleadoActual.obra" (change)="actualizarResponsables()" name="obra" required>
+          <option *ngFor="let o of obras" [ngValue]="o.nombreObra">{{ o.nombreObra }}</option>
         </select>
 
-        <label>Responsable:</label>
-        <select [(ngModel)]="empleadoActual.responsable" required>
-          <option *ngFor="let resp of responsables" [value]="resp.nombre">
-            {{ resp.nombre }}
-          </option>
-        </select>
+        <label for="responsable">Responsable:</label>
+        <input type="text" [value]="empleadoActual.responsable" disabled>
 
-        <label>Responsable Secundario:</label>
-        <select [(ngModel)]="empleadoActual.responsableSecundario">
-          <option *ngFor="let resp of responsables" [value]="resp.nombre">
-            {{ resp.nombre }}
-          </option>
-        </select>
+        <label for="responsableSecundario">Responsable Secundario:</label>
+        <input type="text" [value]="empleadoActual.responsableSecundario" disabled>
 
         <label>Salario:</label>
         <input [(ngModel)]="empleadoActual.salario" type="number" required>

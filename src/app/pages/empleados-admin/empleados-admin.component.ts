@@ -40,6 +40,9 @@ export class EmpleadosAdminComponent implements OnInit {
     ubicacion: ''
   };
 
+  responsableNombre: string = '';
+  responsableSecundario: string = '';
+
   paginaActual = 1;
   itemsPorPagina = 10;
   totalPaginas = 1;
@@ -140,9 +143,32 @@ export class EmpleadosAdminComponent implements OnInit {
       telefono: '',
       numeroCuenta: '',
       fechaInicioContrato: '',
-      fechaFinContrato: ''
+      fechaFinContrato: '',
+      ubicacion: ''
     };
+
+    // Si ya hay una obra seleccionada, actualiza responsables
+    if (this.empleadoActual.obra) {
+      this.actualizarResponsables();
+    }
   }
+
+  actualizarResponsables(): void {
+    const obraSeleccionada = this.obras.find(o => o.nombreObra === this.empleadoActual.obra);
+    if (obraSeleccionada) {
+      this.responsableNombre = obraSeleccionada.responsableNombre || '';
+      this.responsableSecundario = obraSeleccionada.responsableSecundario || '';
+
+      this.empleadoActual.responsable = this.responsableNombre;
+      this.empleadoActual.responsableSecundario = this.responsableSecundario;
+    } else {
+      this.responsableNombre = '';
+      this.responsableSecundario = '';
+      this.empleadoActual.responsable = '';
+      this.empleadoActual.responsableSecundario = '';
+    }
+  }
+
 
   cerrarFormulario(): void {
     this.mostrarFormulario = false;
@@ -161,6 +187,8 @@ export class EmpleadosAdminComponent implements OnInit {
       fechaInicioContrato: '',
       fechaFinContrato: ''
     };
+    this.responsableNombre = '';
+    this.responsableSecundario = '';
   }
 
   guardarEmpleado(): void {
