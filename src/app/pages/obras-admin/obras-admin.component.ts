@@ -34,7 +34,8 @@ export class ObrasAdminComponent implements OnInit {
     clienteObra: 'Sin cliente',
     estado: 'Activo',
     costoObra: 0,
-    ubicacion: 'sin definir'
+    ubicacion: 'sin definir',
+    tamano: 0
   };
 
   private obraService = inject(ObraService);
@@ -219,7 +220,8 @@ export class ObrasAdminComponent implements OnInit {
         estado: this.obraActual.estado,
         costoObra: this.obraActual.costoObra,
         ubicacion: this.obraActual.ubicacion,
-        responsableSecundario: this.obraActual.responsableSecundario
+        responsableSecundario: this.obraActual.responsableSecundario,
+        tamano: this.obraActual.tamano ?? 0
       };
       (obraAEnviar as any).responsableSecundario = this.obraActual.responsableSecundario;
       this.obraService.editObra(obraAEnviar.id, obraAEnviar).subscribe({
@@ -234,14 +236,15 @@ export class ObrasAdminComponent implements OnInit {
         }
       });
     } else {
-      const obraNueva: Omit<Obra, 'id'> = {
+     const obraNueva: Omit<Obra, 'id'> = {
         nombreObra: this.obraActual.nombreObra,
         responsableId: this.obraActual.responsableId,
         clienteObra: this.obraActual.clienteObra,
         estado: "activo",
         costoObra: this.obraActual.costoObra,
         ubicacion: this.obraActual.ubicacion,
-        responsableSecundario: this.obraActual.responsableSecundario
+        responsableSecundario: this.obraActual.responsableSecundario,
+        tamano: this.obraActual.tamano ?? 0
       };
       (obraNueva as any).responsableSecundario = this.obraActual.responsableSecundario;
       this.obraService.createObra(obraNueva).subscribe({

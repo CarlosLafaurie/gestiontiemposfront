@@ -7,13 +7,14 @@ import { User } from './user.service';
 export interface Obra {
   id: number;
   nombreObra: string;
-  responsableId: number | null; // ✅ antes decía solo "number | undefined"
+  responsableId: number | null; 
   clienteObra: string;
   estado: string;
   costoObra: number;
   ubicacion: string;
   responsableSecundario?: string;
-  responsableNombre?: string; // si estás usando esto para mostrar
+  responsableNombre?: string; 
+  tamano?: number; 
 }
 
 

@@ -71,10 +71,7 @@
     </table>
   </div>
 
-  <app-lista-tiempos
-    *ngIf="empleadosSeleccionados.length > 0"
-    [empleadosSeleccionados]="empleadosSeleccionados"
-  ></app-lista-tiempos>
+<app-lista-tiempos [empleadosSeleccionados]="empleadosSeleccionados"></app-lista-tiempos>
 
   <div class="botones-accion">
     <button (click)="registrarIngreso()">Registrar Ingreso</button>

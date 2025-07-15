@@ -28,6 +28,7 @@
         <th>Responsable Secundario</th>
         <th>Cliente</th>
         <th>Ubicación</th>
+        <th>Área (m²)</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -39,6 +40,7 @@
         <td>{{ obra.responsableSecundario || 'Sin responsable Secundario' }}</td>
         <td>{{ obra.clienteObra || 'Sin cliente' }}</td>
         <td>{{ obra.ubicacion ||   'Sin ubicación' }}</td>
+        <td>{{ obra.tamano !== null && obra.tamano !== undefined ? obra.tamano + ' mt²' : '-' }}</td>
         <td>
           <button (click)="mostrarFormularioObra(obra)" class="btn-editar">
             <i class='bx bxs-edit'></i>
@@ -79,6 +81,9 @@
 
       <label>Costo de la Obra:</label>
       <input type="number" [(ngModel)]="obraActual.costoObra" min="0" step="0.01" required>
+
+      <label>Tamaño (m²):</label>
+      <input type="number" [(ngModel)]="obraActual.tamano" min="0" step="1" placeholder="Ej: 120" />
 
       <label>Cliente:</label>
       <select [(ngModel)]="obraActual.clienteObra" required>

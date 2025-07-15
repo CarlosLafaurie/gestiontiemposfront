@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TiemposService } from '../services/tiempos.service.service';
-import { AusentismoService } from '../services/documento-permiso.service';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TiemposService } from '../services/tiempos.service.service';
+import { AusentismoService } from '../services/documento-permiso.service';
 import { forkJoin, Observable } from 'rxjs';
 
 export interface TiempoExtendido {
@@ -28,16 +28,15 @@ export interface TiempoExtendido {
   providers: [TiemposService, AusentismoService]
 })
 export class ListaTiemposComponent implements OnInit, OnChanges {
-  @Input() empleadosSeleccionados: any[] = [];
+  @Input() empleadosSeleccionados: { id: number; nombreEmpleado: string; obra: string }[] = [];
   listaTiempos: TiempoExtendido[] = [];
-
   empleadoSeleccionado: TiempoExtendido | null = null;
 
-  tipoRegistro = 'entrada';
-  fechaHoraGlobal = '';
+  tipoRegistro      = 'entrada';
+  fechaHoraGlobal   = '';
   fechaInicioPermiso = '';
-  fechaFinPermiso = '';
-  modo = 'tiempos';
+  fechaFinPermiso   = '';
+  modo              = 'tiempos';
 
   constructor(
     private tiemposService: TiemposService,
@@ -45,33 +44,28 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
     private snackBar: MatSnackBar
   ) {}
 
-  ngOnInit() {
-    if (this.empleadosSeleccionados.length) {
-      this.generarListaTiempos();
-    }
-  }
+ngOnInit() {
+  console.log('ListaTiempos ❯ ngOnInit, recibí:', this.empleadosSeleccionados);
+  this.generarListaTiempos();
+}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['empleadosSeleccionados'] && this.empleadosSeleccionados.length > 0) {
-      this.generarListaTiempos();
-    }
+ngOnChanges(changes: SimpleChanges): void {
+  if (changes['empleadosSeleccionados']) {
+    console.log('ListaTiempos ❯ ngOnChanges, recibí:', this.empleadosSeleccionados);
+    this.generarListaTiempos();
   }
+}
 
   private generarListaTiempos() {
-    const rol = JSON.parse(localStorage.getItem('usuario') || '{}')?.rol;
-    const obraId = localStorage.getItem('obra-id');
-
-    let empleadosFiltrados = this.empleadosSeleccionados;
-
-    if (rol === 'responsable' && obraId) {
-      empleadosFiltrados = this.empleadosSeleccionados.filter(e => String(e.obraId) === obraId);
-    }
-
-    this.listaTiempos = empleadosFiltrados.map(emp => ({
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const rol = usuario.rol;
+    const nombreObra = usuario.obra;
+    let empleados = this.empleadosSeleccionados;
+    this.listaTiempos = empleados.map(emp => ({
       ingresoId: null,
       salidaId: null,
       empleadoId: emp.id,
-      nombreEmpleado: emp.nombre,
+      nombreEmpleado: emp.nombreEmpleado,
       fechaHoraEntrada: null,
       fechaHoraSalida: null,
       comentarios: '',
@@ -80,18 +74,18 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
     }));
   }
 
- actualizarHoras() {
-  this.listaTiempos.forEach(t => {
-    if (!this.fechaHoraGlobal) return;
-    if (this.tipoRegistro === 'entrada') {
-      t.fechaHoraEntrada = this.fechaHoraGlobal;
-      t.fechaHoraSalida = null;
-    } else {
-      t.fechaHoraSalida = this.fechaHoraGlobal;
-      t.fechaHoraEntrada = null;
-    }
-  });
-}
+  actualizarHoras() {
+    this.listaTiempos.forEach(t => {
+      if (!this.fechaHoraGlobal) return;
+      if (this.tipoRegistro === 'entrada') {
+        t.fechaHoraEntrada = this.fechaHoraGlobal;
+        t.fechaHoraSalida = null;
+      } else {
+        t.fechaHoraSalida = this.fechaHoraGlobal;
+        t.fechaHoraEntrada = null;
+      }
+    });
+  }
 
   esValidoParaGuardar(): boolean {
     return this.listaTiempos.some(t => t.fechaHoraEntrada || t.fechaHoraSalida);
@@ -117,6 +111,7 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
         }));
       }
     });
+
     forkJoin(observables).subscribe({
       next: () => {
         this.snackBar.open('✅ Tiempos cargados correctamente.', 'Cerrar', { duration: 3000 });
@@ -155,10 +150,11 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
       if (t.archivo) {
         fd.append('Archivo', t.archivo);
       } else {
-       fd.append('Archivo', new Blob([]), '');
+        fd.append('Archivo', new Blob([]), '');
       }
       return this.ausentismoService.subirDocumentoAusentismo(fd);
     });
+
     forkJoin(observables).subscribe({
       next: () => {
         this.snackBar.open('✅ Ausentismo enviado correctamente.', 'Cerrar', { duration: 3000 });
@@ -171,13 +167,13 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
   }
 
   manejarArchivo(event: Event, i: number) {
-    const input = event.target as HTMLInputElement;
+    const input = (event.target as HTMLInputElement);
     if (input.files?.length) {
       this.listaTiempos[i].archivo = input.files[0];
     }
   }
 
-  cargarUltimosTiempos() {
+  private cargarUltimosTiempos() {
     if (!this.empleadoSeleccionado) return;
     const emp = this.empleadoSeleccionado;
     forkJoin([

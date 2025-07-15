@@ -25,16 +25,17 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./gestion-personal.component.css']
 })
 export class GestionPersonalComponent implements OnInit {
-  responsable     = '';
-  rol             = '';
-  obraId          = '';
-  obraNombre      = '';
-  empleados       : Empleado[] = [];
+  responsable           = '';
+  rol                   = '';
+  obraId                = '';
+  obraNombre            = '';
+  empleados: Empleado[] = [];
   empleadosFiltrados: Empleado[] = [];
-  empleadosSeleccionados: { id: number; nombre: string }[] = [];
-  guardandoTiempos = false;
-  searchQuery      = '';
-  todosSeleccionados = false;
+  // ahora incluye nombreEmpleado y obra, para pasar a ListaTiempos
+  empleadosSeleccionados: { id: number; nombreEmpleado: string; obra: string }[] = [];
+  guardandoTiempos      = false;
+  searchQuery           = '';
+  todosSeleccionados    = false;
 
   private authService     = inject(AuthService);
   private empleadoService = inject(EmpleadoService);
@@ -52,7 +53,7 @@ export class GestionPersonalComponent implements OnInit {
       this.obraId      = (rol === 'responsable') ? obra : '';
     }
 
-    // 2) Si es responsable, obtenemos el nombre de la obra antes de cargar empleados
+    // 2) Si es responsable, obtener nombre de obra antes de cargar
     if (this.rol === 'responsable' && this.obraId) {
       this.obraService.getObras().subscribe((obras: Obra[]) => {
         const match = obras.find(o => o.id === +this.obraId);
@@ -66,15 +67,12 @@ export class GestionPersonalComponent implements OnInit {
 
   private obtenerTodosEmpleados(): void {
     this.empleadoService.obtenerEmpleados(1, 150).subscribe(data => {
-      console.log('Total empleados cargados:', data.length);
-
+      // Filtrar si responsable
       if (this.rol === 'responsable' && this.obraNombre) {
-        // Filtrar por nombre de obra
         this.empleados = data.filter(emp => emp.obra === this.obraNombre);
       } else {
         this.empleados = data;
       }
-
       this.applySort();
       this.cargarTiemposParaTodos();
       this.aplicarFiltro();
@@ -119,7 +117,7 @@ export class GestionPersonalComponent implements OnInit {
   }
 
   toggleSeleccionarTodos(): void {
-    this.empleadosFiltrados.forEach(emp => (emp.seleccionado = this.todosSeleccionados));
+    this.empleadosFiltrados.forEach(emp => emp.seleccionado = this.todosSeleccionados);
     this.gestionarTiempos();
   }
 
@@ -128,11 +126,16 @@ export class GestionPersonalComponent implements OnInit {
     this.gestionarTiempos();
   }
 
-  gestionarTiempos(): void {
-    this.empleadosSeleccionados = this.empleadosFiltrados
-      .filter(emp => emp.seleccionado)
-      .map(emp => ({ id: emp.id, nombre: emp.nombreCompleto }));
-  }
+  private gestionarTiempos(): void {
+  this.empleadosSeleccionados = this.empleadosFiltrados
+    .filter(emp => emp.seleccionado)
+    .map(emp => ({
+      id: emp.id,
+      nombreEmpleado: emp.nombreCompleto,
+      obra: emp.obra
+    }));
+  console.log('GestionPersonal ❯ empleadosSeleccionados:', this.empleadosSeleccionados);
+}
 
   registrarIngreso(): void {
     this.registrarTiempos('ingreso');
@@ -185,8 +188,8 @@ export class GestionPersonalComponent implements OnInit {
   obtenerClaseFila(emp: Empleado): string {
     const inHoy  = this.esFechaDeHoy(emp.fechaHoraEntrada  ?? null);
     const outHoy = this.esFechaDeHoy(emp.fechaHoraSalida   ?? null);
-    if (inHoy && outHoy)   return 'fila-ingreso-salida';
-    if (inHoy)             return 'fila-solo-ingreso';
+    if (inHoy && outHoy) return 'fila-ingreso-salida';
+    if (inHoy)           return 'fila-solo-ingreso';
     return '';
   }
 }
