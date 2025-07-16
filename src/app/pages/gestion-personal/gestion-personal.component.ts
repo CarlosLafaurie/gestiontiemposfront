@@ -31,7 +31,6 @@ export class GestionPersonalComponent implements OnInit {
   obraNombre            = '';
   empleados: Empleado[] = [];
   empleadosFiltrados: Empleado[] = [];
-  // ahora incluye nombreEmpleado y obra, para pasar a ListaTiempos
   empleadosSeleccionados: { id: number; nombreEmpleado: string; obra: string }[] = [];
   guardandoTiempos      = false;
   searchQuery           = '';
@@ -44,7 +43,6 @@ export class GestionPersonalComponent implements OnInit {
   private router          = inject(Router);
 
   ngOnInit(): void {
-    // 1) Leer datos del usuario
     const usuarioJson = localStorage.getItem('usuario');
     if (usuarioJson) {
       const { nombreCompleto, rol, obra } = JSON.parse(usuarioJson);
@@ -53,7 +51,6 @@ export class GestionPersonalComponent implements OnInit {
       this.obraId      = (rol === 'responsable') ? obra : '';
     }
 
-    // 2) Si es responsable, obtener nombre de obra antes de cargar
     if (this.rol === 'responsable' && this.obraId) {
       this.obraService.getObras().subscribe((obras: Obra[]) => {
         const match = obras.find(o => o.id === +this.obraId);
@@ -67,7 +64,6 @@ export class GestionPersonalComponent implements OnInit {
 
   private obtenerTodosEmpleados(): void {
     this.empleadoService.obtenerEmpleados(1, 150).subscribe(data => {
-      // Filtrar si responsable
       if (this.rol === 'responsable' && this.obraNombre) {
         this.empleados = data.filter(emp => emp.obra === this.obraNombre);
       } else {
@@ -186,10 +182,40 @@ export class GestionPersonalComponent implements OnInit {
   }
 
   obtenerClaseFila(emp: Empleado): string {
-    const inHoy  = this.esFechaDeHoy(emp.fechaHoraEntrada  ?? null);
-    const outHoy = this.esFechaDeHoy(emp.fechaHoraSalida   ?? null);
-    if (inHoy && outHoy) return 'fila-ingreso-salida';
-    if (inHoy)           return 'fila-solo-ingreso';
-    return '';
+  const ahora       = new Date();
+  const horaActual  = ahora.getHours();
+  const fechaStr    = emp.fechaHoraEntrada;
+  // convertir la fecha de ingreso (si existe) a Date
+  const ingresoDate = fechaStr ? new Date(fechaStr) : null;
+
+  // ayuda: compara si una fecha es hoy
+  const esHoy = (d: Date) => {
+    const today = new Date();
+    return d.getFullYear() === today.getFullYear()
+        && d.getMonth()    === today.getMonth()
+        && d.getDate()     === today.getDate();
+  };
+
+  // 1) Si ya pasaron las 9AM y NO hay ingreso hoy → rojo
+  if (horaActual >= 9 && (!ingresoDate || !esHoy(ingresoDate))) {
+    return 'fila-falta-ingreso';
   }
+
+  // 2) Si ingresó hoy y también salió hoy → verde
+  const inHoy  = ingresoDate && esHoy(ingresoDate);
+  const salidaDate = emp.fechaHoraSalida ? new Date(emp.fechaHoraSalida) : null;
+  const outHoy = salidaDate && esHoy(salidaDate);
+  if (inHoy && outHoy) {
+    return 'fila-ingreso-salida';
+  }
+
+  // 3) Si solo ingresó hoy → amarillo
+  if (inHoy) {
+    return 'fila-solo-ingreso';
+  }
+
+  // 4) Resto → sin estilo
+  return '';
+}
+
 }

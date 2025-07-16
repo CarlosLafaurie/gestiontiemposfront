@@ -1,13 +1,6 @@
 <app-navbar></app-navbar>
 <app-boton-regresar></app-boton-regresar>
 
-<div class="info-container">
-  <div class="info-box green">Ingreso y salida cargados</div>
-  <div class="info-box yellow">Solo ingreso cargado</div>
-  <div class="info-box white">No hay tiempos registrados</div>
-</div>
-
-
 <div class="container">
   <h2>Gestión de tiempos del Personal</h2>
 
@@ -23,6 +16,13 @@
 
   <div class="mb-3">
     <p><strong>Total de empleados cargados:</strong> {{ empleados.length }}</p>
+  </div>
+  
+  <div class="info-container" id="info-container">
+    <div class="info-box green">🟢 Ingreso y salida cargados</div>
+    <div class="info-box yellow">🟡 Solo ingreso cargado</div>
+    <div class="info-box red">🔴 No asistió (después de 9 AM sin ingreso)</div>
+    <div class="info-box white">⚪ Sin tiempos registrados</div>
   </div>
 
   <div class="table-responsive">
