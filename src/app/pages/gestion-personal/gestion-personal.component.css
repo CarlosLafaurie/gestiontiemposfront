@@ -29,6 +29,16 @@ nav {
   white-space: nowrap;
 }
 
+.info-box {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s;
+}
+.info-box:hover {
+  transform: scale(1.03);
+}
+
+
 #info-container {
   display: flex;
   justify-content: center;

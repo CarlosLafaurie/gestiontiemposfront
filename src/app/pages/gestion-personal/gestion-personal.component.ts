@@ -11,6 +11,8 @@ import { NavbarComponent } from '../../navbar/navbar.component';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 import { forkJoin } from 'rxjs';
 
+type EstadoTemporal = 'ingreso-salida' | 'solo-ingreso' | 'falta-ingreso' | 'sin-tiempos';
+
 @Component({
   selector: 'app-gestion-personal',
   standalone: true,
@@ -35,6 +37,7 @@ export class GestionPersonalComponent implements OnInit {
   guardandoTiempos      = false;
   searchQuery           = '';
   todosSeleccionados    = false;
+  filtroEstado: EstadoTemporal | null = null;
 
   private authService     = inject(AuthService);
   private empleadoService = inject(EmpleadoService);
@@ -50,7 +53,6 @@ export class GestionPersonalComponent implements OnInit {
       this.rol         = rol;
       this.obraId      = (rol === 'responsable') ? obra : '';
     }
-
     if (this.rol === 'responsable' && this.obraId) {
       this.obraService.getObras().subscribe((obras: Obra[]) => {
         const match = obras.find(o => o.id === +this.obraId);
@@ -64,11 +66,9 @@ export class GestionPersonalComponent implements OnInit {
 
   private obtenerTodosEmpleados(): void {
     this.empleadoService.obtenerEmpleados(1, 150).subscribe(data => {
-      if (this.rol === 'responsable' && this.obraNombre) {
-        this.empleados = data.filter(emp => emp.obra === this.obraNombre);
-      } else {
-        this.empleados = data;
-      }
+      this.empleados = (this.rol === 'responsable' && this.obraNombre)
+        ? data.filter(emp => emp.obra === this.obraNombre)
+        : data;
       this.applySort();
       this.cargarTiemposParaTodos();
       this.aplicarFiltro();
@@ -77,13 +77,22 @@ export class GestionPersonalComponent implements OnInit {
 
   private cargarTiemposParaTodos(): void {
     this.empleados.forEach(emp => {
-      this.tiemposService.obtenerUltimoIngresoPorEmpleado(emp.id).subscribe({
-        next: ingreso => emp.fechaHoraEntrada = ingreso?.fechaHoraEntrada ?? null,
-        error: ()      => emp.fechaHoraEntrada = null
-      });
-      this.tiemposService.obtenerUltimaSalidaPorEmpleado(emp.id).subscribe({
-        next: salida => emp.fechaHoraSalida = salida?.fechaHoraSalida ?? null,
-        error: ()      => emp.fechaHoraSalida = null
+      forkJoin({
+        ing: this.tiemposService.obtenerUltimoIngresoPorEmpleado(emp.id),
+        sal: this.tiemposService.obtenerUltimaSalidaPorEmpleado(emp.id)
+      }).subscribe({
+        next: ({ ing, sal }) => {
+          emp.fechaHoraEntrada = ing?.fechaHoraEntrada ?? null;
+          emp.fechaHoraSalida  = sal?.fechaHoraSalida  ?? null;
+          emp.estadoTemporario = this.calcularEstadoTemporal(emp);
+          this.aplicarFiltro();
+        },
+        error: () => {
+          emp.fechaHoraEntrada = emp.fechaHoraEntrada ?? null;
+          emp.fechaHoraSalida  = emp.fechaHoraSalida  ?? null;
+          emp.estadoTemporario = this.calcularEstadoTemporal(emp);
+          this.aplicarFiltro();
+        }
       });
     });
   }
@@ -92,18 +101,36 @@ export class GestionPersonalComponent implements OnInit {
     this.aplicarFiltro();
   }
 
+  filtrarPorEstado(estado: EstadoTemporal): void {
+    this.filtroEstado = (this.filtroEstado === estado) ? null : estado;
+    this.aplicarFiltro();
+  }
+
   private aplicarFiltro(): void {
     const q = this.searchQuery.trim().toLowerCase();
-    this.empleadosFiltrados = q
-      ? this.empleados.filter(emp =>
-          emp.nombreCompleto.toLowerCase().includes(q) ||
-          emp.cedula.toLowerCase().includes(q) ||
-          emp.cargo.toLowerCase().includes(q) ||
-          emp.obra.toLowerCase().includes(q) ||
-          emp.responsable.toLowerCase().includes(q) ||
-          (emp.responsableSecundario || '').toLowerCase().includes(q)
-        )
-      : [...this.empleados];
+    this.empleadosFiltrados = this.empleados.filter(emp => {
+      const texto = [
+        emp.nombreCompleto,
+        emp.cedula,
+        emp.cargo,
+        emp.obra,
+        emp.responsable,
+        emp.responsableSecundario || ''
+      ].join(' ').toLowerCase();
+      const pasaTexto  = !q || texto.includes(q);
+      const pasaEstado = !this.filtroEstado || emp.estadoTemporario === this.filtroEstado;
+      return pasaTexto && pasaEstado;
+    });
+  }
+
+  obtenerClaseFila(emp: Empleado): string {
+    switch ((emp as any).estadoTemporario as EstadoTemporal) {
+      case 'ingreso-salida': return 'fila-ingreso-salida';
+      case 'solo-ingreso':    return 'fila-solo-ingreso';
+      case 'falta-ingreso':   return 'fila-falta-ingreso';
+      case 'sin-tiempos':     return 'fila-sin-tiempos';
+      default:                return '';
+    }
   }
 
   private applySort(): void {
@@ -123,51 +150,36 @@ export class GestionPersonalComponent implements OnInit {
   }
 
   private gestionarTiempos(): void {
-  this.empleadosSeleccionados = this.empleadosFiltrados
-    .filter(emp => emp.seleccionado)
-    .map(emp => ({
-      id: emp.id,
-      nombreEmpleado: emp.nombreCompleto,
-      obra: emp.obra
-    }));
-  console.log('GestionPersonal ❯ empleadosSeleccionados:', this.empleadosSeleccionados);
-}
-
-  registrarIngreso(): void {
-    this.registrarTiempos('ingreso');
+    this.empleadosSeleccionados = this.empleadosFiltrados
+      .filter(emp => emp.seleccionado)
+      .map(emp => ({
+        id: emp.id,
+        nombreEmpleado: emp.nombreCompleto,
+        obra: emp.obra
+      }));
   }
 
-  registrarSalida(): void {
-    this.registrarTiempos('salida');
-  }
+  registrarIngreso(): void { this.registrarTiempos('ingreso'); }
+  registrarSalida(): void { this.registrarTiempos('salida'); }
 
   private registrarTiempos(accion: 'ingreso' | 'salida'): void {
     this.guardandoTiempos = true;
-    const observables = this.empleadosSeleccionados.map(empleado => {
-      const tiempo: Tiempo = {
-        empleadoId: empleado.id,
+    const ops = this.empleadosSeleccionados.map(e => {
+      const t: Tiempo = {
+        empleadoId: e.id,
         fechaHoraEntrada: accion === 'ingreso' ? new Date().toISOString() : null,
-        fechaHoraSalida:  accion === 'salida' ? new Date().toISOString() : null,
+        fechaHoraSalida:  accion === 'salida'  ? new Date().toISOString() : null,
         comentarios: '',
         permisosEspeciales: ''
       };
       return accion === 'ingreso'
-        ? this.tiemposService.registrarIngreso(tiempo)
-        : this.tiemposService.registrarSalida(tiempo);
+        ? this.tiemposService.registrarIngreso(t)
+        : this.tiemposService.registrarSalida(t);
     });
-
-    forkJoin(observables).subscribe({
-      next: () => {
-        alert(`✅ ${accion === 'ingreso' ? 'Ingresos' : 'Salidas'} registradas correctamente.`);
-        window.location.reload();
-      },
-      error: err => {
-        console.error(`❌ Error al registrar ${accion}`, err);
-        alert(`❌ Error al registrar ${accion}.`);
-      },
-      complete: () => {
-        this.guardandoTiempos = false;
-      }
+    forkJoin(ops).subscribe({
+      next: () => window.location.reload(),
+      error: () => alert(`Error al registrar ${accion}`),
+      complete: () => this.guardandoTiempos = false
     });
   }
 
@@ -176,46 +188,17 @@ export class GestionPersonalComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  esFechaDeHoy(fechaStr: string | null): boolean {
-    if (!fechaStr) return false;
-    return new Date(fechaStr).toDateString() === new Date().toDateString();
+  private calcularEstadoTemporal(emp: Empleado): EstadoTemporal {
+    const ahora = new Date(), h = ahora.getHours();
+    const esHoy = (d: Date) => d.toDateString() === ahora.toDateString();
+    const ing = emp.fechaHoraEntrada ? new Date(emp.fechaHoraEntrada) : null;
+    const sal = emp.fechaHoraSalida  ? new Date(emp.fechaHoraSalida)  : null;
+    const ingresoHoy = ing && esHoy(ing);
+    const salidaHoy  = sal && esHoy(sal);
+
+    if (h >= 9 && !ingresoHoy)          return 'falta-ingreso';
+    if (ingresoHoy && salidaHoy)        return 'ingreso-salida';
+    if (ingresoHoy && !salidaHoy)       return 'solo-ingreso';
+    return 'sin-tiempos';
   }
-
-  obtenerClaseFila(emp: Empleado): string {
-  const ahora       = new Date();
-  const horaActual  = ahora.getHours();
-  const fechaStr    = emp.fechaHoraEntrada;
-  // convertir la fecha de ingreso (si existe) a Date
-  const ingresoDate = fechaStr ? new Date(fechaStr) : null;
-
-  // ayuda: compara si una fecha es hoy
-  const esHoy = (d: Date) => {
-    const today = new Date();
-    return d.getFullYear() === today.getFullYear()
-        && d.getMonth()    === today.getMonth()
-        && d.getDate()     === today.getDate();
-  };
-
-  // 1) Si ya pasaron las 9AM y NO hay ingreso hoy → rojo
-  if (horaActual >= 9 && (!ingresoDate || !esHoy(ingresoDate))) {
-    return 'fila-falta-ingreso';
-  }
-
-  // 2) Si ingresó hoy y también salió hoy → verde
-  const inHoy  = ingresoDate && esHoy(ingresoDate);
-  const salidaDate = emp.fechaHoraSalida ? new Date(emp.fechaHoraSalida) : null;
-  const outHoy = salidaDate && esHoy(salidaDate);
-  if (inHoy && outHoy) {
-    return 'fila-ingreso-salida';
-  }
-
-  // 3) Si solo ingresó hoy → amarillo
-  if (inHoy) {
-    return 'fila-solo-ingreso';
-  }
-
-  // 4) Resto → sin estilo
-  return '';
-}
-
 }
