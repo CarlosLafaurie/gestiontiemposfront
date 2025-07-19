@@ -18,6 +18,7 @@ import { SolicitudesComponent } from './pages/solicitudes/solicitudes.component'
 import { InventarioInternoComponent } from './pages/inventario-interno/inventario-interno.component';
 import { InventariosComponent } from './pages/inventarios/inventarios.component';
 import { RevisionInventarioComponent } from './pages/revision-inventario/revision-inventario.component';
+import { PruebasComponent } from './pages/pruebas/pruebas.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { MetricasComponent } from './pages/metricas/metricas.component';
@@ -44,5 +45,6 @@ export const routes: Routes = [
   { path: 'inventarios', component: InventariosComponent, canActivate: [authGuard] },
   { path: 'revision-inventario', component: RevisionInventarioComponent, canActivate: [authGuard] },
   { path: 'metricas', component: MetricasComponent, canActivate: [authGuard] },
+  { path: 'pruebas', component: PruebasComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
