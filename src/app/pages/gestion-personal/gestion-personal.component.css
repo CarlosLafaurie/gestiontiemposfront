@@ -146,6 +146,9 @@ button:hover, a:hover {
     display: none;
   }
 
+  .seleccionar-text {
+    display: none;
+  }
 }
 
 .table-responsive {

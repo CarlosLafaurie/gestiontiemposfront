@@ -15,8 +15,8 @@ export class PruebasComponent {
 
   private router = inject(Router);
 
-  irAEmpleadosAdmin(): void {
-    this.router.navigate(['/empleado-admin']).then(success => {
+  irAPruebas(): void {
+    this.router.navigate(['/rendimiento']).then(success => {
     });
   }
 

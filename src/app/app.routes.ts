@@ -22,6 +22,7 @@ import { PruebasComponent } from './pages/pruebas/pruebas.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { MetricasComponent } from './pages/metricas/metricas.component';
+import { RendimientoComponent } from './pages/rendimiento/rendimiento.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -46,5 +47,6 @@ export const routes: Routes = [
   { path: 'revision-inventario', component: RevisionInventarioComponent, canActivate: [authGuard] },
   { path: 'metricas', component: MetricasComponent, canActivate: [authGuard] },
   { path: 'pruebas', component: PruebasComponent, canActivate: [authGuard] },
+  { path: 'rendimiento', component: RendimientoComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

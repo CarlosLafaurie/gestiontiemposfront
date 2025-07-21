@@ -1,0 +1,90 @@
+/* Contenedor principal */
+.solicitudes-admin {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Título */
+#title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+/* Formulario */
+.formulario-solicitud {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+.formulario-solicitud h4 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Grupos del formulario */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Inputs y selects */
+.form-control,
+.form-select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  transition: border 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 4px rgba(40, 167, 69, 0.4);
+  outline: none;
+}
+
+/* Botón guardar */
+.btn-guardar {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-guardar:disabled {
+  background-color: #a2d5a5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .solicitudes-admin {
+    padding: 10px;
+  }
+
+  .btn-guardar {
+    width: 100%;
+  }
+}

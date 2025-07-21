@@ -1,0 +1,78 @@
+<app-navbar></app-navbar>
+<app-boton-regresar></app-boton-regresar>
+
+<div class="solicitudes-admin container mt-4">
+  <h2 id="title">Registro de Rendimiento</h2>
+
+  <div class="formulario-solicitud">
+    <h4>Nuevo Registro</h4>
+
+    <form (ngSubmit)="guardarRendimiento()" #formRend="ngForm">
+
+      <!-- Actividad -->
+      <div class="form-group">
+        <label class="form-label">Actividad</label>
+        <select class="form-select" [(ngModel)]="rendimiento.actividad" name="actividad" required>
+          <option value="" disabled selected>Seleccione una actividad</option>
+          <option *ngFor="let act of actividades" [value]="act">{{ act }}</option>
+        </select>
+      </div>
+
+      <!-- Unidad -->
+      <div class="form-group">
+        <label class="form-label">Unidad</label>
+        <select class="form-select" [(ngModel)]="rendimiento.unidad" name="unidad" required>
+          <option value="" disabled selected>Seleccione unidad</option>
+          <option *ngFor="let u of unidades" [value]="u">{{ u }}</option>
+        </select>
+      </div>
+
+      <!-- Empleado -->
+      <div class="form-group">
+        <label class="form-label">Empleado</label>
+        <select class="form-select" [(ngModel)]="rendimiento.idEmpleado" name="idEmpleado" required>
+          <option value="" disabled selected>Seleccione empleado</option>
+          <option *ngFor="let e of empleados" [value]="e.id">{{ e.nombre }}</option>
+        </select>
+      </div>
+
+      <!-- Contratista -->
+      <div class="form-group">
+        <label class="form-label">Contratista</label>
+        <select class="form-select" [(ngModel)]="rendimiento.idContratista" name="idContratista" required>
+          <option value="" disabled selected>Seleccione contratista</option>
+          <option *ngFor="let c of contratistas" [value]="c.id">{{ c.nombre }}</option>
+        </select>
+      </div>
+
+      <!-- Días -->
+      <div class="form-group">
+        <label class="form-label">Días</label>
+        <input type="number" class="form-control" min="0" [(ngModel)]="rendimiento.dias" name="dias" required />
+      </div>
+
+      <!-- Cantidad -->
+      <div class="form-group">
+        <label class="form-label">Cantidad</label>
+        <input type="number" class="form-control" min="0" [(ngModel)]="rendimiento.cantidad" name="cantidad" required />
+      </div>
+
+      <!-- Fecha -->
+      <div class="form-group">
+        <label class="form-label">Fecha</label>
+        <input type="date" class="form-control" [(ngModel)]="rendimiento.fecha" name="fecha" required />
+      </div>
+
+      <!-- Observaciones -->
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea class="form-control" rows="3" [(ngModel)]="rendimiento.observaciones" name="observaciones"></textarea>
+      </div>
+
+      <!-- Botón de guardar -->
+      <div class="form-group">
+        <button type="submit" class="btn-guardar" [disabled]="formRend.invalid">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
