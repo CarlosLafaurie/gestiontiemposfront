@@ -32,14 +32,12 @@ export class AuthService {
           || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
           || null;
 
-        // Aquí sacamos la obraId del token
         const obraId = decoded.obraId || null;
 
-        // Ahora guardamos nombre, rol y obraId
         const userInfo = {
           nombreCompleto: nombre,
           rol: rol,
-          obra: obraId   // <-- nuevo
+          obra: obraId
         };
 
         localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));

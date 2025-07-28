@@ -15,9 +15,15 @@ export class PruebasComponent {
 
   private router = inject(Router);
 
-  irAPruebas(): void {
+  irARendimiento(): void {
     this.router.navigate(['/rendimiento']).then(success => {
     });
   }
+
+   irAVerRendimiento(): void {
+    this.router.navigate(['/ver-rendimientos']).then(success => {
+    });
+  }
+
 
 }

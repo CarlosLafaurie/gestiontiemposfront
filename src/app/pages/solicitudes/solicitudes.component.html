@@ -1,11 +1,9 @@
-<!-- solicitudes.component.html -->
 <app-navbar></app-navbar>
 <app-boton-regresar></app-boton-regresar>
 
 <div class="solicitudes-admin container mt-4">
   <h2 id="title">Gestión de Solicitudes</h2>
 
-  <!-- Formulario (admin o responsable) -->
   <div *ngIf="esResponsable && !esAdmin" class="formulario-solicitud">
     <h4>Nueva Solicitud</h4>
     <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
@@ -25,7 +23,6 @@
           </ng-template>
         </div>
 
-      <!-- Filtro y selección de herramienta -->
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Herramienta</label>
@@ -62,7 +59,6 @@
         </div>
        </div>
 
-      <!-- Lista de herramientas agregadas -->
       <div *ngIf="nueva.items.length > 0" class="table-responsive mb-3">
         <table class="table table-bordered">
           <thead class="table-light">
@@ -86,7 +82,6 @@
         </table>
       </div>
 
-      <!-- Obra y comentario -->
       <div class="form-row">
 
         <div class="form-group">
@@ -95,7 +90,6 @@
         </div>
       </div>
 
-      <!-- Botón de envío -->
       <div class="form-row">
         <div class="form-group">
           <button type="submit" class="btn-guardar" [disabled]="formSolicitud.invalid || !nueva.items.length">Solicitar</button>
@@ -104,7 +98,6 @@
     </form>
   </div>
 
-  <!-- Filtro Estado -->
   <div *ngIf="esAdmin" class="filtro-estado">
     <label for="filtroEstado" class="form-label">Ver:</label>
     <select id="filtroEstado" class="form-select w-auto d-inline-block ms-2" name="filtroEstado"
@@ -116,8 +109,6 @@
       <option [ngValue]="EstadoSolicitud.Comprado">Compradas</option>
     </select>
   </div>
-
-  <!-- Tabla de solicitudes -->
   <div *ngIf="filtradas.length > 0; else sinDatos" class="table-responsive mt-3" id="tablaSolicitudes">
     <table class="table align-middle">
       <thead class="table-dark">

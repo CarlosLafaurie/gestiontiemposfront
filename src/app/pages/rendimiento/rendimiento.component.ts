@@ -27,19 +27,20 @@ export class RendimientoComponent implements OnInit {
     dias: 0,
     unidad: '',
     cantidad: 0,
-    fecha: '',
     observaciones: '',
-    idContratista: 0
+    idContratista: 0,
+    obraId: 0
   };
 
+  destinatarioTipo: string = ''; // 'empleado' o 'contratista'
   actividades: string[] = [];
   unidades: string[] = [];
   empleados: { id: number; nombre: string }[] = [];
   contratistas: { id: number; nombre: string }[] = [];
 
   private rendimientoService = inject(RendimientoService);
-  private empleadoService     = inject(EmpleadoService);
-  // private contratistaService  = inject(ContratistaService); // ← comentado
+  private empleadoService = inject(EmpleadoService);
+  // private contratistaService = inject(ContratistaService); // ← comentado
 
   ngOnInit(): void {
     this.cargarActividades();
@@ -80,20 +81,44 @@ export class RendimientoComponent implements OnInit {
   //   });
   // }
 
-  guardarRendimiento(): void {
-    if (!this.rendimiento.actividad || !this.rendimiento.unidad || !this.rendimiento.idEmpleado /*|| !this.rendimiento.idContratista*/) {
-      alert('Por favor complete todos los campos obligatorios.');
-      return;
-    }
-
-    this.rendimientoService.crear(this.rendimiento).subscribe({
-      next: () => {
-        alert('Rendimiento guardado con éxito');
-        this.resetFormulario();
-      },
-      error: () => alert('Error al guardar rendimiento')
-    });
+guardarRendimiento(): void {
+  if (!this.rendimiento.actividad || !this.rendimiento.unidad) {
+    alert('Debe seleccionar una actividad y unidad.');
+    return;
   }
+
+  if (this.destinatarioTipo === 'empleado' && !this.rendimiento.idEmpleado) {
+    alert('Debe seleccionar un empleado.');
+    return;
+  }
+
+  if (this.destinatarioTipo === 'contratista' && !this.rendimiento.idContratista) {
+    alert('Debe seleccionar un contratista.');
+    return;
+  }
+
+  if (this.destinatarioTipo === 'empleado') {
+    this.rendimiento.idContratista = 0;
+  } else if (this.destinatarioTipo === 'contratista') {
+    this.rendimiento.idEmpleado = 0;
+  }
+
+  const obraIdStr = localStorage.getItem('obra-id');
+  if (!obraIdStr) {
+    alert('No se encontró la obra actual. Reingrese sesión.');
+    return;
+  }
+
+  this.rendimiento.obraId = parseInt(obraIdStr, 10);
+
+  this.rendimientoService.crear(this.rendimiento).subscribe({
+    next: () => {
+      alert('Rendimiento guardado con éxito');
+      this.resetFormulario();
+    },
+    error: () => alert('Error al guardar rendimiento')
+  });
+}
 
   private resetFormulario(): void {
     this.rendimiento = {
@@ -103,9 +128,10 @@ export class RendimientoComponent implements OnInit {
       dias: 0,
       unidad: '',
       cantidad: 0,
-      fecha: '',
       observaciones: '',
-      idContratista: 0
+      idContratista: 0,
+      obraId: 0
     };
+    this.destinatarioTipo = '';
   }
 }

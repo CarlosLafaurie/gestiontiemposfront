@@ -10,9 +10,23 @@ export interface Rendimiento {
   dias: number;
   unidad: string;
   cantidad: number;
-  fecha: string;
   observaciones: string;
   idContratista: number;
+  obraId: number;
+}
+
+export interface ActividadResumen {
+  actividad: string;
+  unidad: string;
+  totalCantidad: number;
+  totalDias: number;
+}
+
+export interface ResumenRendimiento {
+  idEmpleado: number;
+  nombreEmpleado: string;
+  obraId: number;
+  actividades: ActividadResumen[];
 }
 
 @Injectable({
@@ -25,6 +39,10 @@ export class RendimientoService {
 
   obtenerTodos(page: number = 1, pageSize: number = 20): Observable<Rendimiento[]> {
     return this.http.get<Rendimiento[]>(`${this.baseUrl}?page=${page}&pageSize=${pageSize}`);
+  }
+
+  obtenerResumenPorEmpleado(): Observable<ResumenRendimiento[]> {
+    return this.http.get<ResumenRendimiento[]>(`${this.baseUrl}/resumen-por-empleado`);
   }
 
   obtenerPorId(id: number): Observable<Rendimiento> {

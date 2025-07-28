@@ -7,17 +7,15 @@ import { User } from './user.service';
 export interface Obra {
   id: number;
   nombreObra: string;
-  responsableId: number | null; 
+  responsableId: number | null;
   clienteObra: string;
   estado: string;
   costoObra: number;
   ubicacion: string;
   responsableSecundario?: string;
-  responsableNombre?: string; 
-  tamano?: number; 
+  responsableNombre?: string;
+  tamano?: number;
 }
-
-
 
 @Injectable({
   providedIn: 'root',
@@ -37,7 +35,7 @@ export class ObraService {
 
   getObrasInactivas(): Observable<Obra[]> {
   return this.http.get<Obra[]>(`${this.apiUrl}/inactivas`);
-}
+  }
 
  createObra(obra: Omit<Obra, 'id'>): Observable<Obra> {
     return this.http.post<Obra>(this.apiUrl, obra);

@@ -5,11 +5,8 @@
   <h2 id="title">Registro de Rendimiento</h2>
 
   <div class="formulario-solicitud">
-    <h4>Nuevo Registro</h4>
-
     <form (ngSubmit)="guardarRendimiento()" #formRend="ngForm">
 
-      <!-- Actividad -->
       <div class="form-group">
         <label class="form-label">Actividad</label>
         <select class="form-select" [(ngModel)]="rendimiento.actividad" name="actividad" required>
@@ -18,17 +15,18 @@
         </select>
       </div>
 
-      <!-- Unidad -->
-      <div class="form-group">
-        <label class="form-label">Unidad</label>
-        <select class="form-select" [(ngModel)]="rendimiento.unidad" name="unidad" required>
-          <option value="" disabled selected>Seleccione unidad</option>
-          <option *ngFor="let u of unidades" [value]="u">{{ u }}</option>
-        </select>
+      <div *ngIf="rendimiento.actividad">
+        <div class="form-group">
+          <label class="form-label">¿quien realizó la actividad?</label>
+          <select class="form-select" [(ngModel)]="destinatarioTipo" name="destinatarioTipo" required>
+            <option value="" disabled selected>Seleccione una opción</option>
+            <option value="empleado">Empleado</option>
+            <option value="contratista">Contratista</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Empleado -->
-      <div class="form-group">
+      <div *ngIf="destinatarioTipo === 'empleado'" class="form-group">
         <label class="form-label">Empleado</label>
         <select class="form-select" [(ngModel)]="rendimiento.idEmpleado" name="idEmpleado" required>
           <option value="" disabled selected>Seleccione empleado</option>
@@ -36,8 +34,7 @@
         </select>
       </div>
 
-      <!-- Contratista -->
-      <div class="form-group">
+      <div *ngIf="destinatarioTipo === 'contratista'" class="form-group">
         <label class="form-label">Contratista</label>
         <select class="form-select" [(ngModel)]="rendimiento.idContratista" name="idContratista" required>
           <option value="" disabled selected>Seleccione contratista</option>
@@ -45,32 +42,33 @@
         </select>
       </div>
 
-      <!-- Días -->
-      <div class="form-group">
-        <label class="form-label">Días</label>
-        <input type="number" class="form-control" min="0" [(ngModel)]="rendimiento.dias" name="dias" required />
+      <div *ngIf="(rendimiento.idEmpleado || rendimiento.idContratista)">
+        
+        <div class="form-group">
+          <label class="form-label">Unidad</label>
+          <select class="form-select" [(ngModel)]="rendimiento.unidad" name="unidad" required>
+            <option value="" disabled selected>Seleccione unidad</option>
+            <option *ngFor="let u of unidades" [value]="u">{{ u }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cantidad</label>
+          <input type="number" class="form-control" min="0" [(ngModel)]="rendimiento.cantidad" name="cantidad" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Días</label>
+          <input type="number" class="form-control" min="0" [(ngModel)]="rendimiento.dias" name="dias" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Observaciones</label>
+          <textarea class="form-control" rows="3" [(ngModel)]="rendimiento.observaciones" name="observaciones"></textarea>
+        </div>
       </div>
 
-      <!-- Cantidad -->
-      <div class="form-group">
-        <label class="form-label">Cantidad</label>
-        <input type="number" class="form-control" min="0" [(ngModel)]="rendimiento.cantidad" name="cantidad" required />
-      </div>
-
-      <!-- Fecha -->
-      <div class="form-group">
-        <label class="form-label">Fecha</label>
-        <input type="date" class="form-control" [(ngModel)]="rendimiento.fecha" name="fecha" required />
-      </div>
-
-      <!-- Observaciones -->
-      <div class="form-group">
-        <label class="form-label">Observaciones</label>
-        <textarea class="form-control" rows="3" [(ngModel)]="rendimiento.observaciones" name="observaciones"></textarea>
-      </div>
-
-      <!-- Botón de guardar -->
-      <div class="form-group">
+      <div class="form-group mt-3">
         <button type="submit" class="btn-guardar" [disabled]="formRend.invalid">Guardar</button>
       </div>
     </form>

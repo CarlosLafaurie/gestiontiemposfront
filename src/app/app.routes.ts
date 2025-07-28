@@ -23,6 +23,7 @@ import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { MetricasComponent } from './pages/metricas/metricas.component';
 import { RendimientoComponent } from './pages/rendimiento/rendimiento.component';
+import { VerRendimientosComponent } from './pages/ver-rendimientos/ver-rendimientos.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -48,5 +49,6 @@ export const routes: Routes = [
   { path: 'metricas', component: MetricasComponent, canActivate: [authGuard] },
   { path: 'pruebas', component: PruebasComponent, canActivate: [authGuard] },
   { path: 'rendimiento', component: RendimientoComponent, canActivate: [authGuard] },
+  { path: 'ver-rendimientos', component: VerRendimientosComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

@@ -4,7 +4,6 @@
 <div class="inventario-admin">
   <h2 id="title">Revision de Inventario</h2>
 
-  <!-- Buscador -->
   <div class="search-and-add-container mb-3">
     <div class="search-container">
       <input
@@ -17,7 +16,6 @@
     </div>
   </div>
 
-  <!-- Tabla principal -->
   <div class="table-responsive">
     <table class="table table-striped table-bordered">
       <thead>
@@ -34,7 +32,6 @@
       </thead>
       <tbody>
         <ng-container *ngFor="let material of materialesFiltrados | slice:(currentPage - 1) * pageSize : currentPage * pageSize; let i = index">
-          <!-- Fila de herramienta -->
           <tr>
             <td>{{ i + 1 }}</td>
             <td>{{ material.codigo }}</td>
@@ -53,7 +50,6 @@
             </td>
           </tr>
 
-          <!-- Fila de revisiones desplegable -->
           <tr *ngIf="revisionesVisibles[material.id]">
             <td colspan="8">
               <table class="table table-sm table-bordered mb-0">
@@ -84,7 +80,6 @@
     </table>
   </div>
 
-  <!-- Paginación -->
   <nav *ngIf="pages.length > 1" class="pagination-container mt-3">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="currentPage === 1">
@@ -104,7 +99,6 @@
     </ul>
   </nav>
 
- <!-- Modal para nueva revisión -->
   <div class="modal" *ngIf="mostrarModalRevision">
     <div class="modal-content">
       <div class="modal-header-custom" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">

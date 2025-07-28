@@ -30,7 +30,7 @@ export class RegistroJornadaService {
     fechaFin?: string,
   ): Observable<ResumenEmpleado[]> {
     let params = new HttpParams()
-      .set('usarFestivos', 'true'); // ← se fuerza siempre a true
+      .set('usarFestivos', 'true');
 
     if (fechaInicio) {
       params = params.set('fechaInicio', fechaInicio);

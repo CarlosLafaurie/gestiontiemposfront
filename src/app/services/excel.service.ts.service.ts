@@ -53,10 +53,8 @@ export class ExcelService {
       const as = ausMap[key]  || [];
       const filas: any[] = [];
 
-      // a) Agregar jornadas
       js.forEach(j => filas.push(this.rowFromJornada(j)));
 
-      // b) Agregar ausentismos, día a día, sin duplicar donde ya hay jornada
       as.forEach(a => {
         const ini = this.parseLocalDate(a.fechaInicio);
         const fin = this.parseLocalDate(a.fechaFin);
@@ -72,10 +70,8 @@ export class ExcelService {
         }
       });
 
-      // c) Orden cronológico
       filas.sort((x, y) => x.fechaObj.getTime() - y.fechaObj.getTime());
 
-      // d) Construir AOA
       const aoa: any[][] = [[
         'N°','FECHA','DÍA','JORNADA',
         'HORA ENTRA','HORA SALE',
@@ -96,9 +92,7 @@ export class ExcelService {
         ]);
       });
 
-      // e) Crear sheet
       const ws = XLSX.utils.aoa_to_sheet(aoa);
-      // f) Pintar ausencias
       filas.forEach((f, i) => {
         if (f.esAusente) {
           const row = i + 1;
@@ -119,15 +113,11 @@ export class ExcelService {
     saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'Resumen_Jornada_Empleados.xlsx');
   }
 
-  // --- Helpers ---
-
-  /** Toma "YYYY-MM-DDTHH:mm:ss" y devuelve Date(local) sin corrimiento */
   private parseLocalDate(dt: string): Date {
     const [y, m, d] = dt.split('T')[0].split('-').map(v => parseInt(v, 10));
     return new Date(y, m - 1, d);
   }
 
-  /** Elimina hora de una Date */
   private truncDate(d: Date): Date {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   }

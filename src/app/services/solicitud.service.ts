@@ -30,14 +30,11 @@ export class SolicitudService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/Solicitud`;
 
-  // Obtener todas las solicitudes
   getSolicitudes(): Observable<Solicitud[]> {
     return this.http.get<Solicitud[]>(this.apiUrl);
   }
 
-  // Crear una solicitud
   crearSolicitud(sol: Solicitud): Observable<Solicitud> {
-    // No enviar ID ni estado explícitamente si no es necesario
     const payload = {
       solicitante: sol.solicitante,
       obra: sol.obra,
@@ -51,7 +48,6 @@ export class SolicitudService {
     return this.http.post<Solicitud>(this.apiUrl, payload);
   }
 
-  // Cambiar estado
   cambiarEstado(id: number, nuevoEstado: EstadoSolicitud): Observable<void> {
     const params = new HttpParams().set('nuevoEstado', nuevoEstado);
     return this.http.patch<void>(

@@ -1,4 +1,3 @@
-// documento-permiso.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -10,7 +9,7 @@ export interface TiempoAusentismo {
   comentarios: string;
   fechaInicio: string;
   fechaFin: string;
-  nombreArchivo?: string; // viene del backend como nombre del PDF
+  nombreArchivo?: string;
 }
 
 @Injectable({
