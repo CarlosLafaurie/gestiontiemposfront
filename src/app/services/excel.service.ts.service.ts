@@ -76,7 +76,7 @@ export class ExcelService {
       filas.sort((x, y) => x.fechaObj.getTime() - y.fechaObj.getTime());
 
       const aoa: any[][] = [[
-        'N°','FECHA','DÍA','JORNADA',
+        'N°','FECHA ENTRADA','FECHA SALIDA','DÍA','JORNADA',
         'HORA ENTRA','HORA SALE',
         'TOTAL (96h)','EXTRA (+25%)',
         'NOCT (+35%)','DOM/FEST',
@@ -86,8 +86,9 @@ export class ExcelService {
       filas.forEach(f => {
         aoa.push([
           f.esAusente ? '' : String(cnt++),
-          this.formatDate(f.fecha),
-          this.weekday(f.fecha),
+          this.formatDate(f.fechaEntrada || f.fecha),    // entrada
+          this.formatDate(f.fechaSalida || f.fecha),     // salida
+          this.weekday(f.fechaEntrada || f.fecha),
           f.jornada, f.entrada, f.salida,
           f.total, f.extra25, f.noct35,
           f.domFest, f.dom75, f.extraDom,
@@ -126,14 +127,23 @@ export class ExcelService {
   }
 
   private rowFromJornada(j: ResumenEmpleado) {
-    const fechaObj = new Date(j.horaEntrada);
+    const entrada = new Date(j.horaEntrada);
+    let salida = new Date(j.horaSalida);
+
+    if (entrada.getHours() >= 18 && salida <= entrada) {
+      salida.setDate(entrada.getDate() + 1);
+    }
+
+    const horasTrabajadas = Math.round(((salida.getTime() - entrada.getTime()) / 1000 / 60 / 60) * 100) / 100;
+
     return {
-      fecha: j.horaEntrada.split('T')[0],
-      fechaObj,
+      fechaEntrada: j.horaEntrada.split('T')[0],
+     fechaSalida: salida.toISOString().split('T')[0],
+      fechaObj: entrada,
       jornada: 'X',
       entrada: this.hhmm(j.horaEntrada),
       salida: this.hhmm(j.horaSalida),
-      total: j.horasTrabajadas.toFixed(2),
+      total: horasTrabajadas,
       extra25: j.horasExtrasDiurnas.toFixed(2),
       noct35: j.horasNocturnas.toFixed(2),
       domFest: j.trabajoDomingo ? j.horasNocturnas.toFixed(2) : '0',
