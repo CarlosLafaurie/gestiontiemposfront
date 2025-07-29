@@ -24,6 +24,7 @@ import { adminGuard } from './guards/admin.guard';
 import { MetricasComponent } from './pages/metricas/metricas.component';
 import { RendimientoComponent } from './pages/rendimiento/rendimiento.component';
 import { VerRendimientosComponent } from './pages/ver-rendimientos/ver-rendimientos.component';
+import { ContratistaComponent } from './pages/contratista/contratista.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -50,5 +51,6 @@ export const routes: Routes = [
   { path: 'pruebas', component: PruebasComponent, canActivate: [authGuard] },
   { path: 'rendimiento', component: RendimientoComponent, canActivate: [authGuard] },
   { path: 'ver-rendimientos', component: VerRendimientosComponent, canActivate: [authGuard] },
+  { path: 'contratista', component: ContratistaComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

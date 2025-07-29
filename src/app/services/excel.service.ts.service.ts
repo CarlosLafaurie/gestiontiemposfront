@@ -123,9 +123,9 @@ export class ExcelService {
   }
 
   private rowFromJornada(j: ResumenEmpleado) {
-    const fechaObj = this.parseLocalDate(j.fecha);
+    const fechaObj = new Date(j.horaEntrada);
     return {
-      fecha: j.fecha.split('T')[0],
+      fecha: j.horaEntrada.split('T')[0],
       fechaObj,
       jornada: 'X',
       entrada: this.hhmm(j.horaEntrada),
@@ -163,7 +163,7 @@ export class ExcelService {
     return `${d}/${m}/${y}`;
   }
 
-  private weekday(iso: string) { 
+  private weekday(iso: string) {
     const d = this.parseLocalDate(iso);
     const dias = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
     return dias[d.getDay()];
