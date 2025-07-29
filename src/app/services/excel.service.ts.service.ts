@@ -16,8 +16,11 @@ export class ExcelService {
     const hace15 = new Date(hoy);
     hace15.setDate(hoy.getDate() - 15);
 
+    const finExtendido = new Date(hoy);
+    finExtendido.setDate(hoy.getDate() + 1);
+
     const start = hace15.toISOString().slice(0, 10);
-    const end   = hoy.toISOString().slice(0, 10);
+    const end = finExtendido.toISOString().slice(0, 10);
 
     this.registroJornadaService
       .obtenerResumenHoras(start, end)
