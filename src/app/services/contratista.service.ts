@@ -15,7 +15,7 @@ export interface Contratista {
   providedIn: 'root'
 })
 export class ContratistaService {
-  private baseUrl = `${environment.apiUrl}/Contratista`;
+  private baseUrl = `${environment.apiUrl}/Contratistas`;
 
   constructor(private http: HttpClient) {}
 
@@ -27,7 +27,7 @@ export class ContratistaService {
     return this.http.get<Contratista>(`${this.baseUrl}/${id}`);
   }
 
-  crear(contratista: Contratista): Observable<Contratista> {
+  crear(contratista: Omit<Contratista, 'id'>): Observable<Contratista> {
     return this.http.post<Contratista>(this.baseUrl, contratista);
   }
 

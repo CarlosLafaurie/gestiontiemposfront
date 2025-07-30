@@ -24,7 +24,6 @@
     estadoTemporario?: string;
   }
 
-
   @Injectable({
     providedIn: 'root'
   })

@@ -87,7 +87,17 @@ nav {
   border: 1px solid #dee2e6;
 }
 
-
+.fila-ausentismo {
+  background-color: #f8e8ff !important;
+}
+.info-box.purple {
+  background-color: #c29fff;
+  color: #000;
+}
+.badge {
+  font-size: 0.75rem;
+  vertical-align: middle;
+}
 
 .search-container {
   margin-bottom: 1%;

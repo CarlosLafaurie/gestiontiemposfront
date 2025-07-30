@@ -15,25 +15,24 @@
   </div>
 
   <div class="mb-3">
-    <p><strong>Total de empleados cargados:</strong> {{ empleados.length }}</p>
+    <p><strong>Total de empleados cargados:</strong> {{ empleadosFiltrados.length }}</p>
   </div>
 
   <div class="info-container" id="info-container">
-    <div class="info-box green"
-         (click)="filtrarPorEstado('ingreso-salida')">
+    <div class="info-box green" (click)="filtrarPorEstado('ingreso-salida')">
       🟢 Ingreso y salida cargados
     </div>
-    <div class="info-box yellow"
-         (click)="filtrarPorEstado('solo-ingreso')">
+    <div class="info-box yellow" (click)="filtrarPorEstado('solo-ingreso')">
       🟡 Solo ingreso cargado
     </div>
-    <div class="info-box red"
-         (click)="filtrarPorEstado('falta-ingreso')">
+    <div class="info-box red" (click)="filtrarPorEstado('falta-ingreso')">
       🔴 No asistió (después de 9 AM sin ingreso)
     </div>
-    <div class="info-box white"
-         (click)="filtrarPorEstado('sin-tiempos')">
+    <div class="info-box white" (click)="filtrarPorEstado('sin-tiempos')">
       ⚪ Sin tiempos registrados
+    </div>
+    <div class="info-box purple" (click)="filtrarPorEstado('ausentismo')">
+      🟣 Ausentismo activo
     </div>
   </div>
 
@@ -46,8 +45,7 @@
               <input
                 type="checkbox"
                 [(ngModel)]="todosSeleccionados"
-                (change)="toggleSeleccionarTodos()"
-               />
+                (change)="toggleSeleccionarTodos()" />
               <span class="seleccionar-text">Seleccionar</span>
             </label>
           </th>
@@ -62,29 +60,37 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let emp of empleadosFiltrados"
-            [ngClass]="obtenerClaseFila(emp)">
+        <tr *ngFor="let emp of empleadosFiltrados" [ngClass]="obtenerClaseFila(emp)">
           <td>
-            <input type="checkbox"
-                   [(ngModel)]="emp.seleccionado"
-                   (change)="verificarSeleccionIndividual()" />
+            <input type="checkbox" [(ngModel)]="emp.seleccionado" (change)="verificarSeleccionIndividual()" />
           </td>
           <td>{{ emp.cedula }}</td>
-          <td>{{ emp.nombreCompleto }}</td>
+          <td>
+            {{ emp.nombreCompleto }}
+            <span *ngIf="emp.estadoTemporario === 'ausentismo'" class="badge bg-warning text-dark ms-1">📌 Ausente</span>
+          </td>
           <td>{{ emp.cargo }}</td>
           <td class="hide-mobile">{{ emp.obra }}</td>
           <td class="hide-mobile">{{ emp.responsable }}</td>
           <td class="hide-mobile">{{ emp.responsableSecundario }}</td>
-          <td class="hide-mobile">
-            {{ emp.fechaHoraEntrada
-               ? (emp.fechaHoraEntrada | date:'dd/MM/yyyy, h:mm a')
-               : 'Sin registro' }}
+         <td class="hide-mobile">
+            <ng-container *ngIf="emp.estadoTemporario === 'ausentismo'; else fechaIngresoNormal">
+              Ausentismo del: {{ emp.fechaHoraEntrada | date:'dd/MM/yyyy' }}
+            </ng-container>
+            <ng-template #fechaIngresoNormal>
+              {{ emp.fechaHoraEntrada ? (emp.fechaHoraEntrada | date:'dd/MM/yyyy') : 'Sin registro' }}
+            </ng-template>
           </td>
+
           <td class="hide-mobile">
-            {{ emp.fechaHoraSalida
-               ? (emp.fechaHoraSalida | date:'dd/MM/yyyy, h:mm a')
-               : 'Sin registro' }}
+            <ng-container *ngIf="emp.estadoTemporario === 'ausentismo'; else fechaSalidaNormal">
+              Ausentismo al: {{ emp.fechaHoraSalida | date:'dd/MM/yyyy' }}
+            </ng-container>
+            <ng-template #fechaSalidaNormal>
+              {{ emp.fechaHoraSalida ? (emp.fechaHoraSalida | date:'dd/MM/yyyy') : 'Sin registro' }}
+            </ng-template>
           </td>
+
         </tr>
       </tbody>
     </table>
@@ -94,7 +100,7 @@
   </app-lista-tiempos>
 
   <div class="botones-accion">
-    <button (click)="registrarIngreso()">Registrar Ingreso</button>
-    <button (click)="registrarSalida()">Registrar Salida</button>
+    <button (click)="registrarIngreso()" [disabled]="guardandoTiempos">Registrar Ingreso</button>
+    <button (click)="registrarSalida()" [disabled]="guardandoTiempos">Registrar Salida</button>
   </div>
 </div>

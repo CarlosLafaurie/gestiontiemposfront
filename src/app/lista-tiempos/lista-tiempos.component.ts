@@ -56,42 +56,23 @@ ngOnChanges(changes: SimpleChanges): void {
   }
 }
 
- private generarListaTiempos() {
-  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-  const empleados = this.empleadosSeleccionados;
-
-  this.listaTiempos = empleados.map(emp => ({
-    ingresoId: null,
-    salidaId: null,
-    empleadoId: emp.id,
-    nombreEmpleado: emp.nombreEmpleado,
-    fechaHoraEntrada: null,
-    fechaHoraSalida: null,
-    comentarios: '',
-    permisosEspeciales: '',
-    archivo: null
-  }));
-
-  // Consultar últimos ingresos y salidas
-  this.listaTiempos.forEach(tiempo => {
-    forkJoin([
-      this.tiemposService.obtenerUltimoIngresoPorEmpleado(tiempo.empleadoId),
-      this.tiemposService.obtenerUltimaSalidaPorEmpleado(tiempo.empleadoId)
-    ]).subscribe({
-      next: ([ingreso, salida]) => {
-        tiempo.ingresoId = ingreso?.id ?? null;
-        tiempo.fechaHoraEntrada = ingreso?.fechaHoraEntrada ?? null;
-        tiempo.comentarios = ingreso?.comentarios ?? '';
-        tiempo.salidaId = salida?.id ?? null;
-        tiempo.fechaHoraSalida = salida?.fechaHoraSalida ?? null;
-      },
-      error: () => {
-        console.warn(`No se pudieron cargar tiempos del empleado ID ${tiempo.empleadoId}`);
-      }
-    });
-  });
-}
-
+  private generarListaTiempos() {
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const rol = usuario.rol;
+    const nombreObra = usuario.obra;
+    let empleados = this.empleadosSeleccionados;
+    this.listaTiempos = empleados.map(emp => ({
+      ingresoId: null,
+      salidaId: null,
+      empleadoId: emp.id,
+      nombreEmpleado: emp.nombreEmpleado,
+      fechaHoraEntrada: null,
+      fechaHoraSalida: null,
+      comentarios: '',
+      permisosEspeciales: '',
+      archivo: null
+    }));
+  }
 
   actualizarHoras() {
     this.listaTiempos.forEach(t => {

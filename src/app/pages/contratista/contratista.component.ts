@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Contratista, ContratistaService } from '../../services/contratista.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NavbarComponent } from '../../navbar/navbar.component';
+import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
+import { Obra, ObraService } from '../../services/obras.service';
 
 @Component({
   selector: 'app-contratista',
   templateUrl: './contratista.component.html',
-  styleUrls: ['./contratista.component.css']
+  styleUrls: ['./contratista.component.css'],
+  imports: [CommonModule, FormsModule, NavbarComponent, BotonRegresarComponent]
 })
 export class ContratistaComponent implements OnInit {
   contratistas: Contratista[] = [];
@@ -13,11 +19,13 @@ export class ContratistaComponent implements OnInit {
   mostrarFormulario = false;
   esEdicion = false;
   searchQuery = '';
+  obras: Obra[] = [];
 
-  constructor(private contratistaService: ContratistaService) {}
+  constructor(private contratistaService: ContratistaService, private obraService: ObraService) {}
 
   ngOnInit() {
     this.obtenerContratistas();
+    this.obtenerObras();
   }
 
   inicializarContratista(): Contratista {
@@ -35,6 +43,17 @@ export class ContratistaComponent implements OnInit {
       this.contratistas = data;
       this.filtrarContratistas();
     });
+  }
+
+  obtenerObras() {
+    this.obraService.getObras().subscribe(obras => {
+      this.obras = obras;
+    });
+  }
+
+  obtenerNombreObra(id: number): string {
+    const obra = this.obras.find(o => o.id === id);
+    return obra ? obra.nombreObra : 'Sin asignar';
   }
 
   filtrarContratistas() {
