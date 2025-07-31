@@ -74,21 +74,23 @@
           <td class="hide-mobile">{{ emp.responsable }}</td>
           <td class="hide-mobile">{{ emp.responsableSecundario }}</td>
          <td class="hide-mobile">
-            <ng-container *ngIf="emp.estadoTemporario === 'ausentismo'; else fechaIngresoNormal">
+           <ng-container *ngIf="emp.estadoTemporario === 'ausentismo'; else fechaHoraIngreso">
               Ausentismo del: {{ emp.fechaHoraEntrada | date:'dd/MM/yyyy' }}
             </ng-container>
-            <ng-template #fechaIngresoNormal>
-              {{ emp.fechaHoraEntrada ? (emp.fechaHoraEntrada | date:'dd/MM/yyyy') : 'Sin registro' }}
+            <ng-template #fechaHoraIngreso>
+              {{ emp.fechaHoraEntrada ? (emp.fechaHoraEntrada | date:'dd/MM/yyyy, hh:mm a') : 'Sin registro' }}
             </ng-template>
+
           </td>
 
           <td class="hide-mobile">
-            <ng-container *ngIf="emp.estadoTemporario === 'ausentismo'; else fechaSalidaNormal">
+            <ng-container *ngIf="emp.estadoTemporario === 'ausentismo'; else fechaHoraSalida">
               Ausentismo al: {{ emp.fechaHoraSalida | date:'dd/MM/yyyy' }}
             </ng-container>
-            <ng-template #fechaSalidaNormal>
-              {{ emp.fechaHoraSalida ? (emp.fechaHoraSalida | date:'dd/MM/yyyy') : 'Sin registro' }}
+            <ng-template #fechaHoraSalida>
+              {{ emp.fechaHoraSalida ? (emp.fechaHoraSalida | date:'dd/MM/yyyy, hh:mm a') : 'Sin registro' }}
             </ng-template>
+
           </td>
 
         </tr>
