@@ -4,13 +4,30 @@
 <div class="solicitudes-admin container mt-4">
   <h2 id="title">Registro de Rendimiento</h2>
 
+    <button class="btn" id="ver-rendimiento" *ngIf="cargo !== 'cliente'" (click)="irAVerRendimiento()">Ver Rendimientos</button>
+
   <div class="formulario-solicitud">
     <form (ngSubmit)="guardarRendimiento()" #formRend="ngForm">
+      <!-- Selección de Obra -->
+      <div class="form-group">
+        <label class="form-label">Obra</label>
+        <select class="form-select"
+                [(ngModel)]="rendimiento.obraId"
+                name="obraId"
+                [disabled]="!isAdmin"
+                required>
+          <option value="" disabled selected>Seleccione obra</option>
+          <option *ngFor="let o of obras" [value]="o.id">{{ o.nombreObra }}</option>
+        </select>
+      </div>
 
       <!-- Actividad -->
-      <div class="form-group">
+      <div class="form-group" *ngIf="rendimiento.obraId">
         <label class="form-label">Actividad</label>
-        <select class="form-select" [(ngModel)]="rendimiento.actividad" name="actividad" required>
+        <select class="form-select"
+                [(ngModel)]="rendimiento.actividad"
+                name="actividad"
+                required>
           <option value="" disabled selected>Seleccione una actividad</option>
           <option *ngFor="let act of actividades" [value]="act">{{ act }}</option>
         </select>

@@ -180,6 +180,25 @@ textarea:focus {
   margin-top: 1rem;
 }
 
+#ver-rendimiento {
+  display: block;
+  width: 20%;
+  margin: 20px auto;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+#ver-rendimiento:hover {
+  background-color: #075e04;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .modal-content {

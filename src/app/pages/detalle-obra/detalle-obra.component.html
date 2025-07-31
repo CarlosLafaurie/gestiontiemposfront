@@ -12,6 +12,7 @@
       <p><strong>Cliente:</strong> {{ obra.clienteObra }}</p>
       <button class="btn" *ngIf="cargo !== 'cliente'" (click)="irAGestionPersonal()">Gestionar Personal</button>
       <button class="btn" id="inventario" *ngIf="cargo !== 'cliente'" (click)="irAInventarioInterno(obra.nombreObra)">Inventario de obra</button>
+      <button class="btn" id="rendimiento" *ngIf="cargo !== 'cliente'" (click)="irAGestionRendimiento(obra.nombreObra)">Gestionar Rendimiento</button>
     </div>
 
     <ng-template #loading>

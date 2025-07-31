@@ -1,12 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 import { RendimientoService, Rendimiento } from '../../services/rendimiento.service';
 import { EmpleadoService } from '../../services/empleado-service.service';
 import { ContratistaService, Contratista } from '../../services/contratista.service';
 import { ObraService, Obra } from '../../services/obras.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rendimiento',
@@ -30,15 +32,20 @@ export class RendimientoComponent implements OnInit {
     cantidad: 0,
     observaciones: '',
     idContratista: 0,
-    obraId: 0
+    obraId: 0,
   };
 
-  destinatarioTipo: string = '';
+  destinatarioTipo = '';
   actividades: string[] = [];
   unidades: string[] = [];
   empleados: { id: number; nombre: string }[] = [];
   contratistas: { id: number; nombre: string }[] = [];
   obras: Obra[] = [];
+  cargo = '';
+
+  /** Listas completas para filtrar localmente */
+  private empleadosFull: { id: number; nombre: string; obra: string }[] = [];
+  private contratistasFull: Contratista[] = [];
 
   nuevoContratista: Omit<Contratista, 'id'> = {
     nombre: '',
@@ -48,17 +55,53 @@ export class RendimientoComponent implements OnInit {
   };
   mostrarModalContratista = false;
 
-  private rendimientoService = inject(RendimientoService);
-  private empleadoService = inject(EmpleadoService);
-  private contratistaService = inject(ContratistaService);
-  private obraService = inject(ObraService);
+  isAdmin = false;
+
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private obraService: ObraService,
+    private rendimientoService: RendimientoService,
+    private empleadoService: EmpleadoService,
+    private contratistaService: ContratistaService
+  ) {}
 
   ngOnInit(): void {
+    // 0) Cargo rol de usuario para habilitar select de obra
+    const userJson = localStorage.getItem('usuario');
+    if (userJson) {
+      const { rol } = JSON.parse(userJson);
+      this.isAdmin = (rol === 'admin');
+    }
+
+    // 1) Cargo listado de obras y luego preselecciono desde la ruta
+    this.obraService.getObras().subscribe({
+      next: obras => {
+        this.obras = obras;
+        this.preseleccionarObraDesdeRuta();
+      },
+      error: () => alert('Error al cargar obras')
+    });
+
+    // 2) Resto de cargas
     this.cargarActividades();
     this.cargarUnidades();
     this.cargarEmpleados();
     this.cargarContratistas();
-    this.obtenerObras();
+  }
+
+  private preseleccionarObraDesdeRuta() {
+    this.route.paramMap.subscribe(params => {
+      const raw = params.get('nombreObra');
+      if (!raw) return;
+      const buscada = decodeURIComponent(raw).replace(/-/g, ' ');
+      const encontrada = this.obras.find(o => o.nombreObra === buscada);
+      if (encontrada) {
+        this.rendimiento.obraId = encontrada.id;
+      }
+      // tras preselección, aplico filtro
+      this.onObraChange();
+    });
   }
 
   cargarActividades(): void {
@@ -68,10 +111,6 @@ export class RendimientoComponent implements OnInit {
     });
   }
 
-  obtenerObras(): void {
-    this.obraService.getObras().subscribe(obras => this.obras = obras);
-  }
-
   cargarUnidades(): void {
     this.rendimientoService.obtenerUnidades().subscribe({
       next: res => this.unidades = res,
@@ -79,10 +118,20 @@ export class RendimientoComponent implements OnInit {
     });
   }
 
+  irAVerRendimiento(): void {
+    this.router.navigate(['/ver-rendimientos']);
+  }
+
   cargarEmpleados(): void {
     this.empleadoService.obtenerEmpleados(1, 150).subscribe({
       next: data => {
-        this.empleados = data.map(e => ({ id: e.id, nombre: e.nombreCompleto }));
+        // guardo lista completa con el campo obra
+        this.empleadosFull = data.map(e => ({
+          id: e.id,
+          nombre: e.nombreCompleto,
+          obra: e.obra
+        }));
+        this.onObraChange();
       },
       error: () => alert('Error al cargar empleados')
     });
@@ -91,25 +140,40 @@ export class RendimientoComponent implements OnInit {
   cargarContratistas(): void {
     this.contratistaService.obtenerTodos().subscribe({
       next: data => {
-        this.contratistas = data.map(c => ({ id: c.id, nombre: c.nombre }));
+        this.contratistasFull = data;
+        this.onObraChange();
       },
       error: () => alert('Error al cargar contratistas')
     });
   }
 
-  manejarCambioContratista(valor: number): void {
-    if (valor === -1) {
-      this.abrirModalContratista();
+  /** Filtra empleados y contratistas en base a obraId */
+  onObraChange(): void {
+    const idObra = this.rendimiento.obraId;
+    if (idObra) {
+      const nombreObra = this.obras.find(o => o.id === idObra)?.nombreObra ?? '';
+      this.empleados = this.empleadosFull
+        .filter(e => e.obra === nombreObra)
+        .map(e => ({ id: e.id, nombre: e.nombre }));
+      this.contratistas = this.contratistasFull
+        .filter(c => c.obraId === idObra)
+        .map(c => ({ id: c.id, nombre: c.nombre }));
+    } else {
+      this.empleados = [];
+      this.contratistas = [];
     }
+    // limpio selecciones previas
+    this.destinatarioTipo = '';
+    this.rendimiento.idEmpleado    = 0;
+    this.rendimiento.idContratista = 0;
   }
 
   abrirModalContratista(): void {
-    const obraId = Number(localStorage.getItem('obra-id')) || 0;
     this.nuevoContratista = {
       nombre: '',
       cedula: '',
       telefono: '',
-      obraId
+      obraId: this.rendimiento.obraId
     };
     this.mostrarModalContratista = true;
   }
@@ -120,14 +184,13 @@ export class RendimientoComponent implements OnInit {
 
   guardarNuevoContratista(): void {
     const { nombre, cedula, telefono, obraId } = this.nuevoContratista;
-    if (!nombre || !cedula || !telefono) {
-      alert('Todos los campos del contratista son obligatorios.');
-      return;
+    if (!nombre || !cedula || !telefono || !obraId) {
+      return alert('Todos los campos del contratista y la obra son obligatorios.');
     }
-
     this.contratistaService.crear(this.nuevoContratista).subscribe({
-      next: (nuevo) => {
-        this.contratistas.push({ id: nuevo.id, nombre: nuevo.nombre });
+      next: nuevo => {
+        this.contratistasFull.push(nuevo);
+        this.onObraChange();
         this.rendimiento.idContratista = nuevo.id;
         this.mostrarModalContratista = false;
       },
@@ -136,19 +199,17 @@ export class RendimientoComponent implements OnInit {
   }
 
   guardarRendimiento(): void {
+    if (!this.rendimiento.obraId) {
+      return alert('Debe seleccionar una obra.');
+    }
     if (!this.rendimiento.actividad || !this.rendimiento.unidad) {
-      alert('Debe seleccionar una actividad y unidad.');
-      return;
+      return alert('Debe seleccionar actividad y unidad.');
     }
-
     if (this.destinatarioTipo === 'empleado' && !this.rendimiento.idEmpleado) {
-      alert('Debe seleccionar un empleado.');
-      return;
+      return alert('Debe seleccionar un empleado.');
     }
-
     if (this.destinatarioTipo === 'contratista' && !this.rendimiento.idContratista) {
-      alert('Debe seleccionar un contratista.');
-      return;
+      return alert('Debe seleccionar un contratista.');
     }
 
     if (this.destinatarioTipo === 'empleado') {
@@ -156,14 +217,6 @@ export class RendimientoComponent implements OnInit {
     } else {
       this.rendimiento.idEmpleado = 0;
     }
-
-    const obraIdStr = localStorage.getItem('obra-id');
-    if (!obraIdStr) {
-      alert('No se encontró la obra actual. Reingrese sesión.');
-      return;
-    }
-
-    this.rendimiento.obraId = parseInt(obraIdStr, 10);
 
     this.rendimientoService.crear(this.rendimiento).subscribe({
       next: () => {
@@ -187,5 +240,7 @@ export class RendimientoComponent implements OnInit {
       obraId: 0
     };
     this.destinatarioTipo = '';
+    this.empleados = [];
+    this.contratistas = [];
   }
 }

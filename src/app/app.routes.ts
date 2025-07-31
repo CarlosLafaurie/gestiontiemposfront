@@ -49,7 +49,7 @@ export const routes: Routes = [
   { path: 'revision-inventario', component: RevisionInventarioComponent, canActivate: [authGuard] },
   { path: 'metricas', component: MetricasComponent, canActivate: [authGuard] },
   { path: 'pruebas', component: PruebasComponent, canActivate: [authGuard] },
-  { path: 'rendimiento', component: RendimientoComponent, canActivate: [authGuard] },
+  { path: 'rendimiento/:nombreObra', component: RendimientoComponent, canActivate: [authGuard] },
   { path: 'ver-rendimientos', component: VerRendimientosComponent, canActivate: [authGuard] },
   { path: 'contratista', component: ContratistaComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }

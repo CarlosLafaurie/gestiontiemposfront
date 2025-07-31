@@ -49,6 +49,14 @@
   background-color: #1e208a;
 }
 
+#rendimiento {
+  background-color: #fc2c2c;
+}
+
+#rendimiento:hover {
+  background-color: #c90000;
+}
+
 @media (max-width: 768px) {
   .container {
     padding-top: 8%;

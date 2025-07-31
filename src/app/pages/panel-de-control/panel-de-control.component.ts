@@ -72,4 +72,22 @@ export class PanelDeControlComponent implements OnInit {
     this.router.navigate(['/metricas']).then(success => {
     });
   }
+
+   irARendimiento(): void {
+    this.router.navigate(['/rendimiento/:nombreObra']).then(success => {
+    });
+  }
+
+   irAVerRendimiento(): void {
+    this.router.navigate(['/ver-rendimientos']).then(success => {
+    });
+  }
+
+   irAContratista(): void {
+    this.router.navigate(['/contratista']).then(success => {
+    });
+  }
+
+
+
 }
