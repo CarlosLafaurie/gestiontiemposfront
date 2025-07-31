@@ -6,6 +6,7 @@ import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.comp
 import { RendimientoService, Rendimiento } from '../../services/rendimiento.service';
 import { EmpleadoService } from '../../services/empleado-service.service';
 import { ContratistaService, Contratista } from '../../services/contratista.service';
+import { ObraService, Obra } from '../../services/obras.service';
 
 @Component({
   selector: 'app-rendimiento',
@@ -37,6 +38,7 @@ export class RendimientoComponent implements OnInit {
   unidades: string[] = [];
   empleados: { id: number; nombre: string }[] = [];
   contratistas: { id: number; nombre: string }[] = [];
+  obras: Obra[] = [];
 
   nuevoContratista: Omit<Contratista, 'id'> = {
     nombre: '',
@@ -49,12 +51,14 @@ export class RendimientoComponent implements OnInit {
   private rendimientoService = inject(RendimientoService);
   private empleadoService = inject(EmpleadoService);
   private contratistaService = inject(ContratistaService);
+  private obraService = inject(ObraService);
 
   ngOnInit(): void {
     this.cargarActividades();
     this.cargarUnidades();
     this.cargarEmpleados();
     this.cargarContratistas();
+    this.obtenerObras();
   }
 
   cargarActividades(): void {
@@ -62,6 +66,10 @@ export class RendimientoComponent implements OnInit {
       next: res => this.actividades = res,
       error: () => alert('Error al cargar actividades')
     });
+  }
+
+  obtenerObras(): void {
+    this.obraService.getObras().subscribe(obras => this.obras = obras);
   }
 
   cargarUnidades(): void {

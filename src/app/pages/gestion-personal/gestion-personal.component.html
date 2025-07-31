@@ -80,9 +80,7 @@
             <ng-template #fechaHoraIngreso>
               {{ emp.fechaHoraEntrada ? (emp.fechaHoraEntrada | date:'dd/MM/yyyy, hh:mm a') : 'Sin registro' }}
             </ng-template>
-
           </td>
-
           <td class="hide-mobile">
             <ng-container *ngIf="emp.estadoTemporario === 'ausentismo'; else fechaHoraSalida">
               Ausentismo al: {{ emp.fechaHoraSalida | date:'dd/MM/yyyy' }}
@@ -90,9 +88,7 @@
             <ng-template #fechaHoraSalida>
               {{ emp.fechaHoraSalida ? (emp.fechaHoraSalida | date:'dd/MM/yyyy, hh:mm a') : 'Sin registro' }}
             </ng-template>
-
           </td>
-
         </tr>
       </tbody>
     </table>

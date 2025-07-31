@@ -5,14 +5,13 @@ body {
   color: #333;
 }
 
-/* Contenedor principal */
+/* Sección de Solicitudes */
 .solicitudes-admin {
   max-width: 900px;
   margin: 20px auto;
   padding: 20px;
 }
 
-/* Título */
 #title {
   font-size: 2rem;
   margin-bottom: 20px;
@@ -20,7 +19,6 @@ body {
   text-align: center;
 }
 
-/* Formulario */
 .formulario-solicitud {
   background: #fafafa;
   border: 1px solid #ddd;
@@ -36,7 +34,6 @@ body {
   font-weight: 600;
 }
 
-/* Grupos de campos */
 .form-group {
   margin-bottom: 16px;
 }
@@ -48,7 +45,6 @@ body {
   color: #333;
 }
 
-/* Inputs y selects */
 .form-control,
 .form-select,
 textarea {
@@ -69,15 +65,83 @@ textarea:focus {
   outline: none;
 }
 
+/* Sección de Usuarios */
+.usuarios-admin {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 2%;
+  padding-bottom: 6%;
+  text-align: center;
+}
+
+.usuarios-admin h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  padding-top: 3%;
+  color: #333;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.container-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.table thead {
+  background-color: #333;
+  color: #fff;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
 /* Botones */
-.btn-guardar {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  font-weight: 500;
+.btn-guardar,
+.btn-cancelar,
+.btn-copiar,
+.btn-editar,
+.btn-eliminar,
+.btn-agregar {
+  padding: 10px 15px;
+  font-size: 1rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-guardar {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background-color: #218838;
 }
 
 .btn-guardar:disabled {
@@ -85,32 +149,50 @@ textarea:focus {
   cursor: not-allowed;
 }
 
-.btn-secondary {
+.btn-cancelar {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-cancelar:hover {
+  background-color: #c82333;
+}
+
+.btn-copiar {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.btn-copiar:hover {
+  background-color: #138496;
+}
+
+.btn-editar {
+  background-color: #ffcc00;
+  color: #333;
+}
+
+.btn-editar:hover {
+  background-color: #e6b800;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-eliminar:hover {
+  background-color: #c82333;
+}
+
+.btn-agregar {
+  margin-top: 20px;
   background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  font-weight: 500;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #fff;
 }
 
-.btn-secondary:hover {
+.btn-agregar:hover {
   background-color: #218838;
-}
-
-/* Layout del select + botón “Nuevo” */
-.d-flex.align-items-end {
-  display: flex;
-  align-items: flex-end;
-}
-
-.gap-2 {
-  gap: 0.5rem;
-}
-
-.flex-grow-1 {
-  flex-grow: 1;
 }
 
 /* Modal */
@@ -133,43 +215,81 @@ textarea:focus {
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
 }
 
-.modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-weight: 600;
-  color: #2c3e50;
+.modal-content label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+  color: #333;
 }
 
-.modal-content .form-group {
-  margin-bottom: 12px;
-}
-
-.modal-content .form-control {
+.modal-content input,
+.modal-content select {
   width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
-.modal-content .d-flex {
-  display: flex;
+/* Buscador */
+.search-container {
+  margin-bottom: 15px;
 }
 
-.modal-content .justify-content-end {
-  justify-content: flex-end;
+.search-input {
+  width: 100%;
+  max-width: 70%;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .solicitudes-admin {
+  .solicitudes-admin,
+  .usuarios-admin {
     padding: 10px;
   }
+
   .btn-guardar,
-  .btn-secondary {
+  .btn-cancelar {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .btn-agregar {
     width: 100%;
   }
-  .d-flex.align-items-end {
-    flex-direction: column;
-    align-items: stretch;
+
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .btn-copiar,
+  .btn-editar,
+  .btn-eliminar,
+  .btn-agregar {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+    padding: 6px 10px;
   }
 }
