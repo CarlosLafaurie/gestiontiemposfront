@@ -150,7 +150,18 @@ export class RendimientoComponent implements OnInit {
   /** Filtra empleados y contratistas en base a obraId */
   onObraChange(): void {
     const idObra = this.rendimiento.obraId;
-    if (idObra) {
+
+    if (this.isAdmin) {
+      // Si es admin, no se filtra por obra
+      this.empleados = this.empleadosFull.map(e => ({
+        id: e.id,
+        nombre: e.nombre
+      }));
+      this.contratistas = this.contratistasFull.map(c => ({
+        id: c.id,
+        nombre: c.nombre
+      }));
+    } else if (idObra) {
       const nombreObra = this.obras.find(o => o.id === idObra)?.nombreObra ?? '';
       this.empleados = this.empleadosFull
         .filter(e => e.obra === nombreObra)
@@ -162,9 +173,10 @@ export class RendimientoComponent implements OnInit {
       this.empleados = [];
       this.contratistas = [];
     }
+
     // limpio selecciones previas
     this.destinatarioTipo = '';
-    this.rendimiento.idEmpleado    = 0;
+    this.rendimiento.idEmpleado = 0;
     this.rendimiento.idContratista = 0;
   }
 
