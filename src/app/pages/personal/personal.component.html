@@ -1,0 +1,40 @@
+<app-navbar></app-navbar>
+<app-boton-regresar></app-boton-regresar>
+
+<div id="title">
+  <h1>Bienvenido a gestion del personal</h1>
+</div>
+
+<div class="container" id="cards">
+ <div class="card">
+    <div class="card-header">
+      <h3>Usuarios</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona todos los usuarios del sistema.</p>
+      <button class="btn" (click)="irAUsuariosAdmin()"><i class='bx bx-user' style='color:#ffffff' > </i> <b> Gestionar Usuarios</b></button>
+    </div>
+  </div>
+
+    <div class="card">
+    <div class="card-header">
+      <h3>Empleados</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona todos los empleados del sistema.</p>
+      <button class="btn" (click)="irAEmpleadosAdmin()"><i class='bx bxs-hard-hat' style='color:#ffffff' > </i> <b> Gestionar Empleados</b></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Incapacidades</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona todos los permisos y excusas de los empleados.</p>
+      <button class="btn" (click)="irAPermisosAdmin()"><i class='bx bxs-file-pdf'></i> <b> Gestionar Incapacidades</b></button>
+    </div>
+  </div>
+
+
+</div>

@@ -1,0 +1,29 @@
+<app-navbar></app-navbar>
+<app-boton-regresar></app-boton-regresar>
+
+<div id="title">
+  <h1>Bienvenido a gestion de los horarios</h1>
+</div>
+
+<div class="container" id="cards">
+
+   <div class="card">
+    <div class="card-header">
+      <h3>Ingresos</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona los ingresos y salidas de los empleados.</p>
+      <button class="btn" (click)="irAIngresos()"><i class='bx bxs-file-pdf'></i> <b> Gestionar Ingresos</b></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Tiempos</h3>
+    </div>
+    <div class="card-body">
+      <p>Gestiona todos los tiempos de los empleados del sistema.</p>
+      <button class="btn" (click)="irATiemposAdmin()"><i class='bx bx-time-five' style='color:#ffffff' > </i> <b> Gestionar Tiempos</b></button>
+    </div>
+  </div>
+</div>

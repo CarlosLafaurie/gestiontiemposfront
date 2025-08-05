@@ -28,66 +28,24 @@ export class PanelDeControlComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  irAUsuariosAdmin(): void {
-    this.router.navigate(['/usuario-admin']).then(success => {
+  irAPersonal(): void {
+    this.router.navigate(['/personal']).then(success => {
     });
   }
 
-  irAEmpleadosAdmin(): void {
-    this.router.navigate(['/empleado-admin']).then(success => {
+  irAProyectos(): void {
+    this.router.navigate(['/proyectos']).then(success => {
     });
   }
 
-  irAObrasAdmin(): void {
-    this.router.navigate(['/obras-admin']).then(success => {
+  irAHorarios(): void {
+    this.router.navigate(['/horario']).then(success => {
     });
   }
 
-  irATiemposAdmin(): void {
-    this.router.navigate(['/tiempos-admin']).then(success => {
+  irAProductividad(): void {
+    this.router.navigate(['/productividad']).then(success => {
     });
   }
-
-  irAPermisosAdmin(): void {
-    this.router.navigate(['/permisos-admin']).then(success => {
-    });
-  }
-
-  irAMovimientos(): void {
-    this.router.navigate(['/movimientos']).then(success => {
-    });
-  }
-
-  irAInventarios(): void {
-    this.router.navigate(['/inventarios']).then(success => {
-    });
-  }
-
-  irAIngresos(): void {
-    this.router.navigate(['/gestionIngresos/:nombreObra']).then(success => {
-    });
-  }
-
-  irAMetricas(): void {
-    this.router.navigate(['/metricas']).then(success => {
-    });
-  }
-
-   irARendimiento(): void {
-    this.router.navigate(['/rendimiento/:nombreObra']).then(success => {
-    });
-  }
-
-   irAVerRendimiento(): void {
-    this.router.navigate(['/ver-rendimientos']).then(success => {
-    });
-  }
-
-   irAContratista(): void {
-    this.router.navigate(['/contratista']).then(success => {
-    });
-  }
-
-
 
 }

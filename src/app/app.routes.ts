@@ -25,6 +25,10 @@ import { MetricasComponent } from './pages/metricas/metricas.component';
 import { RendimientoComponent } from './pages/rendimiento/rendimiento.component';
 import { VerRendimientosComponent } from './pages/ver-rendimientos/ver-rendimientos.component';
 import { ContratistaComponent } from './pages/contratista/contratista.component';
+import { PersonalComponent } from './pages/personal/personal.component';
+import { ProyectosComponent } from './pages/proyectos/proyectos.component';
+import { HorarioComponent } from './pages/horario/horario.component';
+import { ProductividadComponent } from './pages/productividad/productividad.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -52,5 +56,9 @@ export const routes: Routes = [
   { path: 'rendimiento/:nombreObra', component: RendimientoComponent, canActivate: [authGuard] },
   { path: 'ver-rendimientos', component: VerRendimientosComponent, canActivate: [authGuard] },
   { path: 'contratista', component: ContratistaComponent, canActivate: [authGuard] },
+  { path: 'personal', component: PersonalComponent, canActivate: [authGuard] },
+  { path: 'proyectos', component: ProyectosComponent, canActivate: [authGuard] },
+  { path: 'horario', component: HorarioComponent, canActivate: [authGuard] },
+  { path: 'productividad', component: ProductividadComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
