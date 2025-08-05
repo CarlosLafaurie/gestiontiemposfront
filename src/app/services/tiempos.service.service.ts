@@ -46,6 +46,12 @@ export class TiemposService {
     );
   }
 
+  registrarIngresoAdicional(tiempo: Tiempo): Observable<any> {
+    return this.http.post(`${this.apiIngresos}/adicional`, tiempo).pipe(
+      catchError(err => throwError(() => err))
+    );
+  }
+
   actualizarIngreso(id: number, tiempo: Tiempo): Observable<void> {
     return this.http.put<void>(`${this.apiIngresos}/${id}`, tiempo).pipe(
       catchError(err => {
@@ -81,6 +87,12 @@ export class TiemposService {
 
   registrarSalida(tiempo: Tiempo): Observable<any> {
     return this.http.post(this.apiSalidas, tiempo).pipe(
+      catchError(err => throwError(() => err))
+    );
+  }
+
+  registrarSalidaAdicional(tiempo: Tiempo): Observable<any> {
+    return this.http.post(`${this.apiSalidas}/adicional`, tiempo).pipe(
       catchError(err => throwError(() => err))
     );
   }

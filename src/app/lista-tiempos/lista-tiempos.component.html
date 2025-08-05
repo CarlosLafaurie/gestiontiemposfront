@@ -187,3 +187,59 @@
     </div>
   </form>
 </mat-expansion-panel>
+
+<!-- Separación entre paneles -->
+<div style="margin-top: 20px;"></div>
+
+<mat-expansion-panel (opened)="cambiarModo('adicional')">
+  <mat-expansion-panel-header>
+    <mat-panel-title>Cargar Horarios Adicionales</mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <form (ngSubmit)="guardarTiemposAdicionales()" class="formulario-adicional">
+    <div class="form-group">
+      <label for="fechaHoraIngresoAdicional" class="form-label">Ingreso adicional:</label>
+      <input type="datetime-local"
+             [(ngModel)]="fechaHoraIngresoAdicional"
+             name="fechaHoraIngresoAdicional"
+             class="form-control" />
+    </div>
+
+    <div class="form-group mt-2">
+      <label for="fechaHoraSalidaAdicional" class="form-label">Salida adicional:</label>
+      <input type="datetime-local"
+             [(ngModel)]="fechaHoraSalidaAdicional"
+             name="fechaHoraSalidaAdicional"
+             class="form-control" />
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><h5>Registro adicional por empleado</h5></div>
+      <div class="card-body">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Empleado</th>
+              <th>Comentarios</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tiempo of listaTiempos; let i = index">
+              <td>{{ tiempo.nombreEmpleado }}</td>
+              <td>
+                <input type="text"
+                       [(ngModel)]="tiempo.comentarios"
+                       [name]="'comentariosAdicional' + i"
+                       class="form-control" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3" [disabled]="!fechaHoraIngresoAdicional || !fechaHoraSalidaAdicional">
+      Guardar Registros Adicionales
+    </button>
+  </form>
+</mat-expansion-panel>

@@ -8,6 +8,8 @@ import { NavbarComponent } from '../../navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 import { Empleado, EmpleadoService } from '../../services/empleado-service.service';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 interface FilaMezclada {
   tipo: 'padre' | 'hijo';
@@ -283,5 +285,35 @@ private cargarInventarioPadre(nombreObra: string): void {
     this.mostrarFormulario = false;
     this.esEdicion = false;
     this.registroActual = this.nuevoRegistro();
+  }
+
+   exportarExcel() {
+    const filas: FilaMezclada[] = this.filasMezcladas;
+
+    const aoa: any[][] = [];
+    aoa.push([
+      'Código','Herramienta','Marca','Serie','Cantidad',
+      'Ubicación','Responsable','Usando','Observaciones'
+    ]);
+    filas.forEach(f => {
+      aoa.push([
+        f.codigo ?? '-',
+        f.herramienta ?? '-',
+        f.marca ?? '-',
+        f.numeroSerie ?? '-',
+        f.cantidad ?? '-',
+        f.ubicacion ?? '-',
+        f.responsable ?? '-',
+        f.usando ?? '-',
+        f.observaciones ?? '-'
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), `Inventario_${this.obraUsuario || 'Todos'}.xlsx`);
   }
 }

@@ -8,6 +8,9 @@ import { AuthService } from '../../services/auth.service';
 import { ObraService, Obra } from '../../services/obras.service';
 import { UserService, User } from '../../services/user.service';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 @Component({
   selector: 'app-inventario',
@@ -32,7 +35,6 @@ export class InventarioComponent implements OnInit {
   obras: Obra[] = [];
   responsables: User[] = [];
 
-  // *** PAGINACIÓN ***
   pageSize = 30;
   currentPage = 1;
 
@@ -88,7 +90,6 @@ export class InventarioComponent implements OnInit {
       item.estado.toLowerCase().includes(q)
     );
 
-    // Ordenar por código ascendente (numérico o alfanumérico)
     this.materialesFiltrados.sort((a, b) => {
       const na = Number(a.codigo);
       const nb = Number(b.codigo);
@@ -98,23 +99,19 @@ export class InventarioComponent implements OnInit {
       return a.codigo.localeCompare(b.codigo, undefined, { numeric: true });
     });
 
-    // Al filtrar, volvemos a la página 1
     this.currentPage = 1;
   }
 
-  // getter para el array de páginas
   get pages(): number[] {
     const total = Math.ceil(this.materialesFiltrados.length / this.pageSize);
     return Array.from({ length: total }, (_, i) => i + 1);
   }
 
-  // cambia de página, con límites
   setPage(page: number): void {
     if (page < 1 || page > this.pages.length) return;
     this.currentPage = page;
   }
 
-  // trackBy para optimizar renderizado
   trackById(_: number, item: Inventario): number {
     return item.id;
   }
@@ -208,5 +205,41 @@ mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
     this.router.navigate(['/inventario-interno', nombreSanitizado]).then(success => {
       console.log('Navegación exitosa:', success);
     });
+  }
+
+   exportarExcel(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end   = this.currentPage * this.pageSize;
+    const visibles = this.materialesFiltrados.slice(start, end);
+
+    const aoa: any[][] = [];
+    aoa.push([
+      '#','Código','Herramienta','Marca','Serie','Cantidad',
+      'Ubicación','Responsable','Fecha Compra','Proveedor','Garantía'
+    ]);
+
+    visibles.forEach((m, idx) => {
+      aoa.push([
+        idx + 1,
+        m.codigo,
+        m.herramienta,
+        m.marca || '-',
+        m.numeroSerie || '-',
+        m.cantidad,
+        m.ubicacion,
+        m.responsable,
+        m.fechaCompra ? (new Date(m.fechaCompra)).toLocaleDateString() : '-',
+        m.proveedor || '-',
+        m.garantia ?? '-'
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const nombre = `Inventario_${this.route.snapshot.paramMap.get('nombreObra') || 'General'}.xlsx`;
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), nombre);
   }
 }

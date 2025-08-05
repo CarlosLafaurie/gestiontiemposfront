@@ -45,7 +45,7 @@
 
 
 .btn-agregar {
-  margin-bottom: 20px;
+  margin-bottom: 7px;
   padding: 10px 15px;
   background-color: #28a745;
   color: #fff;
@@ -130,6 +130,8 @@
 .btn-eliminar:hover {
   background-color: #c82333;
 }
+
+
 
 .modal {
   position: fixed;

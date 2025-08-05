@@ -37,6 +37,9 @@ export class ListaTiemposComponent implements OnInit, OnChanges {
   fechaInicioPermiso = '';
   fechaFinPermiso   = '';
   modo              = 'tiempos';
+  fechaHoraIngresoAdicional: string = '';
+  fechaHoraSalidaAdicional: string = '';
+
 
   constructor(
     private tiemposService: TiemposService,
@@ -234,5 +237,40 @@ ngOnChanges(changes: SimpleChanges): void {
 
   cancelarEdicion() {
     this.empleadoSeleccionado = null;
+  }
+
+guardarTiemposAdicionales() {
+    if (!this.fechaHoraIngresoAdicional || !this.fechaHoraSalidaAdicional) {
+      this.snackBar.open('⚠️ Debe ingresar fecha/hora de ingreso y salida adicional.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    const ops: Observable<any>[] = [];
+
+    this.empleadosSeleccionados.forEach(emp => {
+      // Ingreso adicional
+      ops.push(this.tiemposService.registrarIngresoAdicional({
+        empleadoId: emp.id,
+        fechaHoraEntrada: this.fechaHoraIngresoAdicional,
+        comentarios: '',
+        permisosEspeciales: ''
+      }));
+      // Salida adicional
+      ops.push(this.tiemposService.registrarSalidaAdicional({
+        empleadoId: emp.id,
+        fechaHoraSalida: this.fechaHoraSalidaAdicional,
+        comentarios: '',
+        permisosEspeciales: ''
+      }));
+    });
+
+    forkJoin(ops).subscribe({
+      next: () => {
+        this.snackBar.open('✅ Registros adicionales guardados.', 'Cerrar', { duration: 3000 });
+        setTimeout(() => location.reload(), 1000);
+      },
+      error: () => {
+        this.snackBar.open('❌ Error al guardar registros adicionales.', 'Cerrar', { duration: 3000 });
+      }
+    });
   }
 }
