@@ -351,6 +351,18 @@
   }
 }
 
+@media (max-width: 900px) {
+  .pagination {
+    padding-bottom: 3%;
+  }
+}
+
+@media (max-width: 700px) {
+  .pagination {
+    padding-bottom: 5%;
+  }
+}
+
 @media (max-width: 480px) {
   .inventario-admin {
     padding: 10px;
@@ -373,5 +385,9 @@
   .form-select {
     font-size: 0.9rem;
     padding: 8px 10px;
+  }
+
+  .pagination {
+    padding-bottom: 13%;
   }
 }

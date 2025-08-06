@@ -10,6 +10,7 @@ import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.comp
 import { Empleado, EmpleadoService } from '../../services/empleado-service.service';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { ChangeDetectorRef } from '@angular/core';
 
 interface FilaMezclada {
   tipo: 'padre' | 'hijo';
@@ -67,6 +68,7 @@ export class InventarioInternoComponent implements OnInit {
   private empleadoService = inject(EmpleadoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  constructor(private cd: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     // 1) Obtén nombreResponsable del token (solo para mostrar en el modal)
@@ -75,7 +77,8 @@ export class InventarioInternoComponent implements OnInit {
       this.nombreResponsable =
         user['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
         user.name ||
-        '';
+        ''; 
+    window.addEventListener('resize', () => this.cd.detectChanges());
     }
 
     // 2) Lee nombreObra de la ruta y carga datos
@@ -255,6 +258,19 @@ private cargarInventarioPadre(nombreObra: string): void {
 
   setPage(p: number): void {
     this.currentPage = p;
+  }
+
+  get paginatedPages(): number[] {
+  const totalPages = this.pages.length;
+    if (window.innerWidth <= 600) {
+      const blockSize = 5;
+      const currentBlock = Math.floor((this.currentPage - 1) / blockSize);
+      const start = currentBlock * blockSize + 1;
+      const end = Math.min(start + blockSize - 1, totalPages);
+
+      return this.pages.slice(start - 1, end);
+    }
+    return this.pages;
   }
 
   get pages(): number[] {

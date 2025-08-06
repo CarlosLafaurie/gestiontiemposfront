@@ -10,6 +10,7 @@ import { UserService, User } from '../../services/user.service';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
@@ -44,14 +45,16 @@ export class InventarioComponent implements OnInit {
   private userService       = inject(UserService);
   private route             = inject(ActivatedRoute);
   private router            = inject(Router);
+  constructor(private cd: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     console.log('[InventarioComponent] ngOnInit');
     this.obtenerInventario();
     this.cargarObras();
     this.cargarUsuarios();
+    window.addEventListener('resize', () => this.cd.detectChanges());
   }
-
+  
   obtenerInventario(): void {
     console.log('[InventarioComponent] obtenerInventario: solicitando lista...');
     this.inventarioService.obtenerInventario().subscribe({
@@ -106,6 +109,22 @@ export class InventarioComponent implements OnInit {
     const total = Math.ceil(this.materialesFiltrados.length / this.pageSize);
     return Array.from({ length: total }, (_, i) => i + 1);
   }
+
+  get paginatedPages(): number[] {
+  const totalPages = this.pages.length;
+
+  if (window.innerWidth <= 600) {
+    const blockSize = 5;
+    const currentBlock = Math.floor((this.currentPage - 1) / blockSize);
+    const start = currentBlock * blockSize + 1;
+    const end = Math.min(start + blockSize - 1, totalPages);
+
+    return this.pages.slice(start - 1, end);
+  }
+
+  return this.pages;
+}
+
 
   setPage(page: number): void {
     if (page < 1 || page > this.pages.length) return;

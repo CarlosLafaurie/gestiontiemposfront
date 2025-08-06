@@ -326,3 +326,56 @@ margin-bottom: 7px;
   justify-content: center;
   gap: 5px;
 }
+
+
+@media (max-width: 768px) {
+  .table th, .table td {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 900px) {
+  .pagination {
+    padding-bottom: 3%;
+  }
+}
+
+@media (max-width: 700px) {
+  .pagination {
+    padding-bottom: 5%;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventario-admin {
+    padding: 10px;
+  }
+
+  .table th, .table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .btn-editar, .btn-eliminar, .btn-agregar {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .form-select {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+
+  .pagination {
+    padding-bottom: 13%;
+  }
+}

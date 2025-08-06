@@ -76,7 +76,7 @@
     <ul class="pagination">
       <li (click)="setPage(currentPage - 1)" [class.disabled]="currentPage === 1">«</li>
       <li
-        *ngFor="let p of pages"
+        *ngFor="let p of paginatedPages"
         (click)="setPage(p)"
         [class.active]="currentPage === p"
       >
