@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { RegistroJornadaService, ResumenEmpleado } from '../../services/registrojornada.service';
-import { ExcelService } from '../../services/excel.service.ts.service';
+import { ExcelService } from '../../services/excel.service';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
 
 interface EmpleadoAgrupado {
@@ -128,6 +128,10 @@ export class TiemposAdminComponent implements OnInit {
   }
 
   exportarExcel(): void {
-    this.excelService.generarYExportarExcel();
+    if (!this.fechaInicio || !this.fechaFin) {
+      console.warn('⚠️ Debes seleccionar ambas fechas antes de exportar.');
+      return;
+    }
+    this.excelService.generarYExportarExcel(this.fechaInicio, this.fechaFin);
   }
 }

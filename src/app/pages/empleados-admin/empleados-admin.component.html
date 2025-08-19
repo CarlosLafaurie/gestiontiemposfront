@@ -21,7 +21,7 @@
           <th>Nombre Completo</th>
           <th>Cargo</th>
           <th>Obra</th>
-          <th>Ubicación</th> 
+          <th>Ubicación</th>
           <th>Responsable</th>
           <th>Responsable Secundario</th>
           <th>Salario</th>
@@ -39,7 +39,7 @@
           <td>{{ empleado.nombreCompleto }}</td>
           <td>{{ empleado.cargo }}</td>
           <td>{{ empleado.obra }}</td>
-          <td>{{ empleado.ubicacion || 'N/A' }}</td> 
+          <td>{{ empleado.ubicacion || 'N/A' }}</td>
           <td>{{ empleado.responsable }}</td>
           <td>{{ empleado.responsableSecundario || 'N/A' }}</td>
           <td>{{ empleado.salario | number:'1.2-2' }}</td>
@@ -83,6 +83,7 @@
         <label>Ubicación:</label>
         <input [(ngModel)]="empleadoActual.ubicacion" type="text" required>
 
+        <label>Obra</label>
         <select [(ngModel)]="empleadoActual.obra" (change)="actualizarResponsables()" name="obra" required>
           <option *ngFor="let o of obras" [ngValue]="o.nombreObra">{{ o.nombreObra }}</option>
         </select>

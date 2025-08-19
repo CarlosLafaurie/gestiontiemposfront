@@ -105,4 +105,11 @@ export class TiemposService {
       })
     );
   }
+
+  obtenerTiempos(): Observable<Tiempo[]> {
+    return this.http.get<Tiempo[]>(this.apiIngresos).pipe(
+      catchError(err => throwError(() => err))
+    );
+  }
+
 }

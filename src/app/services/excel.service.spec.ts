@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ExcelService } from './excel.service.ts.service';
+import { ExcelService } from './excel.service';
 
 describe('ExcelServiceTsService', () => {
   let service: ExcelService;

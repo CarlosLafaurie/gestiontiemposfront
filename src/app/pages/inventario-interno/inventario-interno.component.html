@@ -58,14 +58,12 @@
           <td>{{ fila.usando        || '-' }}</td>
           <td>{{ fila.observaciones || '-' }}</td>
           <td class="d-flex gap-1">
-            <!-- Botón Agregar/Asignar -->
             <button *ngIf="!fila.internoId"
               class="btn-agregar btn-sm" id="guardar"
               (click)="mostrarFormularioAsignacion(fila)">
               <i class='bx bx-user-plus'></i>
             </button>
 
-            <!-- Si ya existe asignación (internoId), muestra Editar y Eliminar -->
             <ng-container *ngIf="fila.internoId">
               <button
                 class="btn-editar btn-sm" id="editar"
@@ -87,7 +85,6 @@
     </table>
   </div>
 
-  <!-- Paginación -->
   <nav *ngIf="pages.length > 1" class="pagination-container mt-3">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="currentPage === 1">
@@ -108,7 +105,6 @@
 
 <div *ngIf="mostrarFormulario" class="modal">
   <div class="modal-content">
-    <!-- Encabezado del modal -->
     <div class="modal-header-custom" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
       <h5 class="modal-title">
         {{ esEdicion ? 'Editar Asignación' : 'Nueva Asignación' }}
@@ -118,10 +114,8 @@
       </button>
     </div>
 
-    <!-- Cuerpo del modal: formulario -->
     <div class="modal-body-custom">
       <form (ngSubmit)="guardarAsignacion()">
-        <!-- Primera fila: Herramienta y Número de Serie -->
         <div class="form-grid">
           <div>
             <label>Herramienta:</label>
@@ -137,7 +131,6 @@
           </div>
         </div>
 
-        <!-- Segunda fila: Cantidad Disponible / Cantidad a Asignar -->
         <div class="form-grid">
           <div>
             <label>Cantidad Disponible:</label>
@@ -156,7 +149,6 @@
           </div>
         </div>
 
-        <!-- Tercera fila: Usando / Responsable Obra -->
         <div class="form-grid">
           <div>
             <label>Usando:</label>
@@ -179,7 +171,6 @@
           </div>
         </div>
 
-        <!-- Observaciones en toda la ancho -->
         <div>
           <label>Observaciones:</label>
           <textarea
@@ -191,7 +182,6 @@
       </form>
     </div>
 
-    <!-- Pie de modal: botones -->
     <div class="modal-buttons" style="margin-top: 1.5rem;">
       <button type="button" class="btn-cancelar" (click)="cerrarModal()">
         Cancelar
