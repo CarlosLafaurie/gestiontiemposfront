@@ -4,7 +4,7 @@
 <div class="tiempos-admin container mt-4">
   <h2 class="mb-4 text-center">Total de Horas por Empleado</h2>
   <form class="row g-3 mb-4 align-items-end">
-    <div class="col-md-4">
+    <div id="filtro" class="col-md-4">
       <label for="fechaInicio" class="form-label">Fecha inicio</label>
       <input
         type="date"
@@ -15,7 +15,7 @@
       />
     </div>
 
-    <div class="col-md-4">
+    <div id="filtro" class="col-md-4">
       <label for="fechaFin" class="form-label">Fecha fin</label>
       <input
         type="date"
@@ -24,6 +24,19 @@
         name="fechaFin"
         class="form-control"
       />
+    </div>
+    <div id="filtro" class="col-md-4">
+      <label for="ubicacion" class="form-label">Ubicación</label>
+      <select
+        id="ubicacion"
+        [(ngModel)]="ubicacionSeleccionada"
+        name="ubicacion"
+        class="form-control"
+        (change)="cargarResumen()">
+
+        <option value="Todos">-- Todas --</option>
+        <option *ngFor="let u of ubicaciones" [value]="u">{{ u }}</option>
+      </select>
     </div>
 
     <div class="col-md-2">

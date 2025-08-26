@@ -60,4 +60,8 @@
     eliminarEmpleado(id: number): Observable<void> {
       return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
+
+    obtenerUbicaciones(): Observable<string[]> {
+      return this.http.get<string[]>(`${this.apiUrl}/ubicaciones`);
+    }
   }

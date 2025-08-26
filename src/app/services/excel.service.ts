@@ -14,18 +14,43 @@
       private tiemposService: TiemposService
     ) {}
 
-    generarYExportarExcel(fechaInicio: string, fechaFin: string) {
-    forkJoin({
-      jornadas: this.registroJornadaService.obtenerResumenHoras(fechaInicio, fechaFin),
-      aus: this.ausentismoService.getDocumentos(),
-      tiempos: this.tiemposService.obtenerTiempos() // 🔹 Ya trae ingresos y salidas juntos
-    }).subscribe(({ jornadas, aus, tiempos }) => {
-      const tiemposEnRango = (tiempos || [])
-        .filter(t => this.tiempoEnRango(t, fechaInicio, fechaFin));
+    generarYExportarExcel(
+      fechaInicio: string,
+      fechaFin: string,
+      ubicacion?: string,
+      empleadosFiltrados?: ResumenEmpleado[]
+    ) {
+      forkJoin({
+        jornadas: this.registroJornadaService.obtenerResumenHoras(fechaInicio, fechaFin),
+        aus: this.ausentismoService.getDocumentos(),
+        tiempos: this.tiemposService.obtenerTiempos()
+      }).subscribe(({ jornadas, aus, tiempos }) => {
+        let jornadasFiltradas = empleadosFiltrados ?? jornadas;
 
-      this.buildWorkbook(jornadas, aus, tiemposEnRango);
-    });
-  }
+        if (!empleadosFiltrados && ubicacion) {
+          jornadasFiltradas = jornadas.filter(j =>
+            (j.ubicacion || '').trim().toLowerCase() === ubicacion.trim().toLowerCase()
+          );
+        }
+
+        const tiemposEnRango = (tiempos || [])
+          .filter(t => this.tiempoEnRango(t, fechaInicio, fechaFin));
+
+          const nombresFiltrados = new Set(
+            (jornadasFiltradas || []).map(j => (j.nombreCompleto || '').trim().toLowerCase())
+          );
+
+          const ausFiltrados = aus.filter(a =>
+            nombresFiltrados.has((a.nombreEmpleado || '').trim().toLowerCase())
+          );
+
+          const tiemposFiltrados = tiemposEnRango.filter(t =>
+            nombresFiltrados.has((t.nombreEmpleado || '').trim().toLowerCase())
+          );
+
+          this.buildWorkbook(jornadasFiltradas, ausFiltrados, tiemposFiltrados);
+      });
+    }
 
   private tiempoEnRango(t: Tiempo, fechaInicio: string, fechaFin: string): boolean {
     const inicio = new Date(fechaInicio + 'T00:00:00');
@@ -239,22 +264,43 @@
       return dias[d.getDay()];
     }
 
-    private rowFromAusentismo(a: TiempoAusentismo, fecha: Date) {
-      const iso = `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
-      return {
-        fecha: iso,
-        fechaObj: fecha,
-        jornada: 'X',
-        entrada: 'AUSENTE',
-        salida: 'AUSENTE',
-        total: '0', extra25: '0', noct35: '0',
-        domFest: '0', dom75: '0', extraDom: '0',
-        comentarios: a.comentarios,
-        esAusente: true,
-        fuente: 'AUSENTISMO',
-        notas: ''
-      };
+  private rowFromAusentismo(a: TiempoAusentismo, fecha: Date) {
+   const iso = `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
+
+    const comentario = (a.comentarios || '').toLowerCase();
+
+    let tipoAusencia = 'AUSENTE';
+    if (comentario.includes('incapacidad')) {
+      tipoAusencia = 'INCAPACIDAD';
+    } else if (comentario.includes('enfermo') || comentario.includes('enfermedad')) {
+      tipoAusencia = 'ENFERMEDAD GENERAL';
+    } else if (comentario.includes('descanso')) {
+      tipoAusencia = 'DESCANSO';
+    } else if (comentario.includes('permiso')) {
+      tipoAusencia = 'PERMISO';
+    } else if (comentario.includes('sin justificacion')) {
+      tipoAusencia = 'AUSENTISMO';
     }
+
+    return {
+      fecha: iso,
+      fechaObj: fecha,
+      jornada: 'X',
+      entrada: tipoAusencia,
+      salida: tipoAusencia,
+      total: '0',
+      extra25: '0',
+      noct35: '0',
+      domFest: '0',
+      dom75: '0',
+      extraDom: '0',
+      comentarios: a.comentarios || '',
+      esAusente: true,
+      fuente: 'AUSENTISMO',
+      notas: ''
+    };
+  }
+
   private rowFromTiempo(t: Tiempo, tipo: 'entrada'|'salida', fechaFallback: Date) {
     const horaIso = tipo === 'entrada' ? t.fechaHoraEntrada : t.fechaHoraSalida;
     const dt = horaIso ? new Date(horaIso) : fechaFallback;

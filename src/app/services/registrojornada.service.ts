@@ -15,6 +15,7 @@ export interface ResumenEmpleado {
   horasExtrasNocturnas: number;
   trabajoDomingo: boolean;
   trabajoFestivo: boolean;
+  ubicacion?: string;
 }
 
 @Injectable({

@@ -5,6 +5,7 @@ import { NavbarComponent } from '../../navbar/navbar.component';
 import { RegistroJornadaService, ResumenEmpleado } from '../../services/registrojornada.service';
 import { ExcelService } from '../../services/excel.service';
 import { BotonRegresarComponent } from '../../boton-regresar/boton-regresar.component';
+import { EmpleadoService } from '../../services/empleado-service.service';
 
 interface EmpleadoAgrupado {
   nombreCompleto: string;
@@ -15,6 +16,7 @@ interface EmpleadoAgrupado {
   horasExtrasNocturnas: number;
   dominicales: boolean;
   festivos: boolean;
+  ubicacion?: string;
 }
 
 @Component({
@@ -34,6 +36,7 @@ export class TiemposAdminComponent implements OnInit {
     horasExtrasNocturnas: string;
     dominicales: string;
     festivos: string;
+    ubicacion?: string;
   }> = [];
 
   private datosOriginales: ResumenEmpleado[] = [];
@@ -41,12 +44,41 @@ export class TiemposAdminComponent implements OnInit {
   fechaInicio: string = '';
   fechaFin: string = '';
 
+  ubicaciones: string[] = [];
+  ubicacionSeleccionada: string = 'Todos';
+  empleadosFiltrados: ResumenEmpleado[] = [];
+
+
   private jornadaService = inject(RegistroJornadaService);
   private excelService = inject(ExcelService);
+  private empleadoService = inject(EmpleadoService);
 
   ngOnInit(): void {
     console.log('⏳ Iniciando TiemposAdminComponent...');
+    this.cargarUbicaciones();
     this.cargarResumen();
+  }
+
+  private normalizarTexto(txt: string): string {
+    if (!txt) return '';
+    return txt
+      .trim()
+      .toLowerCase()
+      .replace('bogota', 'bogotá')
+      .replace('picso central', 'medellín')
+      .replace('picso sentral', 'medellín');
+  }
+
+  cargarUbicaciones(): void {
+    this.empleadoService.obtenerUbicaciones().subscribe({
+      next: (ubicaciones: string[]) => {
+        this.ubicaciones = ['Todos', ...ubicaciones];
+        console.log('🌎 Ubicaciones desde backend:', this.ubicaciones);
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar ubicaciones:', err);
+      }
+    });
   }
 
   cargarResumen(): void {
@@ -65,13 +97,19 @@ export class TiemposAdminComponent implements OnInit {
         console.log('✅ Datos recibidos del backend:', data);
         this.datosOriginales = data;
 
-        console.log('🧮 Agrupando datos por empleado...');
-        const agrupado = data.reduce((acc: EmpleadoAgrupado[], r: ResumenEmpleado) => {
-          console.log('➕ Procesando registro:', r);
+        // 🔽 Filtro de ubicación
+        let filtrados = data;
+        if (this.ubicacionSeleccionada && this.ubicacionSeleccionada !== 'Todos') {
+          const ubSel = this.normalizarTexto(this.ubicacionSeleccionada);
+          filtrados = data.filter(emp =>
+            this.normalizarTexto(emp.ubicacion || '') === ubSel
+          );
+        }
 
+        console.log('🧮 Agrupando datos por empleado...');
+        const agrupado = filtrados.reduce((acc: EmpleadoAgrupado[], r: ResumenEmpleado) => {
           let e = acc.find(x => x.nombreCompleto === r.nombreCompleto);
           if (!e) {
-            console.log(`🆕 Nuevo empleado encontrado: ${r.nombreCompleto}`);
             e = {
               nombreCompleto: r.nombreCompleto,
               totalHoras: 0,
@@ -80,7 +118,8 @@ export class TiemposAdminComponent implements OnInit {
               horasExtrasDiurnas: 0,
               horasExtrasNocturnas: 0,
               dominicales: false,
-              festivos: false
+              festivos: false,
+              ubicacion: this.normalizarTexto(r.ubicacion || '')
             };
             acc.push(e);
           }
@@ -90,34 +129,25 @@ export class TiemposAdminComponent implements OnInit {
           e.horasNocturnas += r.horasNocturnas;
           e.horasExtrasDiurnas += r.horasExtrasDiurnas;
           e.horasExtrasNocturnas += r.horasExtrasNocturnas;
-          if (r.trabajoDomingo) {
-            console.log(`📌 ${r.nombreCompleto} trabajó domingo.`);
-            e.dominicales = true;
-          }
-          if (r.trabajoFestivo) {
-            console.log(`📌 ${r.nombreCompleto} trabajó festivo.`);
-            e.festivos = true;
-          }
+          if (r.trabajoDomingo) e.dominicales = true;
+          if (r.trabajoFestivo) e.festivos = true;
 
           return acc;
         }, []);
 
-        console.log('✅ Datos agrupados:', agrupado);
+        this.resumenEmpleados = agrupado.map((e) => ({
+          nombreCompleto: e.nombreCompleto,
+          totalHoras: e.totalHoras.toFixed(2),
+          horasDiurnas: e.horasDiurnas.toFixed(2),
+          horasNocturnas: e.horasNocturnas.toFixed(2),
+          horasExtrasDiurnas: e.horasExtrasDiurnas.toFixed(2),
+          horasExtrasNocturnas: e.horasExtrasNocturnas.toFixed(2),
+          dominicales: e.dominicales ? 'Sí' : 'No',
+          festivos: e.festivos ? 'Sí' : 'No',
+          ubicacion: e.ubicacion
+        }));
 
-        this.resumenEmpleados = agrupado.map((e) => {
-          const mapeado = {
-            nombreCompleto: e.nombreCompleto,
-            totalHoras: e.totalHoras.toFixed(2),
-            horasDiurnas: e.horasDiurnas.toFixed(2),
-            horasNocturnas: e.horasNocturnas.toFixed(2),
-            horasExtrasDiurnas: e.horasExtrasDiurnas.toFixed(2),
-            horasExtrasNocturnas: e.horasExtrasNocturnas.toFixed(2),
-            dominicales: e.dominicales ? 'Sí' : 'No',
-            festivos: e.festivos ? 'Sí' : 'No'
-          };
-          console.log('🧾 Resumen empleado:', mapeado);
-          return mapeado;
-        });
+        this.empleadosFiltrados = filtrados;
 
         console.log('🏁 Finalizó la carga de resumenEmpleados:', this.resumenEmpleados);
       },
@@ -132,6 +162,19 @@ export class TiemposAdminComponent implements OnInit {
       console.warn('⚠️ Debes seleccionar ambas fechas antes de exportar.');
       return;
     }
-    this.excelService.generarYExportarExcel(this.fechaInicio, this.fechaFin);
+
+    const ubicacion = this.ubicacionSeleccionada !== 'Todos'
+      ? this.ubicacionSeleccionada
+      : undefined;
+
+    this.excelService.generarYExportarExcel(
+      this.fechaInicio,
+      this.fechaFin,
+      ubicacion,
+      this.empleadosFiltrados
+    );
   }
+
+
+
 }

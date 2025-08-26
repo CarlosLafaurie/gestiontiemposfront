@@ -31,6 +31,10 @@ form {
   border-color: #ccc;
 }
 
+#filtro{
+  padding-bottom: 1%;
+}
+
 .form-check-label {
   margin-left: 5px;
   color: #333;

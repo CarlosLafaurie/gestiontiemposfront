@@ -8,6 +8,7 @@ export interface Tiempo {
   empleadoId: number;
   fechaHoraEntrada?: string | null;
   fechaHoraSalida?: string | null;
+  ubicacion?: string;
   comentarios: string;
   permisosEspeciales: string;
   nombreEmpleado?: string;
