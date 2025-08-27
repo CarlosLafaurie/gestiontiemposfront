@@ -158,27 +158,22 @@
           }
         });
 
-        // 3) Insertamos tiempos adicionales (uno por cada registro: entrada y/o salida)
         Object.keys(tiemposByDate).forEach(fecha => {
           const fechaObj = this.parseLocalDate(fecha);
           tiemposByDate[fecha].forEach(t => {
-            // Si el registro tiene fechaHoraEntrada -> fila de entrada
             if (t.fechaHoraEntrada) {
               filas.push(this.rowFromTiempo(t, 'entrada', fechaObj));
             }
-            // Si tiene fechaHoraSalida -> fila de salida
             if (t.fechaHoraSalida) {
               filas.push(this.rowFromTiempo(t, 'salida', fechaObj));
             }
           });
         });
 
-        // Ordenamos por fecha y hora (si hay hora)
         filas.sort((x, y) => {
           const a = x.fechaObj?.getTime() ?? 0;
           const b = y.fechaObj?.getTime() ?? 0;
           if (a !== b) return a - b;
-          // Si ambos tienen hora, ordenar por hora
           const ha = x.horaNum ?? 0;
           const hb = y.horaNum ?? 0;
           return ha - hb;
@@ -220,15 +215,11 @@
       const entrada = new Date(j.horaEntrada);
       const salida = new Date(j.horaSalida);
 
-      // Ajustar si salida < entrada (cruce de medianoche)
       if (salida < entrada) {
         salida.setDate(salida.getDate() + 1);
       }
 
-      // Calcular total horas
-      const totalHoras = Math.round(((salida.getTime() - entrada.getTime()) / 1000 / 60 / 60) * 100) / 100;
-
-      // Determinar el texto del día
+    const totalHoras = Math.round(((salida.getTime() - entrada.getTime()) / 1000 / 60 / 60) * 100) / 100;
       let diaTexto = this.weekdayISO(entrada);
       if (entrada.getDate() !== salida.getDate()) {
         diaTexto = `${this.weekdayISO(entrada)}/${this.weekdayISO(salida)}`;
@@ -241,65 +232,66 @@
         jornada: 'X',
         entrada: this.hhmm(j.horaEntrada),
         salida: this.hhmm(j.horaSalida),
-        total: totalHoras,
-        extra25: Number(j.horasExtrasDiurnas ?? 0).toFixed(2),
-        noct35: Number(j.horasNocturnas ?? 0).toFixed(2),
-        domFest: j.trabajoDomingo ? Number(j.horasNocturnas ?? 0).toFixed(2) : '0',
-        dom75: j.trabajoFestivo ? (Number(j.horasExtrasDiurnas ?? 0) * 0.75).toFixed(2) : '0',
+        total: Number(totalHoras.toFixed(2)),
+        extra25: Number(j.horasExtrasDiurnas ?? 0),
+        noct35: Number(j.horasNocturnas ?? 0),
+        domFest: j.trabajoDomingo ? Number(j.horasNocturnas ?? 0) : 0,
+        dom75: j.trabajoFestivo ? Math.round(Number(j.horasExtrasDiurnas ?? 0) * 0.75 * 100) / 100 : 0,
         extraDom: (j.trabajoDomingo || j.trabajoFestivo)
-          ? ((Number(j.horasNocturnas ?? 0) + Number(j.horasExtrasDiurnas ?? 0)) * 0.75).toFixed(2)
-          : '0',
+          ? Math.round(((Number(j.horasNocturnas ?? 0) + Number(j.horasExtrasDiurnas ?? 0)) * 0.75) * 100) / 100
+          : 0,
         comentarios: 'EXTRAS NOCTURNAS DOMINICALES',
         esAusente: false,
         fuente: fuente,
         fechaObj: entrada,
         notas: ''
       }];
-      }
+    }
 
-
-    // Función para obtener nombre del día
     private weekdayISO(d: Date) {
       const dias = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
       return dias[d.getDay()];
     }
 
-  private rowFromAusentismo(a: TiempoAusentismo, fecha: Date) {
-   const iso = `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
+private rowFromAusentismo(a: TiempoAusentismo, fecha: Date) {
+  const iso = `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
 
-    const comentario = (a.comentarios || '').toLowerCase();
+  const comentario = (a.comentarios || '').trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    let tipoAusencia = 'AUSENTE';
-    if (comentario.includes('incapacidad')) {
-      tipoAusencia = 'INCAPACIDAD';
-    } else if (comentario.includes('enfermo') || comentario.includes('enfermedad')) {
-      tipoAusencia = 'ENFERMEDAD GENERAL';
-    } else if (comentario.includes('descanso')) {
-      tipoAusencia = 'DESCANSO';
-    } else if (comentario.includes('permiso')) {
-      tipoAusencia = 'PERMISO';
-    } else if (comentario.includes('sin justificacion')) {
-      tipoAusencia = 'AUSENTISMO';
-    }
-
-    return {
-      fecha: iso,
-      fechaObj: fecha,
-      jornada: 'X',
-      entrada: tipoAusencia,
-      salida: tipoAusencia,
-      total: '0',
-      extra25: '0',
-      noct35: '0',
-      domFest: '0',
-      dom75: '0',
-      extraDom: '0',
-      comentarios: a.comentarios || '',
-      esAusente: true,
-      fuente: 'AUSENTISMO',
-      notas: ''
-    };
+  let tipoAusencia = 'AUSENTE';
+  if (comentario.includes('incapacidad')) {
+    tipoAusencia = 'INCAPACIDAD';
+  } else if (comentario.includes('enfermo') || comentario.includes('enfermedad')) {
+    tipoAusencia = 'ENFERMEDAD GENERAL';
+  } else if (comentario.includes('descanso')) {
+    tipoAusencia = 'DESCANSO';
+  } else if (comentario.includes('permiso')) {
+    tipoAusencia = 'PERMISO';
+  } else if (comentario.includes('suspension')) {
+    tipoAusencia = 'SUSPENSIÓN';
+  } else if (comentario.includes('sin justificacion') || comentario.includes('sin justificación')) {
+    tipoAusencia = 'AUSENTISMO';
   }
+
+  return {
+    fecha: iso,
+    fechaObj: fecha,
+    jornada: 'X',
+    entrada: tipoAusencia,
+    salida: tipoAusencia,
+    total: 0,
+    extra25: 0,
+    noct35: 0,
+    domFest: 0,
+    dom75: 0,
+    extraDom: 0,
+    comentarios: a.comentarios || '',
+    esAusente: true,
+    fuente: 'AUSENTISMO',
+    notas: ''
+  };
+}
 
   private rowFromTiempo(t: Tiempo, tipo: 'entrada'|'salida', fechaFallback: Date) {
     const horaIso = tipo === 'entrada' ? t.fechaHoraEntrada : t.fechaHoraSalida;
@@ -315,25 +307,24 @@
       fecha: fechaIso,
       fechaEntrada: tipo === 'entrada' ? fechaIso : '',
       fechaSalida: tipo === 'salida' ? fechaIso : '',
-      fechaObj: dt, // ✅ fecha y hora reales
+      fechaObj: dt,
       jornada: 'AD',
       entrada: tipo === 'entrada' ? horaText : '',
       salida: tipo === 'salida' ? horaText : '',
-      total: '0',
-      extra25: '0',
-      noct35: '0',
-      domFest: '0',
-      dom75: '0',
-      extraDom: '0',
+      total: 0,
+      extra25: 0,
+      noct35: 0,
+      domFest: 0,
+      dom75: 0,
+      extraDom: 0,
       comentarios: t.comentarios || '',
       esAusente: false,
       fuente: tipo === 'entrada' ? 'INGRESO_ADICIONAL' : 'SALIDA_ADICIONAL',
-      horaNum: dt.getHours() * 60 + dt.getMinutes(), // ✅ orden correcto por hora real
+      horaNum: dt.getHours() * 60 + dt.getMinutes(),
       notas: ''
     };
   }
 
-    // intenta extraer la fecha YYYY-MM-DD desde cualquiera de los campos del tiempo
     private extractDateFromTiempo(t: Tiempo): string | null {
       const s = t.fechaHoraEntrada || t.fechaHoraSalida;
       if (!s) return null;
@@ -341,7 +332,6 @@
     }
 
     private parseLocalDate(dt: string): Date {
-      // acepta ISO date or full date-time, devuelve Date sin hora
       const [y, m, d] = dt.split('T')[0].split('-').map(v => parseInt(v, 10));
       return new Date(y, m - 1, d);
     }

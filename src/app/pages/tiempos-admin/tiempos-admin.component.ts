@@ -73,31 +73,30 @@ export class TiemposAdminComponent implements OnInit {
     this.empleadoService.obtenerUbicaciones().subscribe({
       next: (ubicaciones: string[]) => {
         this.ubicaciones = ['Todos', ...ubicaciones];
-        console.log('🌎 Ubicaciones desde backend:', this.ubicaciones);
+        console.log('Ubicaciones desde backend:', this.ubicaciones);
       },
       error: (err) => {
-        console.error('❌ Error al cargar ubicaciones:', err);
+        console.error('Error al cargar ubicaciones:', err);
       }
     });
   }
 
   cargarResumen(): void {
-    console.log('📥 Método cargarResumen() invocado');
-    console.log('🕓 Fecha inicio seleccionada:', this.fechaInicio);
-    console.log('🕓 Fecha fin seleccionada:', this.fechaFin);
+    console.log('Método cargarResumen() invocado');
+    console.log('Fecha inicio seleccionada:', this.fechaInicio);
+    console.log('Fecha fin seleccionada:', this.fechaFin);
 
     if (!this.fechaInicio || !this.fechaFin) {
-      console.warn('⚠️ Debes seleccionar ambas fechas.');
+      console.warn('Debes seleccionar ambas fechas.');
       return;
     }
 
     console.log('📡 Solicitando datos al backend...');
     this.jornadaService.obtenerResumenHoras(this.fechaInicio, this.fechaFin).subscribe({
       next: (data: ResumenEmpleado[]) => {
-        console.log('✅ Datos recibidos del backend:', data);
+        console.log('Datos recibidos del backend:', data);
         this.datosOriginales = data;
 
-        // 🔽 Filtro de ubicación
         let filtrados = data;
         if (this.ubicacionSeleccionada && this.ubicacionSeleccionada !== 'Todos') {
           const ubSel = this.normalizarTexto(this.ubicacionSeleccionada);
@@ -106,7 +105,7 @@ export class TiemposAdminComponent implements OnInit {
           );
         }
 
-        console.log('🧮 Agrupando datos por empleado...');
+        console.log('Agrupando datos por empleado...');
         const agrupado = filtrados.reduce((acc: EmpleadoAgrupado[], r: ResumenEmpleado) => {
           let e = acc.find(x => x.nombreCompleto === r.nombreCompleto);
           if (!e) {
@@ -149,17 +148,17 @@ export class TiemposAdminComponent implements OnInit {
 
         this.empleadosFiltrados = filtrados;
 
-        console.log('🏁 Finalizó la carga de resumenEmpleados:', this.resumenEmpleados);
+        console.log('Finalizó la carga de resumenEmpleados:', this.resumenEmpleados);
       },
       error: err => {
-        console.error('❌ Error al cargar resumen de horas:', err);
+        console.error('Error al cargar resumen de horas:', err);
       }
     });
   }
 
   exportarExcel(): void {
     if (!this.fechaInicio || !this.fechaFin) {
-      console.warn('⚠️ Debes seleccionar ambas fechas antes de exportar.');
+      console.warn('Debes seleccionar ambas fechas antes de exportar.');
       return;
     }
 
