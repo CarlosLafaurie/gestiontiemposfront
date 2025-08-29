@@ -39,6 +39,20 @@
       </select>
     </div>
 
+    <div id="filtro" class="col-md-4">
+      <label for="empleado" class="form-label">Empleado</label>
+      <select
+        id="empleado"
+        [(ngModel)]="empleadoSeleccionado"
+        name="empleado"
+        class="form-control"
+        (change)="cargarResumen()">
+
+        <option value="Todos">-- Todos --</option>
+        <option *ngFor="let e of empleados" [value]="e">{{ e }}</option>
+      </select>
+    </div>
+
     <div class="col-md-2">
       <button
         type="button"

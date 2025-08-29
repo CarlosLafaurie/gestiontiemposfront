@@ -46,8 +46,11 @@ export class TiemposAdminComponent implements OnInit {
 
   ubicaciones: string[] = [];
   ubicacionSeleccionada: string = 'Todos';
-  empleadosFiltrados: ResumenEmpleado[] = [];
 
+  empleados: string[] = [];
+  empleadoSeleccionado: string = 'Todos';
+
+  empleadosFiltrados: ResumenEmpleado[] = [];
 
   private jornadaService = inject(RegistroJornadaService);
   private excelService = inject(ExcelService);
@@ -98,12 +101,23 @@ export class TiemposAdminComponent implements OnInit {
         this.datosOriginales = data;
 
         let filtrados = data;
-        if (this.ubicacionSeleccionada && this.ubicacionSeleccionada !== 'Todos') {
-          const ubSel = this.normalizarTexto(this.ubicacionSeleccionada);
-          filtrados = data.filter(emp =>
-            this.normalizarTexto(emp.ubicacion || '') === ubSel
-          );
-        }
+          // 🔽 Filtro por ubicación
+          if (this.ubicacionSeleccionada && this.ubicacionSeleccionada !== 'Todos') {
+            const ubSel = this.normalizarTexto(this.ubicacionSeleccionada);
+            filtrados = filtrados.filter(emp =>
+              this.normalizarTexto(emp.ubicacion || '') === ubSel
+            );
+          }
+
+          // 🔽 Actualizar lista de empleados según la ubicación seleccionada
+          this.empleados = ['Todos', ...Array.from(new Set(filtrados.map(e => e.nombreCompleto)))];
+
+          // 🔽 Filtro por empleado
+          if (this.empleadoSeleccionado && this.empleadoSeleccionado !== 'Todos') {
+            filtrados = filtrados.filter(emp =>
+              emp.nombreCompleto === this.empleadoSeleccionado
+            );
+          }
 
         console.log('Agrupando datos por empleado...');
         const agrupado = filtrados.reduce((acc: EmpleadoAgrupado[], r: ResumenEmpleado) => {
@@ -173,7 +187,4 @@ export class TiemposAdminComponent implements OnInit {
       this.empleadosFiltrados
     );
   }
-
-
-
 }
